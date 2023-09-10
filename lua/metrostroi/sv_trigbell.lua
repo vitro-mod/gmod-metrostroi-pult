@@ -46,13 +46,13 @@ local function loadTrigs(name, keep)
          end
 		 --PrintTable(triggers)
      end
-	VitroMod.trigSendAll()
+	--VitroMod.trigSendAll()
 end
 
 local function loadBells(name, keep)
     name = name or game.GetMap()
 
-    VitroMod.bellFlush()
+    VitroMod.Bells.flush()
 
     if keep then return end
     local bells = getFile("metrostroi_data/bells_%s",name,"Bell")
@@ -68,14 +68,14 @@ local function loadBells(name, keep)
          end
 		 --PrintTable(bells)
      end
-	VitroMod.bellSend()
-	hook.Run("VitroModBellsLoaded")
+	--VitroMod.bellSend()
+	--hook.Run("VitroModBellsLoaded")
 end
 
 hook.Add("Initialize", "Metrostroi_VitroModInitialize", function()
     timer.Simple(2.0, function() 
 		loadTrigs() 
-		loadBells() 
+		loadBells()
 	end)
 end)
 
@@ -83,6 +83,7 @@ timer.Simple(2, function()                  --Задержка после загрузки игры
 
 local m_save = Metrostroi.Save
 function Metrostroi.Save(name)
+
     m_save(name)
 
     if not file.Exists("metrostroi_data","DATA") then

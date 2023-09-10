@@ -148,13 +148,7 @@ function sck:onMessage(txt)
 			for k,v in pairs(string.Explode(";",ltmtMsg)) do
 				local bellName = string.sub(v, 1, -3)
 				local bellStatus = string.sub(v, -1)
-				for _, ent in pairs(ents.FindByName(bellName)) do
-					if bellStatus == "0" then
-						ent:Stop()
-					elseif bellStatus == "1" then
-						ent:Ring()
-					end
-				end
+				hook.Run('VitroMod.Bells.Status',bellName, bellStatus == '1' and true or false)
 			end
 		elseif string.sub(txt, 1, 2) == "LM" then
 			local ltmtMsg = string.sub(txt, 3)

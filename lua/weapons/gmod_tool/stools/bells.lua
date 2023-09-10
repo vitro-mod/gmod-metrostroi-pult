@@ -28,7 +28,8 @@ function TOOL:LeftClick(trace)
 	if not self.settings then return false end
 	if not self.settings.name then return false end
 	local userOffset = Vector(self.settings.XOffset, self.settings.YOffset, self.settings.ZOffset)
-	VitroMod.bellAtLook(trace, ply, self.settings.name, userOffset)
+	local userAngle = Angle(self.settings.pitch, self.settings.yaw, self.settings.roll)
+	VitroMod.Bells.atLook(trace, ply, self.settings.name, userOffset, userAngle)
 	return true
 end
 
@@ -36,7 +37,7 @@ function TOOL:RightClick(trace)
 	local ply = self:GetOwner()
 	if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
 	if CLIENT then return true end
-	VitroMod.bellRemove(trace)
+	VitroMod.Bells.remove(trace)
 	return true
 end
 
@@ -47,9 +48,9 @@ function TOOL:Deploy()
 	local ply = self:GetOwner()
 	if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
 	if SERVER then
-		VitroMod.bellSend()
-		VitroMod.BellCap = true
-		VitroMod.bellSendCap(ply)
+		VitroMod.Bells.send(ply)
+		VitroMod.Bells.Caption = true
+		VitroMod.Bells.sendCap(ply)
 	end
 end
 
@@ -57,8 +58,8 @@ function TOOL:Holster()
 	local ply = self:GetOwner()
 	if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
 	if SERVER then
-		VitroMod.BellCap = false
-		VitroMod.bellSendCap(ply)
+		VitroMod.Bells.Caption = false
+		VitroMod.Bells.sendCap(ply)
 	end
 end
 
@@ -72,13 +73,11 @@ function TOOL:Think()
 	end
 end
 
-function TOOL:Initialize()
-	self:SendSettings = function()
-		if not self.settings.name then return end
-		net.Start "vitromod_belltool_send"
-		net.WriteTable(self.settings)
-		net.SendToServer()
-	end
+local function SendSettings(self)
+	if not self.settings.name then return end
+	net.Start "vitromod_belltool_send"
+	net.WriteTable(self.settings)
+	net.SendToServer()
 end
 
 net.Receive("vitromod_belltool_send", function(_, ply)
@@ -97,33 +96,50 @@ function TOOL:BuildCPanel()
     CPanel:SetPadding(0)
     CPanel:SetSpacing(0)
     CPanel:Dock( FILL )
-
-	tool.settings = tool.settings or {}
-	tool.settings.name = tool.settings.name or 'test'		
-
+	
     local VRightNum = CPanel:TextEntry("Name:")
+	tool.settings = tool.settings or {}
+	tool.settings.name = tool.settings.name or 'test'	
     VRightNum:SetValue(tool.settings.name)
 	function VRightNum:OnChange()
 		tool.settings.name = self:GetValue()
-		tool:SendSettings()
+		SendSettings(tool)
 	end
 	local VXOffT = CPanel:NumSlider("X Offset:",nil,-100,100,0)
 	VXOffT:SetValue(tool.settings.YOffset or 0)
 	VXOffT.OnValueChanged = function(num)
 		tool.settings.XOffset = VXOffT:GetValue()
-		tool:SendSettings()
+		SendSettings(tool)
 	end
 	local VYOffT = CPanel:NumSlider("Y Offset:",nil,-100,100,0)
 	VYOffT:SetValue(tool.settings.YOffset or 0)
 	VYOffT.OnValueChanged = function(num)
 		tool.settings.YOffset = VYOffT:GetValue()
-		tool:SendSettings()
+		SendSettings(tool)
 	end
 	local VZOffT = CPanel:NumSlider("Z Offset:",nil,-100,100,0)
 	VZOffT:SetValue(tool.settings.ZOffset or 0)
 	VZOffT.OnValueChanged = function(num)
 		tool.settings.ZOffset = VZOffT:GetValue()
-		tool:SendSettings()
+		SendSettings(tool)
+	end	
+	local pitch = CPanel:NumSlider("Pitch",nil,0,360,0)
+	pitch:SetValue(tool.settings.pitch or 0)
+	pitch.OnValueChanged = function(num)
+		tool.settings.pitch = pitch:GetValue()
+		SendSettings(tool)
+	end	
+	local yaw = CPanel:NumSlider("Yaw",nil,0,360,0)
+	yaw:SetValue(tool.settings.yaw or 0)
+	yaw.OnValueChanged = function(num)
+		tool.settings.yaw = yaw:GetValue()
+		SendSettings(tool)
+	end
+	local roll = CPanel:NumSlider("Roll",nil,0,360,0)
+	roll:SetValue(tool.settings.roll or 0)
+	roll.OnValueChanged = function(num)
+		tool.settings.roll = roll:GetValue()
+		SendSettings(tool)
 	end
 end
 
