@@ -7,7 +7,7 @@ VitroMod.Pult.SwitchesInvertAll = false
 require("gwsockets")
 pings = 0
 timer.Remove("ping")
-include('config.lua')
+include('vitro_mod/config.lua')
 include('Maps.lua')
 local mapName = game.GetMap()
 local handshake = VitroMod.Pult.Name..'! '..VitroMod.Pult.Key
