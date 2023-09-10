@@ -1,5 +1,8 @@
 VitroMod = VitroMod or {}
 VitroMod.Pult = VitroMod.Pult or {}
+VitroMod.Pult.WhiteList = VitroMod.Pult.WhiteList or {}
+VitroMod.Pult.WhiteList.Rc = VitroMod.Pult.WhiteList.Rc or {}
+VitroMod.Pult.WhiteList.Control = VitroMod.Pult.WhiteList.Control or {}
 VitroMod.Pult.SwitchesInvertAll = false
 require("gwsockets")
 pings = 0
@@ -327,6 +330,10 @@ include('Switches.lua')
 
 hook.Add( "PostCleanupMap", "PostCleanup_InitSwitches", initSwitches )
 initSwitches()
+
+hook.Add( "VitroModWhiteList", "VitroModWhiteListSend", function ()
+	WriteToSocketSimple("WL"..util.TableToJSON(VitroMod.Pult.WhiteList))
+end)
 
 function SendSWInfo(ACTIVATOR,CALLER) --писать
 	local ctrl = CALLER:GetSaveTable().m_eDoorState
