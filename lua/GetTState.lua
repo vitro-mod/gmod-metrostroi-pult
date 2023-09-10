@@ -1,8 +1,5 @@
 function GetTrainState(train, signal)
-    -- if not IsValid(train) then 
-        -- print('no train')
-        -- return 
-    -- end
+    if not IsValid(train) then return end
     local RN = -1
     local CS = 0 --control state
     local ARS = 0
@@ -75,7 +72,7 @@ function GetTrainState(train, signal)
             RN = tonumber(train.MFDU.RouteN)
         elseif train.RouteNumber then
             RN = tonumber(train:GetNW2String("RouteNumber",0))
-            if train.RouteNumber.Max == 2 and class ~= 'gmod_subway_81-717_6' and class ~= 'gmod_subway_em508' and class ~= 'gmod_subway_em508t' then RN = RN/10 end
+            if train.RouteNumber.Max == 2 and class ~= 'gmod_subway_81-717_5a' and class ~= 'gmod_subway_81-717_freight' and class ~= 'gmod_subway_81-717_6' and class ~= 'gmod_subway_em508' and class ~= 'gmod_subway_em508t' then RN = RN/10 end
         elseif train.RouteNumberSys then
             RN = tonumber(train.RouteNumberSys.RouteNumber)
         end
@@ -85,5 +82,3 @@ function GetTrainState(train, signal)
 
     return {rn = RN, nick = nick, ctrl = CS, ars = ARS, type = Type, newWag = newWag and true or nil, newTrain = train, wcount = #train.WagonList} 
 end
-
---lua_run PrintTable(GetTrainState(Metrostroi.GetSignalByName("350A").OccupiedBy))
