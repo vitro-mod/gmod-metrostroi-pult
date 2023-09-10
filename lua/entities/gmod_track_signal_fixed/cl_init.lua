@@ -605,7 +605,7 @@ function ENT:Think()
             ID = ID + 1
         end
 
-        local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb_p.mdl"
+        local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb_l.mdl"
         local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.model.."_lamp.mdl"
         for k,v in pairs(self.RouteNumbers) do
             if k == "sep" then continue end
