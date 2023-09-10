@@ -19,7 +19,7 @@ function sck:onConnected()
 	VitroMod.Pult.Maps[mapName].OnConnect()
 	--RunConsoleCommand("say","WebSocket connected to server")
 	self:write(handshake)
-	if VitroMod.Pult.Name == 'MASTER' then
+	if string.Explode(":", VitroMod.Pult.Name)[1] == 'MASTER' then
 		VitroMod.Pult.UpdateIntervals()
 		self:write("RCs_"..util.TableToJSON(rcTriggers))
 		self:write("SWS_"..util.TableToJSON(VitroMod.Pult.SwitchesControl))
