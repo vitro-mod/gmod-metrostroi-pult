@@ -1,25 +1,6 @@
 function initSwitches()
 	VitroMod.Pult.Switches = {}
 	VitroMod.Pult.SwitchesControl = VitroMod.Pult.SwitchesControl or {}
-	--VitroMod.Pult.SwitchesInvert = {}
-	-- if game.GetMap() == "gm_metro_minsk_1984" then
-		-- VitroMod.Pult.SwitchesInvert['dm1'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm2'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm13'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm18'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm23'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm27'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm51'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm56'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm32'] = 1
-		-- VitroMod.Pult.SwitchesInvert['dm34'] = 1
-	-- end
-	-- if game.GetMap() == "gm_metro_kalinin_v2" then
-		-- VitroMod.Pult.SwitchesInvert['nv3'] = true
-		-- VitroMod.Pult.SwitchesInvert['nv4'] = true
-		-- VitroMod.Pult.SwitchesInvert['nk3'] = true
-		-- VitroMod.Pult.SwitchesInvert['nk4'] = true
-	-- end	
 	for k,v in pairs(ents.FindByClass('prop_door_rotating')) do 
 		if string.Explode('_',v:GetName())[1] == 'trackswitch' then
 			local ctrl = v:GetSaveTable().m_eDoorState
