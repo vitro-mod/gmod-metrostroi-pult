@@ -11,7 +11,7 @@ local handshake = VitroMod.Pult.Name..'! '..VitroMod.Pult.Key
 if VitroMod.Pult.Urls[mapName] then sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) end
 sck:closeNow()
 function sck:onConnected()
-	print("Connected to SCBServ!")
+	print("VitroPult: connected to SCB server")
 	--PultDefaultCleanup()
 	VitroMod.Pult.Maps[mapName].OnConnect()
 	--RunConsoleCommand("say","WebSocket connected to server")
@@ -182,8 +182,8 @@ end
 	--print("error: "..errMsg)
 --end
 
-function wsConnect()
-	if sck:isConnected() then
+function wsConnect(reconnect)
+	if sck:isConnected() and not reconnect then
 		if pings > 0 then 
 			print("notPong(")
 			sck:closeNow()
@@ -354,3 +354,10 @@ end)
 VitroMod.Pult.Maps[mapName].OnConnect()
 hook.Add( "PostCleanupMap", "PostCleanup_Pult", VitroMod.Pult.Maps[mapName].OnConnect )
 hook.Add( "PostCleanupMap", "PostCleanup_Signals", Metrostroi.Load )
+
+concommand.Add("vitropult_reconnect", function(ply)
+	if ply:IsValid() and not ply:IsAdmin() then return end
+	print('VitroPult: reconnecting')
+	wsConnect(true)
+	pultUpd()
+end)
