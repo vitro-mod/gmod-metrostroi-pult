@@ -11,6 +11,7 @@ include('vitro_mod/config.lua')
 include('Maps.lua')
 local mapName = game.GetMap()
 local handshake = VitroMod.Pult.Name..'! '..VitroMod.Pult.Key
+VitroMod.Pult.IsMaster = string.Explode(":", VitroMod.Pult.Name)[1] == 'MASTER'
 if VitroMod.Pult.Urls[mapName] then sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) end
 sck:closeNow()
 function sck:onConnected()
@@ -19,7 +20,7 @@ function sck:onConnected()
 	VitroMod.Pult.Maps[mapName].OnConnect()
 	--RunConsoleCommand("say","WebSocket connected to server")
 	self:write(handshake)
-	if string.Explode(":", VitroMod.Pult.Name)[1] == 'MASTER' then
+	if VitroMod.Pult.IsMaster then
 		VitroMod.Pult.UpdateIntervals()
 		self:write("RCs_"..util.TableToJSON(rcTriggers))
 		self:write("SWS_"..util.TableToJSON(VitroMod.Pult.SwitchesControl))
@@ -263,7 +264,7 @@ function SendBU(name, occ, signal)
 	rcNamesOcc[name] = occ and true or nil
 	local sendRN = rcASNP[name] and IsValid(signal.OccupiedBy) and occ
 	rcASNP[name] = rcASNP[name] and true or nil
-	if VitroMod.Pult.Name == 'MASTER' then WriteToSocket("BU"..name..(occ and "_1" or "_0")) end
+	if VitroMod.Pult.IsMaster then WriteToSocket("BU"..name..(occ and "_1" or "_0")) end
 	if sendRN and signal.OccupiedBy:GetClass() ~= "me_train" and signal.OccupiedBy:GetClass() ~= "me_train_static" then
 		rcASNP[name] = occ and signal.OccupiedBy or true
 		local tst = GetTrainState(signal.OccupiedBy, signal)
@@ -336,7 +337,7 @@ function SendSWInfo(ACTIVATOR,CALLER) --писать
 	if VitroMod.Pult.SwitchesInvertAll then ctrl = invCtrl(ctrl) end
 	VitroMod.Pult.SwitchesControl[name] = ctrl
 	local swmsg = 'SW'..name..'_'..ctrl
-	if VitroMod.Pult.Name == 'MASTER' then WriteToSocket(swmsg) end
+	if VitroMod.Pult.IsMaster then WriteToSocket(swmsg) end
 end
 
 hook.Add( "PlayerSpawn", "KalinaDeletePult", function(ply)
