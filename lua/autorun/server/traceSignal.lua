@@ -8,7 +8,7 @@ function traceSignal(name)
 
 	--print(sig.Name, dist, nxt)
 	out = out .. string.format("%-8s\t%f\t\t%s\n", sig.Name, dist, nxt)
-	outTable[sig.Name] = {'next' = nxt, 'dist' = dist}
+	outTable[sig.Name] = {next = nxt, dist = dist}
 
 
 	while sig.Name != nxt do
@@ -17,7 +17,7 @@ function traceSignal(name)
 		dist = sig:GetNW2Float("DistanceToNext")
 		nxt = sig:GetNW2String("NextSignalName")
 		out = out .. string.format("%-8s\t%f\t\t%s\n", sig.Name, dist, nxt)
-		outTable[sig.Name] = {'next' = nxt, 'dist' = dist}
+		outTable[sig.Name] = {next = nxt, dist = dist}
 		--print(sig.Name, dist, nxt)
 	end
 
