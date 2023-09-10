@@ -1,5 +1,5 @@
-"unlitgeneric"
+UnlitGeneric
 {
-	"$basetexture" "models/metrostroi/signals/mus/old_indic_num_6"
-	"$additive" 1
+	$basetexture "models/metrostroi/signals/mus/old_indic_num_6"
+	$additive 1
 }

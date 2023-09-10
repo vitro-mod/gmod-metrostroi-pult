@@ -1,0 +1,5 @@
+UnlitGeneric
+{
+	$basetexture "models/metrostroi/signals/mus/old_indic_num_12"
+	$additive 1
+}
