@@ -251,17 +251,13 @@ end
 
 VitroMod.Pult.Maps[mapName].Init()
 
-function SendRCInfo(ACTIVATOR,CALLER,INFO)
+hook.Add("VitroMod_Trigger_Update", "VitroMod_socket", function(ACTIVATOR,CALLER,INFO)
 	local vname = CALLER:GetName()
 	--print(vname..'_'..INFO)
 	if(rcTriggersExclude[vname] == nil) then
 		WriteToSocket(vname..'_'..INFO)
 	end
 	rcTriggers[vname] = (INFO == 1 and ''..INFO or nil)
-end
-
-hook.Add("VitroMod_Trigger_Update", "VitroMod_socket", function(ACTIVATOR,CALLER,INFO)
-	SendRCInfo(ACTIVATOR,CALLER,INFO)
 end)
 
 --hook.Add("Metrostroi.Signaling.ChangeRCState","VitroModRcHook", function(name, occ) RunConsoleCommand("say",name..' '..(occ and '1' or '0')) end)
