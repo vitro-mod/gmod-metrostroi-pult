@@ -360,6 +360,7 @@ hook.Add( "PostCleanupMap", "PostCleanup_Signals", Metrostroi.Load )
 concommand.Add("vitropult_reconnect", function(ply)
 	if ply:IsValid() and not ply:IsAdmin() then return end
 	print('VitroPult: reconnecting')
+	RunConsoleCommand('say', 'VitroPult: reconnecting')
 	wsConnect(true)
 	pultUpd()
 end)
