@@ -13,7 +13,9 @@ local mapName = game.GetMap()
 local handshake = VitroMod.Pult.Name..'! '..VitroMod.Pult.Key
 VitroMod.Pult.IsMaster = string.Explode(":", VitroMod.Pult.Name)[1] == 'MASTER'
 if sck then sck:closeNow() end
-if VitroMod.Pult.Urls[mapName] then sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) end
+if VitroMod.Pult.Urls[mapName] and not sck then 
+	sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) 
+end
 -- sck:closeNow()
 function sck:onConnected()
 	print("VitroPult: connected to SCB server")
