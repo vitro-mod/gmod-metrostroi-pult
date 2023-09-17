@@ -8,16 +8,18 @@ for k,v in pairs(ents.FindByClass('gmod_track_clock_small')) do
 end
 
 VitroMod.Pult.ResetClock = function(name)
-	if not IsValid(VitroMod.Pult.IntervalClocks[name]) then return false end
-	VitroMod.Pult.IntervalClocks[name].NoAutoSearch = true
-	VitroMod.Pult.IntervalClocks[name].IntervalReset = false
-	VitroMod.Pult.IntervalClocks[name]:Fire("Reset")
-	--VitroMod.Pult.Intervals[name] = VitroMod.Pult.GetInterval(name)
-	if not IsValid(VitroMod.Pult.IntervalSmall[name]) then return false end
-	VitroMod.Pult.IntervalSmall[name].NoAutoSearch = true
-	VitroMod.Pult.IntervalSmall[name].IntervalReset = false
-	VitroMod.Pult.IntervalSmall[name]:Fire("Reset")	
-	VitroMod.Pult.Intervals[name] = 0
+	if IsValid(VitroMod.Pult.IntervalClocks[name]) then
+		VitroMod.Pult.IntervalClocks[name].NoAutoSearch = true
+		VitroMod.Pult.IntervalClocks[name].IntervalReset = false
+		VitroMod.Pult.IntervalClocks[name]:Fire("Reset")	
+	end
+
+	if IsValid(VitroMod.Pult.IntervalSmall[name]) then
+		VitroMod.Pult.IntervalSmall[name].NoAutoSearch = true
+		VitroMod.Pult.IntervalSmall[name].IntervalReset = false
+		VitroMod.Pult.IntervalSmall[name]:Fire("Reset")	
+		VitroMod.Pult.Intervals[name] = 0	
+	end
 end
 
 VitroMod.Pult.GetInterval = function(name)
