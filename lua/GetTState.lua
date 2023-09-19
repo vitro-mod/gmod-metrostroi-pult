@@ -1,6 +1,6 @@
 function GetTrainState(train, signal)
     if not IsValid(train) then return end
-    local RN = -1
+    local RN = nil 
     local CS = 0 --control state
     local ARS = 0
 	local class = train:GetClass()
@@ -59,11 +59,10 @@ function GetTrainState(train, signal)
         if CS ~= 0 and train:ReadTrainWire(87) > 0 then ARS = 2 end
     end
 	
-    if RN == -1 then
+    if not RN then
         if train.ASNP and not train.ASNP.Disable and (train:GetNW2Int("ASNP:RouteNumber",0) ~= 0) then
             RN = train:GetNW2Int("ASNP:RouteNumber",0)
         elseif train.PAM and train.PAM_VV and train.PAM_VV.Power and tonumber(train:GetNW2String("PAM:RouteNumber",0)) ~= 0 then
-            print()
             RN = tonumber(train:GetNW2String("PAM:RouteNumber",0))
         --elseif train.MFDU and not train.MFDU.RouteNumber == 0 and not train.MFDU.RouteNumber < 0 then
         elseif train.MFDU and train.MFDU.RouteNumber and train.MFDU.RouteNumber > 0 then
@@ -77,8 +76,8 @@ function GetTrainState(train, signal)
             RN = tonumber(train.RouteNumberSys.RouteNumber)
         end
     end
+    if not RN then RN = 0 end
+    
     local Type = class:Replace('gmod_subway_', '')
-    if RN < 0 then RN = 0 end
-
     return {rn = RN, nick = nick, ctrl = CS, ars = ARS, type = Type, newWag = newWag and true or nil, newTrain = train, wcount = #train.WagonList} 
 end
