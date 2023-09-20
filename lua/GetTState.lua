@@ -62,8 +62,8 @@ function GetTrainState(train, signal)
     if not RN then
         if train.ASNP and not train.ASNP.Disable and (train:GetNW2Int("ASNP:RouteNumber",0) ~= 0) then
             RN = train:GetNW2Int("ASNP:RouteNumber",0)
-        elseif train.PAM and train.PAM_VV and train.PAM_VV.Power and tonumber(train:GetNW2String("PAM:RouteNumber",0)) ~= 0 then
-            RN = tonumber(train:GetNW2String("PAM:RouteNumber",0))
+        elseif train.PAM and train.PAM_VV and train.PAM_VV.Power and train:GetNW2String("PAM:RouteNumber","") ~= "" then
+            RN = tonumber(train:GetNW2String("PAM:RouteNumber","0"))
         --elseif train.MFDU and not train.MFDU.RouteNumber == 0 and not train.MFDU.RouteNumber < 0 then
         elseif train.MFDU and train.MFDU.RouteNumber and train.MFDU.RouteNumber > 0 then
             RN = train.MFDU.RouteNumber
