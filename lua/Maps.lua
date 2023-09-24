@@ -88,6 +88,7 @@ VitroMod.Pult.Maps['gm_metro_kalinin_v2'] = {
 		local stations = {'nv','nk','se','mr','tr','tretyak'}
 		local wildcard = {'dep_'}
 		for _,v in pairs(ents.GetAll()) do
+			if v:GetClass() == 'trigger_multiple' then SafeRemoveEntity(v) end
 			for _,s in pairs(stations) do
 				for _,c in pairs(cleanup) do
 					if  v:GetName():StartWith(s..'_'..c) or v:GetName():StartWith(c..'_'..s) then 
