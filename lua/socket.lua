@@ -7,8 +7,8 @@ VitroMod.Pult.SwitchesInvertAll = false
 require("gwsockets")
 pings = 0
 timer.Remove("ping")
-include('vitro_mod/config.lua')
-include('Maps.lua')
+include('vitro_mod/pult/config.lua')
+include('vitro_mod/pult/Maps.lua')
 local mapName = game.GetMap()
 local handshake = VitroMod.Pult.Name..'! '..VitroMod.Pult.Key
 VitroMod.Pult.IsMaster = string.Explode(":", VitroMod.Pult.Name)[1] == 'MASTER'
@@ -20,7 +20,7 @@ end
 function sck:onConnected()
 	print("VitroPult: connected to SCB server")
 	--PultDefaultCleanup()
-	VitroMod.Pult.Maps[mapName].OnConnect()
+	VitroMod.Pult.Map.OnConnect()
 	--RunConsoleCommand("say","WebSocket connected to server")
 	self:write(handshake)
 	if VitroMod.Pult.IsMaster then
@@ -58,7 +58,7 @@ function sck:onMessage(txt)
 						to = pos ~= '+'
 					end
 					sw(name, to)
-					VitroMod.Pult.Maps[mapName].OnSwitch(name, to)
+					VitroMod.Pult.Map.OnSwitch(name, to)
 				end
 			end
 		elseif string.sub(txt, 1, 2 ) == "LT" then
@@ -250,7 +250,7 @@ for k, v in pairs(ents.FindByClass("gmod_track_signal")) do
     --end	
 end
 
-VitroMod.Pult.Maps[mapName].Init()
+VitroMod.Pult.Map.Init()
 
 function SendRCInfo(ACTIVATOR,CALLER,INFO)
 	local vname = CALLER:GetName()
@@ -356,8 +356,8 @@ hook.Add('swSend','swSendInfo',function()
 	SendSWInfo(ACTIVATOR,CALLER)
 end)
 
-VitroMod.Pult.Maps[mapName].OnConnect()
-hook.Add( "PostCleanupMap", "PostCleanup_Pult", VitroMod.Pult.Maps[mapName].OnConnect )
+VitroMod.Pult.Map.OnConnect()
+hook.Add( "PostCleanupMap", "PostCleanup_Pult", VitroMod.Pult.Map.OnConnect )
 hook.Add( "PostCleanupMap", "PostCleanup_Signals", Metrostroi.Load )
 
 concommand.Add("vitropult_reconnect", function(ply)
