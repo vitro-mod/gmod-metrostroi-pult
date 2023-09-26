@@ -1,9 +1,9 @@
 VitroMod.Pult.Map = {
     Init = function()
-    end
+    end,
     
 	OnSwitch = function(name, to)
-    end
+    end,
 
     OnConnect = function()
     end
