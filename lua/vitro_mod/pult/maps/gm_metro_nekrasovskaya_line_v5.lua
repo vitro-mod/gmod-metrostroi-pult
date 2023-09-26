@@ -1,4 +1,4 @@
-local map = {
+VitroMod.Pult.Map = {
     Init = function()
 		local renameTable = {
 			{pult = '1', gm = '1'},

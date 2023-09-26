@@ -1,4 +1,4 @@
-local map = {
+VitroMod.Pult.Map = {
     Init = function()
 		VitroMod.Pult.SwitchesInvert = {}
 		VitroMod.Pult.SwitchesInvert['dm1'] = true
