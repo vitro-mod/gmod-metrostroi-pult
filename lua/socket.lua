@@ -348,9 +348,6 @@ function SendSWInfo(ACTIVATOR,CALLER) --писать
 	if VitroMod.Pult.IsMaster then WriteToSocket(swmsg) end
 end
 
-hook.Add( "PlayerSpawn", "KalinaDeletePult", function(ply)
-	ply:SendLua('hook.Remove( "PlayerButtonDown", "menu")')
-end)
 hook.Add("PlayerSay","vitromod-say", function(ply, comm) if comm:sub(1,2) == '!p' then WriteToSocket('SY'..comm) end end)
 hook.Add('swSend','swSendInfo',function()
 	--RunConsoleCommand('say',CALLER:GetName()..'ss') 

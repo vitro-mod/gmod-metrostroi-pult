@@ -33,7 +33,11 @@ VitroMod.Pult.Map = {
 		
 		rcASNP['ASNPWE3'] = true
 		
-		rcASNP['ASNPTR3'] = true	
+		rcASNP['ASNPTR3'] = true
+
+        hook.Add( "PlayerSpawn", "KalinaDeletePult", function(ply)
+            ply:SendLua('hook.Remove( "PlayerButtonDown", "menu")')
+        end)
 	end,
 	OnSwitch = function(name, to)
 		if name == 'depo1' then sw('depo3',to) end
