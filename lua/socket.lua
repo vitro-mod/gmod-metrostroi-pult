@@ -267,7 +267,7 @@ hook.Add("VitroMod_Trigger_Update", "VitroMod_socket", function(ACTIVATOR,CALLER
 end)
 
 --hook.Add("Metrostroi.Signaling.ChangeRCState","VitroModRcHook", function(name, occ) RunConsoleCommand("say",name..' '..(occ and '1' or '0')) end)
-hook.Add("Metrostroi.Signaling.ChangeRCState","VitroModRcHook", SendBU)
+hook.Add("Metrostroi.Signaling.ChangeRCState","VitroModRcHook", function(name, occ,signal) SendBU(name,occ,signal) end)
 function SendBU(name, occ, signal)
 	rcNamesOcc[name] = occ and true or nil
 	local sendRN = rcASNP[name] and IsValid(signal.OccupiedBy) and occ
