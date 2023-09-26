@@ -16,6 +16,7 @@ if sck then sck:closeNow() end
 if VitroMod.Pult.Urls[mapName] and not sck then 
 	sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) 
 end
+if not sck then return end
 -- sck:closeNow()
 function sck:onConnected()
 	print("VitroPult: connected to SCB server")
