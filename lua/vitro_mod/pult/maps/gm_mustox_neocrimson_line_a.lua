@@ -1,5 +1,6 @@
 VitroMod.Pult.Map = {
     Init = function()
+		VitroMod.Pult.SwitchesInvert = {}
     end,
     
 	OnSwitch = function(name, to)
