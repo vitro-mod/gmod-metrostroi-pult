@@ -7,8 +7,8 @@ VitroMod.Pult.SwitchesInvertAll = false
 require("gwsockets")
 pings = 0
 timer.Remove("ping")
-include('vitro_mod/config.lua')
-include('Maps.lua')
+include('vitro_mod/pult/config.lua')
+include('vitro_mod/pult/Maps.lua')
 local mapName = game.GetMap()
 local handshake = VitroMod.Pult.Name..'! '..VitroMod.Pult.Key
 VitroMod.Pult.IsMaster = string.Explode(":", VitroMod.Pult.Name)[1] == 'MASTER'
@@ -16,11 +16,12 @@ if sck then sck:closeNow() end
 if VitroMod.Pult.Urls[mapName] and not sck then 
 	sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) 
 end
+if not sck then return end
 -- sck:closeNow()
 function sck:onConnected()
 	print("VitroPult: connected to SCB server")
 	--PultDefaultCleanup()
-	VitroMod.Pult.Maps[mapName].OnConnect()
+	VitroMod.Pult.Map.OnConnect()
 	--RunConsoleCommand("say","WebSocket connected to server")
 	self:write(handshake)
 	if VitroMod.Pult.IsMaster then
@@ -58,7 +59,7 @@ function sck:onMessage(txt)
 						to = pos ~= '+'
 					end
 					sw(name, to)
-					VitroMod.Pult.Maps[mapName].OnSwitch(name, to)
+					VitroMod.Pult.Map.OnSwitch(name, to)
 				end
 			end
 		elseif string.sub(txt, 1, 2 ) == "LT" then
@@ -250,7 +251,7 @@ for k, v in pairs(ents.FindByClass("gmod_track_signal")) do
     --end	
 end
 
-VitroMod.Pult.Maps[mapName].Init()
+VitroMod.Pult.Map.Init()
 
 function SendRCInfo(ACTIVATOR,CALLER,INFO)
 	local vname = CALLER:GetName()
@@ -347,17 +348,14 @@ function SendSWInfo(ACTIVATOR,CALLER) --писать
 	if VitroMod.Pult.IsMaster then WriteToSocket(swmsg) end
 end
 
-hook.Add( "PlayerSpawn", "KalinaDeletePult", function(ply)
-	ply:SendLua('hook.Remove( "PlayerButtonDown", "menu")')
-end)
 hook.Add("PlayerSay","vitromod-say", function(ply, comm) if comm:sub(1,2) == '!p' then WriteToSocket('SY'..comm) end end)
 hook.Add('swSend','swSendInfo',function()
 	--RunConsoleCommand('say',CALLER:GetName()..'ss') 
 	SendSWInfo(ACTIVATOR,CALLER)
 end)
 
-VitroMod.Pult.Maps[mapName].OnConnect()
-hook.Add( "PostCleanupMap", "PostCleanup_Pult", VitroMod.Pult.Maps[mapName].OnConnect )
+VitroMod.Pult.Map.OnConnect()
+hook.Add( "PostCleanupMap", "PostCleanup_Pult", VitroMod.Pult.Map.OnConnect )
 hook.Add( "PostCleanupMap", "PostCleanup_Signals", Metrostroi.Load )
 
 concommand.Add("vitropult_reconnect", function(ply)
