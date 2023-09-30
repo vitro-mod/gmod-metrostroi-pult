@@ -88,11 +88,13 @@ function sck:onMessage(txt)
 			local signal = Metrostroi.GetSignalByName(string.Explode('-', v)[1])
 			if signal then
 				signal.ControllerLogic = true
-				signal.Sig = tostring(string.Explode('-', v)[2])
-				signal:SetNW2String('Signal', signal.Sig)
-				signal.Red = tobool(string.Explode('-', v)[3])
-				signal.AutoEnabled = not tobool(string.Explode('-', v)[4])
-				signal:SetNW2Bool('Autostop', signal.AutoEnabled)
+				signal.Sig = tostring(string.Explode("-", v)[2])
+				signal:SetNW2String("Signal", signal.Sig)
+				signal.Red = tobool(string.Explode("-", v)[3])
+				signal.AutoEnabled = not tobool(string.Explode("-", v)[4])
+				signal:SetNW2Bool("Autostop", signal.AutoEnabled)
+				signal.ForceFade = tobool(string.Explode("-", v)[5])
+				signal:SetNW2Bool("ForceFade", signal.ForceFade)
 				signal.ControllerLogicCheckOccupied = true
 			end
 		end
