@@ -546,6 +546,7 @@ function ENT:Think()
 
         self.Sig = self:GetNW2String("Signal","")
         self.Num = self:GetNW2String("Number",nil)
+        self.ForceFade = self:GetNW2Bool("ForceFade",false)
         if self.OldNum ~= self.Num and self.OldNum == '' then
             self.NextNumWork = CurTime + 1
         end

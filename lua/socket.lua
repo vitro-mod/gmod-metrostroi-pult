@@ -74,6 +74,8 @@ function sck:onMessage(txt)
 					signal.Red = tobool(string.Explode("-",v)[3])
 					signal.AutoEnabled = not tobool(string.Explode("-",v)[4])
 					signal:SetNW2Bool("Autostop",signal.AutoEnabled)
+					signal.ForceFade = tobool(string.Explode("-",v)[5])
+					signal:SetNW2Bool("ForceFade",signal.ForceFade)
 					signal.ControllerLogicCheckOccupied = true
 				end
 			end
