@@ -142,7 +142,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
         self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
         self.Models[3][IDID2]:SetModelScale(TLM.lense_scale or 1)
     end
-	
+
 	self.Sprites[IDID2] = {
         pos = self:LocalToWorld(pos+Metrostroi.SigSpriteOffset+(TLM.sprite_offset or vector_origin)), 
         bri = State, col = Metrostroi.Lenses[self.SpriteConverter[skin+1]], 
@@ -546,7 +546,9 @@ function ENT:Think()
 
         self.Sig = self:GetNW2String("Signal","")
         self.Num = self:GetNW2String("Number",nil)
+
         self.ForceFade = self:GetNW2Bool("ForceFade",false)
+
         if self.OldNum ~= self.Num and self.OldNum == '' then
             self.NextNumWork = CurTime + 1
         end
@@ -605,15 +607,17 @@ function ENT:Think()
 						if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]] and IsValid(self.Models[1][ID..ID2.."d"]) then self.Models[1][ID..ID2.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]]) end
 						self.rnIdx = self.rnIdx + 1
 					end
+
                     local n = tonumber(self.Sig[ID2])
-                    if n and self.Signals[ID2].RealState ~= (n > 0) then
-                        self.Signals[ID2].RealState = n > 0
+                    if n and (self.Signals[ID2].OldState ~= n or self.ForceFade) then
+                        self.Signals[ID2].OldState = n
 						--0.5 время между началом погасания выключаемого и началом включения включаемого
                         self.Signals[ID2].Stop = CurTime + 0.1
                     end
-                    if self.Signals[ID2].Stop and CurTime-self.Signals[ID2].Stop > 0 then
+                    if self.Signals[ID2].Stop and (CurTime - self.Signals[ID2].Stop) > 0 then
                         self.Signals[ID2].Stop = nil
                     end
+
 					--Animate(clientProp, value, min, max, speed, damping, stickyness)
 					if v[i] == "M" then 
 						i = i - 1
@@ -623,6 +627,7 @@ function ENT:Think()
 					local State = ((n == 1 or (n == 2 and blink)) and not self.Signals[ID2].Stop) and 1 or 0
                     if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
                     local offsetAndLongOffset = offset + self.LongOffset
+
 					if not self.DoubleL then
 						self:SetLight(ID,ID2,self.BasePosition*(self.Left and vector_mirror or 1) + offsetAndLongOffset + lenOff*(self.Left and vector_mirror or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State, self.Signals[ID2].Stop)
 					else
@@ -650,6 +655,9 @@ function ENT:Think()
                 self.rnIdx = self.rnIdx + 1
 			end
             ID = ID + 1
+
+            if self.ForceFade then self:SetNW2Bool("ForceFade",false) end
+
         end
 
         local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb_l.mdl"
