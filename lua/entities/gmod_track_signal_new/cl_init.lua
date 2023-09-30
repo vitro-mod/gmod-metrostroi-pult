@@ -157,7 +157,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
         self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
         self.Models[3][IDID2]:SetModelScale(TLM.lense_scale or 1)
     end
-	
+
 	self.Sprites[IDID2] = {
         pos = self:LocalToWorld(pos+Metrostroi.SigSpriteOffset+(TLM.sprite_offset or vector_origin)), 
         bri = State, col = Metrostroi.Lenses[self.SpriteConverter[skin+1]], 
