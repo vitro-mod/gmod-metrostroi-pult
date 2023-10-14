@@ -16,7 +16,10 @@ local TypesOfSignal = {"Inside","Outside big","Outside small","Small","Virus New
 local TypesOfSign = {"NF","40","60","70","80","Station border","C(horn) Street","STOP Street","Dangerous","Deadlock",
     "Stop marker","!(stop)","X","T Start","T End","T Sbor(engage)","Engines off","Engines on","C(horn)","T stop emer","Shod",
     "Left doors","Phone▲","Phone▼","1up","STOP Street cyka","NF outside","35 outside","40 outside","60 outside","70 outside","80 outside",
-    "T Sbor(engage) outside","35","Dangerous 200","CR End","CR End(inv)","2up","3up","4up","5up","6up","X outside", "Metal","50","50 outside","Hod2","Hod3","Green shield", "Yellow shield"}
+    "T Sbor(engage) outside","35","Dangerous 200","CR End","CR End(inv)","2up","3up","4up","5up","6up","X outside", "Metal","50","50 outside","Hod2","Hod3","Green shield", "Yellow shield", 
+    "0o", "1o", "2o", "3o", "4o", "5o", "6o", "7o", "8o", "9o", "10o", "11o", "12o", "13o",
+    "0o-st", "1o-st", "2o-st", "3o-st", "4o-st", "5o-st", "6o-st", "7o-st", "8o-st", "9o-st", "10o-st", "11o-st", "12o-st", "13o-st",
+}
 local RouteTypes = {"Auto", "Manual","Repeater","Emerg"}
 
 local TypesOfAuto = {

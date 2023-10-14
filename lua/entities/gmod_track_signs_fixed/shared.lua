@@ -295,3 +295,207 @@ ENT.SignModels[49] = {
 	pos = Vector(0,110,125),
 	angles = Angle(0,270,0),
 }
+
+-- New signs by Snipeerkeen
+
+ENT.SignModels[50] = {
+	model = "models/mn_signs_lord/UP0_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,5),
+	noauto = true,
+}
+
+ENT.SignModels[51] = {
+	model = "models/mn_signs_lord/UP1_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[52] = {
+	model = "models/mn_signs_lord/UP2_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[53] = {
+	model = "models/mn_signs_lord/UP3_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[54] = {
+	model = "models/mn_signs_lord/UP4_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[55] = {
+	model = "models/mn_signs_lord/UP5_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[56] = {
+	model = "models/mn_signs_lord/UP6_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[57] = {
+	model = "models/mn_signs_lord/UP7_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[58] = {
+	model = "models/mn_signs_lord/UP8_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[59] = {
+	model = "models/mn_signs_lord/UP9_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[60] = {
+	model = "models/mn_signs_lord/UP10_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[61] = {
+	model = "models/mn_signs_lord/UP11_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[62] = {
+	model = "models/mn_signs_lord/UP12_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[63] = {
+	model = "models/mn_signs_lord/UP13_r.mdl",
+	pos = Vector(0,110,135),
+	angles = Angle(0,0,0),
+	noauto = true,
+}
+
+ENT.SignModels[64] = {
+	model = "models/mn_signs_lord/UP0_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[65] = {
+	model = "models/mn_signs_lord/UP1_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[66] = {
+	model = "models/mn_signs_lord/UP2_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[67] = {
+	model = "models/mn_signs_lord/UP3_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[68] = {
+	model = "models/mn_signs_lord/UP4_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[69] = {
+	model = "models/mn_signs_lord/UP5_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[70] = {
+	model = "models/mn_signs_lord/UP6_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[71] = {
+	model = "models/mn_signs_lord/UP7_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[72] = {
+	model = "models/mn_signs_lord/UP8_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[73] = {
+	model = "models/mn_signs_lord/UP9_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[74] = {
+	model = "models/mn_signs_lord/UP10_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[75] = {
+	model = "models/mn_signs_lord/UP11_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
+
+ENT.SignModels[76] = {
+	model = "models/mn_signs_lord/UP12_st.mdl",
+	pos = Vector(0,95,135),
+	angles = Angle(0,-90,0),
+	noauto = true,
+	rotate = true,
+}
