@@ -158,7 +158,7 @@ VitroMod.trigRemove = function(name, num)
 	--VitroMod.trigSendAll()
 	net.Start("vitromod_trigger_one")
 	net.WriteString(name)
-	net.WriteTable({})
+	net.WriteTable(VitroMod.Triggers.ClientData[name])
 	net.Broadcast()	
 end
 VitroMod.trigSend = function(ent)
