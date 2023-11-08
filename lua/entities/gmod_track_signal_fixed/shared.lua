@@ -323,6 +323,16 @@ ENT.TrafficLightModels[3] = {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39-10,2.32+2.5,16+38.7)},
 				}
 				}},
+	[2]	= { Vector(15,0,0), "models/metrostroi/signals/mus/fixed_outside_2.mdl", {
+				[0] = Vector(10.07-10,-29.7+2.5,39.1+38.7),
+				[1] = Vector(10.07-10,-29.7+2.5,27.55+38.7),
+				[2] = Vector(10.07-10,-29.7+2.5,16+38.7),
+				["glass"]	= {
+					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39-10,2.32+2.5,39.1+38.7)},
+					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39-10,2.32+2.5,27.55+38.7)},
+					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39-10,2.32+2.5,16+38.7)},
+				}
+		}},
 	noleft = true,
 }
 --------------------------------------------------------------------------------
