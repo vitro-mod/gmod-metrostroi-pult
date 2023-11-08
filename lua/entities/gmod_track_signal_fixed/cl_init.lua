@@ -388,7 +388,7 @@ function ENT:Think()
 				local notM = v~="M"
 				if assembled and v[#v] == 'M' then data = TLM['M'] notM = false self.RouteNumber = ID end
                 if not data then continue end			
-                local vec = Vector(0,0,data[1])
+                local vec = data[1]
 				if assembled then curoffset = Vector(0,0,TLM['kronOff'] + TLM['step'] * #v) end
                 if first then
                     first = false
@@ -541,7 +541,7 @@ function ENT:Think()
             if not data then continue end
 			local notM = v~="M"
 			if assembled and v[#v] == 'M' then data = TLM['M'] notM = false end			
-			local vec = Vector(0,0,data[1])
+			local vec = data[1]
 			
 			if assembled then curoffset = Vector(0,0,TLM['kronOff'] + TLM['step'] * #v) end
 			if first then
@@ -553,7 +553,7 @@ function ENT:Think()
 			
 			self.rnIdx = 1
 			self.rnNums = {}
-            --self.NamesOffset = self.NamesOffset + Vector(0,0,data[1])
+            --self.NamesOffset = self.NamesOffset + data[1]
             if v~="M" then
 				self.rnNums[v] = 0
 				for i = 1,#v-1 do
@@ -817,7 +817,7 @@ local function enableDebug()
                                         end
                                         if not data then continue end
 
-                                        --sig.NamesOffset = sig.NamesOffset + Vector(0,0,data[1])
+                                        --sig.NamesOffset = sig.NamesOffset + data[1]
                                         if v ~= "M" then
                                             for i = 1,#v do
                                                 ID2 = ID2 + 1

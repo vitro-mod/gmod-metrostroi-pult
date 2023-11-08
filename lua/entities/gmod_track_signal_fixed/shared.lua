@@ -198,7 +198,7 @@ ENT.TrafficLightModels[0] = {
 	name_s	= Vector(112, 10, 0.5),
 	name_s_ang	= Angle(0, 0, -90),
 	name_out 	= Vector(11.5,2.5+30,36.6+16),	
-	[1]	= { 32, "models/metrostroi/signals/mus/light_2.mdl", {
+	[1]	= { Vector(0,0,32), "models/metrostroi/signals/mus/light_2.mdl", {
 				[0] = Vector(7.41,-27.54,25.26),
 				[1] = Vector(7.41,-27.54,14.2),--
 				["glass"]	= {
@@ -206,7 +206,7 @@ ENT.TrafficLightModels[0] = {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(7.43,4.46,14)},
 				}
 			}},
-	[2]	= { 43, "models/metrostroi/signals/mus/light_3.mdl", {
+	[2]	= { Vector(0,0,43), "models/metrostroi/signals/mus/light_3.mdl", {
 				[0] = Vector(7.41,-27.54,35.1),
 				[1] = Vector(7.41,-27.54,25.26),
 				[2] = Vector(7.41,-27.54,14.2),---27.54
@@ -217,7 +217,7 @@ ENT.TrafficLightModels[0] = {
 				}
 				}},
 
-	M = { 24, "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.1,2, 19.5), 1.75, 2.05, 4},
+	M = { Vector(0,0,24), "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.1,2, 19.5), 1.75, 2.05, 4},
 	arsletter = true,
 }
 
@@ -231,7 +231,7 @@ ENT.RenderOffset[1] = Vector(0,0,200)
 ENT.TrafficLightModels[1] = {
 	["m1"]	= "models/metrostroi/signals/mus/pole_1.mdl",
 	name	= Vector(0,3,40),
-	[1]	= { 46, "models/metrostroi/signals/mus/light_outside_2.mdl", {
+	[1]	= { Vector(0,0,46), "models/metrostroi/signals/mus/light_outside_2.mdl", {
 				[0] = Vector(-0.51,-18.76,19.95),
 				[1] = Vector(-0.51,-18.76,7.97),
 				["glass"]	= {
@@ -239,7 +239,7 @@ ENT.TrafficLightModels[1] = {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(0,13.3,7.97 )},
 				}
 				}},
-	[2]	= { 56, "models/metrostroi/signals/mus/light_outside_3.mdl", {
+	[2]	= { Vector(0,0,56), "models/metrostroi/signals/mus/light_outside_3.mdl", {
 				[0] = Vector(-0.51,-18.76,30.88),
 				[1] = Vector(-0.51,-18.76,19.95),
 				[2] = Vector(-0.51,-18.76,7.97),
@@ -250,13 +250,13 @@ ENT.TrafficLightModels[1] = {
 				}
 				} },
 
-	W = { 25, "models/metrostroi/signals/mus/light_outside_1.mdl" , {
+	W = { Vector(0,0,25), "models/metrostroi/signals/mus/light_outside_1.mdl" , {
 				[0] = Vector(-0.51,-18.76,7.97),
 				["glass"]	= {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(0,13.3,7.97 )},
 				}
 				}},
-	M = { 40, "models/metrostroi/signals/mus/light_pathindicator3.mdl",  Vector(7,11, 25), 3.6, 3.4, 5},
+	M = { Vector(0,0,40), "models/metrostroi/signals/mus/light_pathindicator3.mdl",  Vector(7,11, 25), 3.6, 3.4, 5},
 	noleft = true,
 }
 
@@ -271,7 +271,7 @@ ENT.TrafficLightModels[2] = {
 	["m2"]	= "models/metrostroi/signals/mus/pole_3.mdl",
 	["name"]	= Vector(-3,2.5,7),
 	name_one	= Vector(10.07,0.5,3),
-	[1]	= { 42, "models/metrostroi/signals/mus/light_outside2_2.mdl", {
+	[1]	= { Vector(0,0,42), "models/metrostroi/signals/mus/light_outside2_2.mdl", {
 				[0] = Vector(10.07,-29.7,27.55),
 				[1] = Vector(10.07,-29.7,16),
 				["glass"]	= {
@@ -279,7 +279,7 @@ ENT.TrafficLightModels[2] = {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39,2.32,16)},
 				}
 				}},
-	[2]	= { 47, "models/metrostroi/signals/mus/light_outside2_3.mdl", {
+	[2]	= { Vector(0,0,47), "models/metrostroi/signals/mus/light_outside2_3.mdl", {
 				[0] = Vector(10.07,-29.7,39.37),
 				[1] = Vector(10.07,-29.7,27.55),
 				[2] = Vector(10.07,-29.7,16),
@@ -289,7 +289,7 @@ ENT.TrafficLightModels[2] = {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(10.39,2.32,16)},
 				}
 				}},
-	[3]	= { 47, "models/metrostroi/signals/mus/light_outside2_4.mdl", {
+	[3]	= { Vector(0,0,47), "models/metrostroi/signals/mus/light_outside2_4.mdl", {
 				[0] = Vector(10.07,-29.7,50.45),
 				[1] = Vector(10.07,-29.7,39.37),
 				[2] = Vector(10.07,-29.7,27.55),
@@ -302,7 +302,7 @@ ENT.TrafficLightModels[2] = {
 				}
 				}},
 
-	M = { 24, "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.8,2, 22.8), 1.8, 2.1, 4},
+	M = { Vector(0,0,24), "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.8,2, 22.8), 1.8, 2.1, 4},
 }
 
 --------------------------------------------------------------------------------
@@ -315,7 +315,7 @@ if game.GetMap() == "gm_metro_minsk_1984" then ENT.RenderOffset[3] = Vector(0,0,
 ENT.TrafficLightModels[3] = {
 	name	= Vector(10.07-10,0.5+6,42.5),
 	name_one	= Vector(10.07-10,0.5+6,42.5),
-	[1]	= { 42, "models/metrostroi/signals/mus/fixed_outside_2.mdl", {
+	[1]	= { Vector(15,0,0), "models/metrostroi/signals/mus/fixed_outside_2.mdl", {
 				[0] = Vector(10.07-10,-29.7+2.5,27.55+38.7),
 				[1] = Vector(10.07-10,-29.7+2.5,16+38.7),
 				["glass"]	= {
@@ -358,19 +358,19 @@ ENT.TrafficLightModels[5] = {
 	name_one	= Vector(-1.75,2.5,0),
 	kronOff = 13,
 	step = 11.79,
-	single	= { 24, "models/virus/new_signals/light_single.mdl", {
+	single	= { Vector(0,0,24), "models/virus/new_signals/light_single.mdl", {
 				[0] = Vector(7.22,-29.56,12.93),--
 				["glass"]	= {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(7.22,3,12.93)},
 				}
 			}},
-	[0]	= { 24, "models/virus/new_signals/light_1.mdl", {
+	[0]	= { Vector(0,0,24), "models/virus/new_signals/light_1.mdl", {
 				[0] = Vector(7.22,-29.56,12.93),--
 				["glass"]	= {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(7.22,3,12.93)},
 				}
 			}},
-	[1]	= { 35, "models/virus/new_signals/light_2.mdl", {
+	[1]	= { Vector(0,0,35), "models/virus/new_signals/light_2.mdl", {
 				[0] = Vector(7.22,-29.56,24.72),
 				[1] = Vector(7.22,-29.56,12.93),--
 				["glass"]	= {
@@ -378,7 +378,7 @@ ENT.TrafficLightModels[5] = {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(7.22,3,12.93)},
 				}
 			}},
-	[2]	= { 46, "models/virus/new_signals/light_3.mdl", {
+	[2]	= { Vector(0,0,46), "models/virus/new_signals/light_3.mdl", {
 				[0] = Vector(7.22,-29.56,36.54),
 				[1] = Vector(7.22,-29.56,24.72),
 				[2] = Vector(7.22,-29.56,12.93),---27.54
@@ -389,7 +389,7 @@ ENT.TrafficLightModels[5] = {
 				}
 				}},
 
-	M = { 24.5, "models/virus/new_signals/path_ind.mdl",  Vector(13.1,2, 19.5), 1.75, 2.05, 4},
+	M = { Vector(0,0,24.5), "models/virus/new_signals/path_ind.mdl",  Vector(13.1,2, 19.5), 1.75, 2.05, 4},
 }
 
 ENT.SignalConverter = {
