@@ -30,7 +30,7 @@ function ENT:Initialize()
 end
 
 function ENT:StartTouch(entity)
-
+	hook.Run("VitroMod_Trigger_StartTouch", self:GetName(), entity)
 	if entity:GetClass() ~= 'gmod_train_wheels' then return false end
 
 	if VitroMod.Triggers.Count[self:GetName()] == 0 then hook.Run("VitroMod_Trigger_Update",nil,self,1) end
@@ -40,7 +40,7 @@ function ENT:StartTouch(entity)
 end
 
 function ENT:EndTouch(entity)
-
+	hook.Run("VitroMod_Trigger_EndTouch", self:GetName(), entity)
 	if entity:GetClass() ~= 'gmod_train_wheels' then return false end
 	
 	VitroMod.Triggers.Count[self:GetName()] = VitroMod.Triggers.Count[self:GetName()] - 1
