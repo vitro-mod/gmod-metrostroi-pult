@@ -79,7 +79,7 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
     end
 end
 
-function ENT:SpawnHeads(ID,model,pos,ang,glass,notM,add)
+function ENT:SpawnHead(ID,model,pos,ang,glass,notM,add)
     if not IsValid(self.Models[1][ID]) then
         self.Models[1][ID] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[1][ID]:SetPos(self:LocalToWorld(pos))
@@ -399,9 +399,9 @@ function ENT:Think()
                 self.NamesOffset = self.NamesOffset + vec
 				if assembled then self.LongOffset = Vector(0,0,0) end
                 local offsetAndLongOffset = offset + self.LongOffset
-				--SpawnHeads(ID,model,pos,ang,glass,notM,add)
-                if not self.Left or self.Double then    self:SpawnHeads(ID,data[2],self.BasePosition + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,notM) end
-                if self.Left or self.Double then self:SpawnHeads((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,notM,true) end
+				--SpawnHead(ID,model,pos,ang,glass,notM,add)
+                if not self.Left or self.Double then    self:SpawnHead(ID,data[2],self.BasePosition + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,notM) end
+                if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,notM,true) end
 
                 if v ~= "M" then
                     for i = 1,#v do
@@ -414,8 +414,8 @@ function ENT:Think()
 						--if assembled then lenOff = Vector(0,0,100) end
                         ID2 = ID2 + 1
 						if assembled and i < #v then
-							if not self.Left or self.Double then    self:SpawnHeads(ID..ID2,lenMdl[2],self.BasePosition + offsetAndLongOffset + Vector(0,0,TLM['step']*i),Angle(0, 0, 0),lenMdl[3] and lenMdl[3].glass,not lenM) end
-							if self.Left or self.Double then self:SpawnHeads((self.Double and ID..ID2.."d" or ID..ID2),(not TLM.noleft) and lenMdl[2]:Replace(".mdl","_mirror.mdl") or lenMdl[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + Vector(0,0,TLM['step']*i),Angle(0, 0, 0),lenMdl[3] and lenMdl[3].glass,not lenM,true) end					
+							if not self.Left or self.Double then    self:SpawnHead(ID..ID2,lenMdl[2],self.BasePosition + offsetAndLongOffset + Vector(0,0,TLM['step']*i),Angle(0, 0, 0),lenMdl[3] and lenMdl[3].glass,not lenM) end
+							if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),(not TLM.noleft) and lenMdl[2]:Replace(".mdl","_mirror.mdl") or lenMdl[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + Vector(0,0,TLM['step']*i),Angle(0, 0, 0),lenMdl[3] and lenMdl[3].glass,not lenM,true) end					
 						end						
                         if not self.Signals[ID2] then self.Signals[ID2] = {} end
                     end
