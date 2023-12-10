@@ -67,7 +67,7 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
                 local k_long = k.."_long"
                 if TLM[k_long] and LenseNum > 7 then
                     self.Models[1][idx] = ClientsideModel(TLM[k_long],RENDERGROUP_OPAQUE)
-                    self.LongOffset = Vector(0,0,TLM[k.."_long_pos"])
+                    self.LongOffset = TLM[k.."_long_pos"]
                 else
                     self.Models[1][idx] = ClientsideModel(v,RENDERGROUP_OPAQUE)
                 end
