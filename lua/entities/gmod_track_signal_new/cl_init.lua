@@ -526,6 +526,7 @@ function ENT:Think()
         local ID2 = 0
         local first = true
 		local assembled = false
+        self.rnIdx = 1
         for _,v in ipairs(self.LensesTBL) do
             local data		
 			if not TLM[v] then
@@ -551,7 +552,6 @@ function ENT:Think()
 				else offset = offset - curoffset end
 			end			
 			
-			self.rnIdx = 1
 			self.rnNums = {}
             --self.NamesOffset = self.NamesOffset + data[1]
             if v~="M" then
@@ -595,12 +595,14 @@ function ENT:Think()
                     self.Signals[ID2].State = State
                 end
             else
-                if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][self.RouteNumber]) then self.Models[1][self.RouteNumber]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-				if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][self.RouteNumber.."d"]) then self.Models[1][self.RouteNumber.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+                if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+				if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+                self.rnIdx = self.rnIdx + 1
             end
-			if v[#v] == "M" then
-				if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][self.RouteNumber]) then self.Models[1][self.RouteNumber]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-				if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][self.RouteNumber.."d"]) then self.Models[1][self.RouteNumber.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+			if v[#v] == "M" and assembled then
+				if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+				if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+                self.rnIdx = self.rnIdx + 1
 			end
             ID = ID + 1
         end
