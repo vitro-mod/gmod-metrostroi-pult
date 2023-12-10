@@ -287,6 +287,17 @@ function ENT:Think()
             self.SpecRouteNumbers = {}
             for i=1,#self.RouteNumberSetup do
                 local CurRN = self.RouteNumberSetup[i]
+                --[[
+                    self.OldRouteNumberSetup[1] = "1234D",
+                    self.OldRouteNumberSetup[2] = "WKFX",
+                    self.OldRouteNumberSetup[3] = "LR"
+                    rn1 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[1]
+                    rn2 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[2]
+                    SpecRouteNumbers заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[3]
+                    rn1 - цифробуквенные
+                    rn2 - W-20КМ, K-КГУ, F-стрела вверх, X-пустой (для длинного кронштейна)
+                    и SpecRouteNumbers - особые маршрутники, редко используются (стрелы влево вправо)
+                ]]
                 if self.OldRouteNumberSetup[1]:find(CurRN) then
                     rn1N = table.insert(rn1,CurRN)
                 elseif self.OldRouteNumberSetup[2]:find(CurRN) then
