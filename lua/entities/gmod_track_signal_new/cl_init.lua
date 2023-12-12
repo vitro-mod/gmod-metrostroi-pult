@@ -7,7 +7,7 @@ function ENT:Initialize()
     self.Models = {{},{},{}}
     self.Signals = {}
     self.Anims = {}
-	self.PixVis = util.GetPixelVisibleHandle()
+    self.PixVisibleHandlers = {}
 	self.Sprites = {}
 	self.Lights = {}
 	self.PTs = {}
@@ -441,6 +441,11 @@ function ENT:Think()
 							if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),(not TLM.noleft) and lenMdl[2]:Replace(".mdl","_mirror.mdl") or lenMdl[2],self.BasePosition*Vector(-1,1,1) + offsetAndLongOffset + Vector(0,0,TLM['step']*i),Angle(0, 0, 0),lenMdl[3] and lenMdl[3].glass,not lenM,true) end					
 						end						
                         if not self.Signals[ID2] then self.Signals[ID2] = {} end
+                        
+                        self.PixVisibleHandlers[ID..ID2] = util.GetPixelVisibleHandle()
+                        if self.DoubleL then 
+                            self.PixVisibleHandlers[ID..ID2.."x"] = util.GetPixelVisibleHandle()
+                        end
                     end
                 end
                 ID = ID + 1
@@ -721,13 +726,17 @@ end
 function ENT:LightSprites()
 	if not self.Sprites then return end
 	for k,v in pairs(self.Sprites) do
-		self:Sprite(v.pos, self:GetAngles(), v.col, v.bri, v.mul)
+		self:Sprite(v.pos, self:GetAngles(), v.col, v.bri, v.mul, k)
 	end	
 end
 
-function ENT:Sprite(pos, ang, col, bri, mul)
-	local Visible = util.PixelVisible( pos, 1, self.PixVis )
-	if ( ( Visible ) and ( Visible > 0.1 ) and ( bri > 0 ) ) then
+function ENT:Sprite(pos, ang, col, bri, mul, handlerKey )
+    if bri <= 0 then return end
+    local Visible = 0
+    if self.PixVisibleHandlers[handlerKey] then
+	    Visible = util.PixelVisible( pos, 1, self.PixVisibleHandlers[handlerKey] )
+    end
+	if ( ( Visible ) and ( Visible > 0.1 ) ) then
 		local fw = ang:Forward()
 		fw:Rotate(Angle(0,90,0))
 		local view = EyePos() - pos
