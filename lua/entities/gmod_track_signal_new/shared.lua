@@ -7,6 +7,7 @@ ENT.AdminSpawnable	= false
 
 ENT.TrafficLightModels = {}
 ENT.RenderOffset = {}
+ENT.LongThreshold = {}
 ENT.BasePosition = Vector(-110,32,0)
 if (game.GetMap() == "gm_metro_minsk_1984") then
 	ENT.BasePosition = Vector(-97,32,0)
@@ -228,6 +229,7 @@ ENT.TrafficLightModels[0] = {
 Metrostroi.SigTypeNames[1] = 'Outside'
 Metrostroi.SigTypeSpriteMul[1] = 0.75
 ENT.RenderOffset[1] = Vector(0,0,200)
+ENT.LongThreshold[1] = 1
 ENT.TrafficLightModels[1] = {
 	["m1"]	= "models/metrostroi/signals/mus/pole_1.mdl",
 	name	= Vector(0,3,40),
@@ -266,6 +268,7 @@ ENT.TrafficLightModels[1] = {
 Metrostroi.SigTypeNames[2] = 'Outside box'
 Metrostroi.SigTypeSpriteMul[2] = 0.75
 ENT.RenderOffset[2] = Vector(0,0.,112)
+ENT.LongThreshold[2] = 1
 ENT.TrafficLightModels[2] = {
 	["m1"]	= "models/metrostroi/signals/mus/box_outside.mdl",
 	["m2"]	= "models/metrostroi/signals/mus/pole_3.mdl",

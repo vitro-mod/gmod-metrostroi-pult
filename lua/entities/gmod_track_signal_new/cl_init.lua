@@ -65,7 +65,7 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
             local idx = add and v..add or v
             if IsValid(self.Models[1][idx]) then break else
                 local k_long = k.."_long"
-                if TLM[k_long] and LenseNum > 7 then
+                if TLM[k_long] and LenseNum > (self.LongThreshold[self.LightType] or 2) then
                     self.Models[1][idx] = ClientsideModel(TLM[k_long],RENDERGROUP_OPAQUE)
                     self.LongOffset = TLM[k.."_long_pos"]
                 else
@@ -334,6 +334,18 @@ function ENT:Think()
                 end
             end
             if LenseNum == 0 then OneLense = false end
+            LenseNum = 0
+            local oneItemHeadCount = 0
+            for k,v in pairs(self.LensesTBL) do
+                if #v > 1 then
+                    LenseNum = LenseNum + 1
+                else
+                    oneItemHeadCount = oneItemHeadCount + 1
+                end
+            end
+            if oneItemHeadCount > 1 then 
+                LenseNum = LenseNum + oneItemHeadCount
+            end
             local offset = self.RenderOffset[self.LightType] or Vector(0, 0, 0)
             self.LongOffset = self.LongOffset or Vector(0, 0, 0)
             if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,Angle(0, 0, 0),LenseNum) end
