@@ -1,16 +1,17 @@
 include("shared.lua")
-
+include("cl_font.lua")
 --------------------------------------------------------------------------------
 function ENT:Initialize()
     self.Sig = ""
     self.OldName = ""
-    self.Models = {{},{},{}}
+    self.Models = {{},{},{},{}}
     self.Signals = {}
     self.Anims = {}
     self.PixVisibleHandlers = {}
 	self.Sprites = {}
 	self.Lights = {}
 	self.PTs = {}
+    self.NumLit = {}
 end
 function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
     local id = clientProp
@@ -207,7 +208,8 @@ function ENT:RemoveModels(final)
     if self.Models and  self.Models.have then
         for _,v in pairs(self.Models) do if type(v) == "table" then for _,v1 in pairs(v) do v1:Remove() end end end
     end
-    self.Models = {{},{},{}}
+    self.NumLit = {}
+    self.Models = {{},{},{},{}}
     self.ModelsCreated = false
 end
 
@@ -447,6 +449,9 @@ function ENT:Think()
                             self.PixVisibleHandlers[ID..ID2.."x"] = util.GetPixelVisibleHandle()
                         end
                     end
+                elseif self.UseRoutePointerFont then
+                    if not self.Left or self.Double then self:SpawnPointerLamps(ID, self.BasePosition + TLM.M[3] + offsetAndLongOffset, TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7]) end
+                    if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", self.BasePosition*Vector(-1,1,1) + TLM.M[3] + offsetAndLongOffset, TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7]) end
                 end
                 ID = ID + 1
             end
@@ -623,8 +628,16 @@ function ENT:Think()
                     self.Signals[ID2].State = State
                 end
             else
-                if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-				if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+                if not self.UseRoutePointerFont then
+                    if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+				    if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+                else
+                    if Metrostroi.RoutePointerFont[self.Num[self.rnIdx]] and (not self.NumLit[ID] or self.NumLit[ID] ~= self.Num[self.rnIdx]) then
+                        if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, TLM.M[8], TLM.M[9]) end
+                        if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."il", TLM.M[8], TLM.M[9]) end
+                        self.NumLit[ID] = self.Num[self.rnIdx]
+                    end
+                end
                 self.rnIdx = self.rnIdx + 1
             end
 			if v[#v] == "M" and assembled then
@@ -753,6 +766,49 @@ function ENT:Sprite(pos, ang, col, bri, mul, handlerKey )
 			render.DrawSprite( pos, s, s, col )
 		end
 	end	
+end
+
+function ENT:SpawnPointerLamps(ID, InitPos, StepX, StepY, Scale, mdl)
+    local xf = 0;
+    local yf = 0;
+
+    for i=1,#Metrostroi.RoutePointerFont[""] do
+        self.Models[4][ID..i] = ClientsideModel(mdl,RENDERGROUP_OPAQUE)
+        self.Models[4][ID..i]:SetPos(self:LocalToWorld((InitPos - Vector(xf * StepX, 0, yf * StepY)) ))
+        self.Models[4][ID..i]:SetAngles(self:LocalToWorldAngles(Angle(0,90,0)))
+        self.Models[4][ID..i]:SetModelScale(Scale)
+        self.Models[4][ID..i]:SetParent(self)
+        self.Models[4][ID..i]:SetNoDraw(true)
+        self.PixVisibleHandlers['m'..ID..i] = util.GetPixelVisibleHandle()
+
+        xf = xf + 1
+        if xf == 5 then
+            xf = 0
+            yf = yf + 1
+        end
+    end
+end
+
+function ENT:UpdatePointerLamps(ID, SpriteColor, SpriteMultiplier)
+    local pos = Vector(0,0.5,0)
+    pos:Rotate(self:GetAngles())
+
+    for i=1,#Metrostroi.RoutePointerFont[""] do
+        if not IsValid(self.Models[4][ID..i]) then return end
+        local state = Metrostroi.RoutePointerFont[self.Num[self.rnIdx]][i]
+        local IDi = ID..i
+        local mIDi = 'm'..ID..i
+        self.Models[4][IDi]:SetSkin(state and 1 or 0)
+        self.Models[4][IDi]:SetNoDraw(not state)
+        if state or self.Sprites[mIDi] then
+            self.Sprites[mIDi] = {
+                pos = self.Models[4][IDi]:GetPos() + pos, 
+                bri = state and 1 or 0, 
+                col = Metrostroi.Lenses[SpriteColor], 
+                mul = SpriteMultiplier
+            }
+        end
+    end
 end
 
 local debug = GetConVar("metrostroi_drawsignaldebug")

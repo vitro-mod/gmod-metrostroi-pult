@@ -8,6 +8,7 @@ ENT.AdminSpawnable	= false
 ENT.TrafficLightModels = {}
 ENT.RenderOffset = {}
 ENT.LongThreshold = {}
+ENT.UseRoutePointerFont = {}
 ENT.BasePosition = Vector(-110,32,0)
 if (game.GetMap() == "gm_metro_minsk_1984") then
 	ENT.BasePosition = Vector(-97,32,0)
@@ -29,117 +30,6 @@ Metrostroi.LiterWarper = {
 -- 3 Blue
 -- 4 Second yellow (flashing yellow)
 -- 5 White
---[[
-Metrostroi.RoutePointer = {
-	[""] = {
-	false,false,false,false,false,
-	false,false,false,false,false,
-	false,false,false,false,false,
-	false,false,false,false,false,
-	false,false,false,false,false,
-	false,false,false,false,false,
-	false,false,false,false,false,
-	},
-	["1"] = {
-	false,false,true ,false,false,
-	false,true ,true ,false,false,
-	true ,false,true ,false,false,
-	false,false,true ,false,false,
-	false,false,true ,false,false,
-	false,false,true ,false,false,
-	true ,true ,true ,true ,true ,
-	},
-	["2"] = {
-	false,true ,true ,true ,false,
-	true ,false,false,false,true ,
-	false,false,false,false,true ,
-	false,false,false,true,false,
-	false,false,true ,false,false,
-	false,true ,false,false,false,
-	true ,true ,true ,true ,true ,
-	},
-	["3"] = {
-	false,true ,true ,true ,false,
-	true ,false,false,false,true ,
-	false,false,false,false,true ,
-	false,false,true ,true ,false,
-	false,false,false,false,true ,
-	true ,false,false,false,true ,
-	false,true ,true ,true ,false,
-	},
-	["4"] = {
-	false,false,false,true ,false,
-	false,false,true ,true ,false,
-	false,true ,false,true ,false,
-	true ,false,false,true ,false,
-	true ,true ,true ,true ,true ,
-	false,false,false,true ,false,
-	false,false,false,true ,false,
-	},
-	["5"] = {
-	true ,true ,true ,true ,true ,
-	true ,false,false,false,false,
-	true ,true ,true ,true ,false,
-	false,false,false,false,true ,
-	false,false,false,false,true ,
-	true ,false,false,false,true ,
-	false,true ,true ,true ,false,
-	},
-	["6"] = {
-	false,true ,true ,true ,false,
-	true ,false,false,false,true ,
-	true ,false,false,false,false,
-	true ,true ,true ,true ,false,
-	true ,false,false,false,true ,
-	true ,false,false,false,true ,
-	false,true ,true ,true ,false,
-	},
-	["7"] = {
-	true ,true ,true ,true ,true ,
-	false,false,false,false,true ,
-	false,false,false,true ,false,
-	false,false,true ,false,false,
-	false,true ,false,false,false,
-	false,true ,false,false,false,
-	false,true ,false,false,false,
-	},
-	["8"] = {
-	false,true ,true ,true ,false,
-	true ,false,false,false,true ,
-	true ,false,false,false,true ,
-	false,true ,true ,true ,false,
-	true ,false,false,false,true ,
-	true ,false,false,false,true ,
-	false,true ,true ,true ,false,
-	},
-	["9"] = {
-	false,true ,true ,true ,false,
-	true ,false,false,false,true ,
-	true ,false,false,false,true ,
-	false,true ,true ,true ,true ,
-	false,false,false,false,true ,
-	true ,false,false,false,true ,
-	false,true ,true ,true ,false,
-	},
-	["0"] = {
-	false,true ,true ,true ,false,
-	true ,false,false,false,true ,
-	true ,false,false,true ,true ,
-	true ,false,true ,false,true ,
-	true ,true ,false,false,true ,
-	true ,false,false,false,true ,
-	false,true ,true ,true ,false,
-	},
-	["D"] = {
-	false,true ,true ,true ,false,
-	false,true ,false,true ,false,
-	false,true ,false,true ,false,
-	false,true ,false,true ,false,
-	false,true ,false,true ,false,
-	true ,true ,true ,true ,true ,
-	true ,false,false,false,true ,
-	},
-}]]
 Metrostroi.RoutePointer = {
 	[""] = 0,
 	["0"] = 10,
@@ -154,6 +44,7 @@ Metrostroi.Lenses = {
 	["G"] = Color(0,255,144),
 	["W"] = Color(150,200,255),
 	["B"] = Color(0,10,255),
+	["I"] = Color(226,190,154),
 }
 --[[
 ENT.LightType = 0
