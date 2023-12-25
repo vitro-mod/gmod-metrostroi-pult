@@ -449,7 +449,7 @@ function ENT:Think()
                             self.PixVisibleHandlers[ID..ID2.."x"] = util.GetPixelVisibleHandle()
                         end
                     end
-                elseif self.UseRoutePointerFont then
+                elseif self.UseRoutePointerFont[self.LightType] then
                     if not self.Left or self.Double then self:SpawnPointerLamps(ID, self.BasePosition + TLM.M[3] + offsetAndLongOffset, TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7]) end
                     if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", self.BasePosition*Vector(-1,1,1) + TLM.M[3] + offsetAndLongOffset, TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7]) end
                 end
@@ -628,7 +628,7 @@ function ENT:Think()
                     self.Signals[ID2].State = State
                 end
             else
-                if not self.UseRoutePointerFont then
+                if not self.UseRoutePointerFont[self.LightType] then
                     if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
 				    if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
                 else
