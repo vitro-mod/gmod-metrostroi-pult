@@ -15,3 +15,8 @@ resource.AddFile( "materials/models/metrostroi/signals/mus/old_indic_num_19.vmt"
 resource.AddFile( "materials/models/metrostroi/signals/mus/old_indic_num_20.vmt" )
 resource.AddFile( "materials/models/metrostroi/signals/mus/old_indic_num_21.vmt" )
 resource.AddFile( "materials/models/metrostroi/signals/mus/old_indic_num_22.vmt" )
+
+resource.AddFile( "models/mn_signs/light_sensor.mdl" )
+resource.AddFile( "models/mn_signs/light_sensor_emitter.mdl" )
+resource.AddFile( "materials/models/mn_signs/light_sensor_black.vmt" )
+resource.AddFile( "materials/models/mn_signs/light_sensor_white.vmt" )
