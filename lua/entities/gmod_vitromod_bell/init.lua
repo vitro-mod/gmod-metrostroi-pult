@@ -11,7 +11,7 @@ VitroMod.Bells.Caption = false
 
 hook.Add('VitroMod.Bells.Status', 'VitroMod.Bells.Status.set', function(name, status)
 	VitroMod.Bells.Status[name] = status
-	VitroMod.Bells.sendRing(name)
+	VitroMod.Bells.sendBell(name)
 end)
 
 function ENT:Initialize()
@@ -78,7 +78,7 @@ VitroMod.Bells.send = function(ply)
 end
 
 
-VitroMod.Bells.sendRing = function(name, ply, mute)
+VitroMod.Bells.sendBell = function(name, ply, mute)
 	--if ply then print(ent:GetName(), ply:GetName(), mute) end
 	if not VitroMod.BellNWAdded3 then 
 		util.AddNetworkString("vitromod_bell") 
