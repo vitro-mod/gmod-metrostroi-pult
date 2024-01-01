@@ -79,7 +79,7 @@ hook.Add("Initialize", "Metrostroi_VitroModInitialize", function()
 	end)
 end)
 
-timer.Simple(2, function()                  --Задержка после загрузки игры
+timer.Simple(2, function()
 
 local m_save = Metrostroi.Save
 function Metrostroi.Save(name)
@@ -130,7 +130,7 @@ function Metrostroi.Load(name,keep_signs)
     m_load(name,keep_signs)
     loadTrigs(name,keep_signs)
 	loadBells(name,keep_signs)
-	timer.Simple(1, function() hook.Run("Metrostroi.Signalling.Load") end)
+	timer.Simple(1, function() hook.Run("Metrostroi.Signalling.AfterLoad") end)
 end
 
-end)                                        --Окончание тела функции с задержкой
+end)

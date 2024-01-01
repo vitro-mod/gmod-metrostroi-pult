@@ -228,7 +228,7 @@ end
 function pultUpd()
 	sck:write('UPD')
 end
-hook.Add("Metrostroi.Signalling.Load","VitroModUpdOnLoad", pultUpd)
+hook.Add("Metrostroi.Signalling.AfterLoad","VitroModUpdOnLoad", pultUpd)
 rcTriggers = {}
 rcTriggersExclude = {}
 
