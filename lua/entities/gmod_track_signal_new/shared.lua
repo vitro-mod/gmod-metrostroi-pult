@@ -46,6 +46,8 @@ Metrostroi.Lenses = {
 	["B"] = Color(0,10,255),
 	["I"] = Color(226,190,154),
 }
+
+Metrostroi.SigSpriteOffset = Vector(0, 32, 0)
 --[[
 ENT.LightType = 0
 ENT.Name = ""
