@@ -345,11 +345,9 @@ function ENT:Think()
                     oneItemHeadCount = oneItemHeadCount + 1
                 end
             end
-            if oneItemHeadCount > 1 then 
-                LenseNum = LenseNum + oneItemHeadCount
-            end
-            self.LongOffset = self.LongOffset or Vector(0, 0, 0)
             -- if oneItemHeadCount > 1 then 
+            --     LenseNum = LenseNum + oneItemHeadCount
+            -- end
             local offset = self.RenderOffset[self.LightType] or vector_origin
             self.LongOffset = self.LongOffset or vector_origin
             if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,Angle(0, 0, 0),LenseNum) end
