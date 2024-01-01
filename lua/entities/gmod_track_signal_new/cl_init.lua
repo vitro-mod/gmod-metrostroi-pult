@@ -350,7 +350,7 @@ function ENT:Think()
             -- end
             local offset = self.RenderOffset[self.LightType] or vector_origin
             self.LongOffset = self.LongOffset or vector_origin
-            if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,Angle(0, 0, 0),LenseNum) end
+            if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,angle_zero,LenseNum) end
             if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*vector_mirror,Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
 
 
@@ -425,8 +425,8 @@ function ENT:Think()
 				if assembled then self.LongOffset = vector_origin end
                 local offsetAndLongOffset = offset + self.LongOffset
 				--SpawnHead(ID,model,pos,ang,glass,notM,add)
-                if not self.Left or self.Double then    self:SpawnHead(ID,data[2],self.BasePosition + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,notM) end
-                if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*vector_mirror + offsetAndLongOffset,Angle(0, 0, 0),data[3] and data[3].glass,notM,true) end
+                if not self.Left or self.Double then    self:SpawnHead(ID,data[2],self.BasePosition + offsetAndLongOffset,angle_zero,data[3] and data[3].glass,notM) end
+                if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*vector_mirror + offsetAndLongOffset,angle_zero,data[3] and data[3].glass,notM,true) end
 
                 if v ~= "M" then
                     for i = 1,#v do
@@ -439,8 +439,8 @@ function ENT:Think()
 						--if assembled then lenOff = Vector(0,0,100) end
                         ID2 = ID2 + 1
 						if assembled and i < #v then
-							if not self.Left or self.Double then    self:SpawnHead(ID..ID2,lenMdl[2],self.BasePosition + offsetAndLongOffset + Vector(0,0,TLM['step']*i),Angle(0, 0, 0),lenMdl[3] and lenMdl[3].glass,not lenM) end
-							if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),(not TLM.noleft) and lenMdl[2]:Replace(".mdl","_mirror.mdl") or lenMdl[2],self.BasePosition*vector_mirror + offsetAndLongOffset + Vector(0,0,TLM['step']*i),Angle(0, 0, 0),lenMdl[3] and lenMdl[3].glass,not lenM,true) end					
+							if not self.Left or self.Double then    self:SpawnHead(ID..ID2,lenMdl[2],self.BasePosition + offsetAndLongOffset + Vector(0,0,TLM['step']*i),angle_zero,lenMdl[3] and lenMdl[3].glass,not lenM) end
+							if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),(not TLM.noleft) and lenMdl[2]:Replace(".mdl","_mirror.mdl") or lenMdl[2],self.BasePosition*vector_mirror + offsetAndLongOffset + Vector(0,0,TLM['step']*i),angle_zero,lenMdl[3] and lenMdl[3].glass,not lenM,true) end					
 						end						
                         if not self.Signals[ID2] then self.Signals[ID2] = {} end
                         
@@ -620,10 +620,10 @@ function ENT:Think()
                     if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
                     local offsetAndLongOffset = offset + self.LongOffset
 					if not self.DoubleL then
-						self:SetLight(ID,ID2,self.BasePosition*(self.Left and vector_mirror or 1) + offsetAndLongOffset + lenOff*(self.Left and vector_mirror or 1),Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State, self.Signals[ID2].Stop)
+						self:SetLight(ID,ID2,self.BasePosition*(self.Left and vector_mirror or 1) + offsetAndLongOffset + lenOff*(self.Left and vector_mirror or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State, self.Signals[ID2].Stop)
 					else
-						self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + lenOff,Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
-						self:SetLight(ID,ID2.."x",self.BasePosition*vector_mirror + offsetAndLongOffset + lenOff*vector_mirror,Angle(0, 0, 0),self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+						self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + lenOff,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+						self:SetLight(ID,ID2.."x",self.BasePosition*vector_mirror + offsetAndLongOffset + lenOff*vector_mirror,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
 					end
                     self.Signals[ID2].State = State
                 end
