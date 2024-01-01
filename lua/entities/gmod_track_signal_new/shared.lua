@@ -23,6 +23,8 @@ Metrostroi.LiterWarper = {
 	W = "o",Q = "z",
 }
 
+vector_mirror = Vector(-1, 1, 1)
+
 -- Lamp indexes
 -- 0 Red
 -- 1 Yellow
