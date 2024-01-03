@@ -141,7 +141,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
     end
 	
 	self.Sprites[IDID2] = {
-        pos = self:LocalToWorld(pos+Metrostroi.SigSpriteOffset), 
+        pos = self:LocalToWorld(pos+Metrostroi.SigSpriteOffset+(TLM.sprite_offset or vector_origin)), 
         bri = State, col = Metrostroi.Lenses[self.SpriteConverter[skin+1]], 
         mul = Metrostroi.SigTypeSpriteMul[self.LightType] * self.SpriteMultiplier[skin+1]
     }
