@@ -112,6 +112,7 @@ function ENT:SpawnHead(ID,model,pos,ang,glass,notM,add)
                     self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and vector_mirror or 1)))
                     self.Models[1][ID_glassi]:SetAngles(self:LocalToWorldAngles(ang))
                     self.Models[1][ID_glassi]:SetParent(self)
+                    self.Models[1][ID_glassi]:SetModelScale(TLM.lense_scale or 1)
                 end
             end
         end
@@ -119,6 +120,7 @@ function ENT:SpawnHead(ID,model,pos,ang,glass,notM,add)
 end
 
 function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
+    local TLM = self.TrafficLightModels[self.LightType]
     local IsStateAboveZero = State > 0
     local IDID2 = ID..ID2
     local IsModelValid = IsValid(self.Models[3][IDID2])
@@ -138,6 +140,7 @@ function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
         self.Models[3][IDID2]:SetParent(self)
         self.Models[3][IDID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
         self.Models[3][IDID2]:SetColor(Color(255,255,255,State*255))
+        self.Models[3][IDID2]:SetModelScale(TLM.lense_scale or 1)
     end
 	
 	self.Sprites[IDID2] = {
@@ -744,6 +747,7 @@ function ENT:LightSprites()
 end
 
 function ENT:Sprite(pos, ang, col, bri, mul, handlerKey )
+    local TLM = self.TrafficLightModels[self.LightType]
     if bri <= 0 then return end
     local Visible = 0
     if self.PixVisibleHandlers[handlerKey] then
@@ -759,7 +763,7 @@ function ENT:Sprite(pos, ang, col, bri, mul, handlerKey )
 		viewdot = viewdot
 		if ( viewdot > 0 ) then
 			Visible = Visible * viewdot
-			local s = bri ^ 0.5 * math.Clamp(dist ^ 0.5 /32,64,384) * mul
+			local s = bri ^ 0.5 * math.Clamp(dist ^ 0.5 /32,64,384) * mul * (TLM.lense_scale or 1)
 			--local s = bri ^ 0.5 * math.Clamp(dist/20,48,256)
 			s = s * Visible
 			render.SetMaterial( self.SpriteMat )
