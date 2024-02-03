@@ -384,7 +384,7 @@ function ENT:CreateModels()
             if assembled and v[#v] == 'M' then data = TLM['M'] notM = false self.RouteNumber = ID end
             if not data then continue end			
             local vec = data[1]
-            if assembled then curoffset = Vector(0,0,TLM['kronOff'] + TLM['step'] * #v) end
+            if assembled then curoffset = TLM['kronOff'] + TLM['step'] * #v end
             if first then
                 first = false
             else
@@ -405,12 +405,12 @@ function ENT:CreateModels()
                     local lenM = v[#v-i] == 'M'
                     local lenMdl = TLM.single
                     if lenM then lenMdl = TLM.M end
-                    if assembled then lenOff = TLM['single'][3][0] - Vector(0,0,TLM['step'] * (i-#v)) end
+                    if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i-#v) end
                     --if assembled then lenOff = Vector(0,0,100) end
                     ID2 = ID2 + 1
                     if assembled and i < #v then
-                        if not self.Left or self.Double then    self:SpawnHead(ID..ID2,lenMdl[2],self.BasePosition + offsetAndLongOffset + Vector(0,0,TLM['step']*i),angle_zero,lenMdl[3] and lenMdl[3].glass,not lenM) end
-                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),(not TLM.noleft) and lenMdl[2]:Replace(".mdl","_mirror.mdl") or lenMdl[2],self.BasePosition*vector_mirror + offsetAndLongOffset + Vector(0,0,TLM['step']*i),angle_zero,lenMdl[3] and lenMdl[3].glass,not lenM,true) end					
+                        if not self.Left or self.Double then    self:SpawnHead(ID..ID2,lenMdl[2],self.BasePosition + offsetAndLongOffset + TLM['step']*i,angle_zero,lenMdl[3] and lenMdl[3].glass,not lenM) end
+                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),(not TLM.noleft) and lenMdl[2]:Replace(".mdl","_mirror.mdl") or lenMdl[2],self.BasePosition*vector_mirror + offsetAndLongOffset + TLM['step']*i,angle_zero,lenMdl[3] and lenMdl[3].glass,not lenM,true) end					
                     end						
                     if not self.Signals[ID2] then self.Signals[ID2] = {} end
                     
@@ -554,7 +554,7 @@ function ENT:UpdateModels(CurrentTime)
         if assembled and v[#v] == 'M' then data = TLM['M'] notM = false end			
         local vec = data[1]
         
-        if assembled then curoffset = Vector(0,0,TLM['kronOff'] + TLM['step'] * #v) end
+        if assembled then curoffset = TLM['kronOff'] + TLM['step'] * #v end
         if first then
             first = false
         else
@@ -572,7 +572,7 @@ function ENT:UpdateModels(CurrentTime)
             for i = 1,#v do
                 ID2 = ID2 + 1
                 local lenOff = data[3][i-1]
-                if assembled then lenOff = TLM['single'][3][0] - Vector(0,0,TLM['step'] * (i-#v)) end
+                if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i-#v) end
                 if v[#v-i] == "M" then
                     if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]] and IsValid(self.Models[1][ID..ID2]) then self.Models[1][ID..ID2]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]]) end
                     if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]] and IsValid(self.Models[1][ID..ID2.."d"]) then self.Models[1][ID..ID2.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]]) end
