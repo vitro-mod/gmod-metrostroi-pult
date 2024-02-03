@@ -112,6 +112,8 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft)
         for i,tbl in pairs(TLM[head][3][k]) do
             local ID_modeli = ID_model..i
             if IsValid(self.Models[1][ID_modeli]) then continue end
+            if tbl.left and not isLeft then continue end
+            if tbl.right and isLeft then continue end
             self.Models[1][ID_modeli] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
             self.Models[1][ID_modeli]:SetPos(self:LocalToWorld(pos+tbl[2]*(isLeft and vector_mirror or 1)))
             self.Models[1][ID_modeli]:SetAngles(self:LocalToWorldAngles(ang))
