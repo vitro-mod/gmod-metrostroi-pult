@@ -104,18 +104,16 @@ function ENT:SpawnHead(ID,model,pos,ang,glass,notM,add)
         if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset*(self.Left and LampIndicator[1] or LampIndicator[2]) end
         self.RN = self.RN + 1
     end
-    if notM then
-        if glass then
-            local ID_glass = tostring(ID).."_glass"
-            for i,tbl in pairs(glass) do
-                local ID_glassi = ID_glass..i
-                if not IsValid(self.Models[1][ID_glassi]) then  --NEWLENSES
-                    self.Models[1][ID_glassi] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
-                    self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and vector_mirror or 1)))
-                    self.Models[1][ID_glassi]:SetAngles(self:LocalToWorldAngles(ang))
-                    self.Models[1][ID_glassi]:SetParent(self)
-                    self.Models[1][ID_glassi]:SetModelScale(TLM.lense_scale or 1)
-                end
+    if notM and glass then
+        local ID_glass = tostring(ID).."_glass"
+        for i,tbl in pairs(glass) do
+            local ID_glassi = ID_glass..i
+            if not IsValid(self.Models[1][ID_glassi]) then  --NEWLENSES
+                self.Models[1][ID_glassi] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
+                self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and vector_mirror or 1)))
+                self.Models[1][ID_glassi]:SetAngles(self:LocalToWorldAngles(ang))
+                self.Models[1][ID_glassi]:SetParent(self)
+                self.Models[1][ID_glassi]:SetModelScale(TLM.lense_scale or 1)
             end
         end
     end
