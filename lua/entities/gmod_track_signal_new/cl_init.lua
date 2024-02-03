@@ -80,8 +80,10 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
     end
 end
 
-function ENT:SpawnHead(ID,model,pos,ang,glass,notM,add)
+function ENT:SpawnHead(ID,head,pos,ang,isLeft)
     local TLM = self.TrafficLightModels[self.LightType]
+    local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(".mdl","_mirror.mdl") or TLM[head][2]
+    local glass = TLM[head][3] and TLM[head][3].glass
 
     if not IsValid(self.Models[1][ID]) then
         self.Models[1][ID] = ClientsideModel(model,RENDERGROUP_OPAQUE)
@@ -104,17 +106,17 @@ function ENT:SpawnHead(ID,model,pos,ang,glass,notM,add)
         if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset*(self.Left and LampIndicator[1] or LampIndicator[2]) end
         self.RN = self.RN + 1
     end
-    if notM and glass then
-        local ID_glass = tostring(ID).."_glass"
-        for i,tbl in pairs(glass) do
-            local ID_glassi = ID_glass..i
-            if not IsValid(self.Models[1][ID_glassi]) then  --NEWLENSES
-                self.Models[1][ID_glassi] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
-                self.Models[1][ID_glassi]:SetPos(self:LocalToWorld(pos+tbl[2]*(add and vector_mirror or 1)))
-                self.Models[1][ID_glassi]:SetAngles(self:LocalToWorldAngles(ang))
-                self.Models[1][ID_glassi]:SetParent(self)
-                self.Models[1][ID_glassi]:SetModelScale(TLM.lense_scale or 1)
-            end
+    for k,v in pairs(TLM[head][3]) do
+        local ID_model = tostring(ID).."_"..k
+        if type(k) ~= "string" then continue end
+        for i,tbl in pairs(TLM[head][3][k]) do
+            local ID_modeli = ID_model..i
+            if IsValid(self.Models[1][ID_modeli]) then continue end
+            self.Models[1][ID_modeli] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
+            self.Models[1][ID_modeli]:SetPos(self:LocalToWorld(pos+tbl[2]*(isLeft and vector_mirror or 1)))
+            self.Models[1][ID_modeli]:SetAngles(self:LocalToWorldAngles(ang))
+            self.Models[1][ID_modeli]:SetParent(self)
+            self.Models[1][ID_modeli]:SetModelScale(tbl[3] or 1)
         end
     end
 end
@@ -364,11 +366,14 @@ function ENT:CreateModels()
         self.RouteHeads = self.RouteHeads or {}
         for _,v in ipairs(self.LensesTBL) do
             local data
+            local head
             if not TLM[v] then
                 if not TLM['single'] then 
-                    data = TLM[#v-1] 
+                    data = TLM[#v-1]
+                    head = #v-1
                 else
                     data = TLM[0]
+                    head = 0
                     assembled = true
                 end
             else
@@ -379,9 +384,15 @@ function ENT:CreateModels()
                     self.RouteNumber = ID
                 end
                 data = TLM[v]
+                head = v
             end
             local notM = v~="M"
-            if assembled and v[#v] == 'M' then data = TLM['M'] notM = false self.RouteNumber = ID end
+            if assembled and v[#v] == 'M' then 
+                data = TLM['M'] 
+                head = 'M'
+                notM = false 
+                self.RouteNumber = ID 
+            end
             if not data then continue end			
             local vec = data[1]
             if assembled then curoffset = TLM['kronOff'] + TLM['step'] * #v end
@@ -394,9 +405,9 @@ function ENT:CreateModels()
             self.NamesOffset = self.NamesOffset + vec
             if assembled then self.LongOffset = vector_origin end
             local offsetAndLongOffset = offset + self.LongOffset
-            --SpawnHead(ID,model,pos,ang,glass,notM,add)
-            if not self.Left or self.Double then    self:SpawnHead(ID,data[2],self.BasePosition + offsetAndLongOffset,angle_zero,data[3] and data[3].glass,notM) end
-            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),(not TLM.noleft) and data[2]:Replace(".mdl","_mirror.mdl") or data[2],self.BasePosition*vector_mirror + offsetAndLongOffset,angle_zero,data[3] and data[3].glass,notM,true) end
+            --SpawnHead(ID,model,pos,ang,isLeft)
+            if not self.Left or self.Double then self:SpawnHead(ID,head,self.BasePosition + offsetAndLongOffset,angle_zero) end
+            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,self.BasePosition*vector_mirror + offsetAndLongOffset,angle_zero,true) end
 
             if v ~= "M" then
                 for i = 1,#v do
@@ -409,8 +420,8 @@ function ENT:CreateModels()
                     --if assembled then lenOff = Vector(0,0,100) end
                     ID2 = ID2 + 1
                     if assembled and i < #v then
-                        if not self.Left or self.Double then    self:SpawnHead(ID..ID2,lenMdl[2],self.BasePosition + offsetAndLongOffset + TLM['step']*i,angle_zero,lenMdl[3] and lenMdl[3].glass,not lenM) end
-                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),(not TLM.noleft) and lenMdl[2]:Replace(".mdl","_mirror.mdl") or lenMdl[2],self.BasePosition*vector_mirror + offsetAndLongOffset + TLM['step']*i,angle_zero,lenMdl[3] and lenMdl[3].glass,not lenM,true) end					
+                        if not self.Left or self.Double then self:SpawnHead(ID..ID2,head,self.BasePosition + offsetAndLongOffset + TLM['step']*i,angle_zero) end
+                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,self.BasePosition*vector_mirror + offsetAndLongOffset + TLM['step']*i,angle_zero,true) end					
                     end						
                     if not self.Signals[ID2] then self.Signals[ID2] = {} end
                     
@@ -420,8 +431,8 @@ function ENT:CreateModels()
                     end
                 end
             elseif self.UseRoutePointerFont[self.LightType] then
-                if not self.Left or self.Double then self:SpawnPointerLamps(ID, self.BasePosition + TLM.M[3] + offsetAndLongOffset, TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7]) end
-                if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", self.BasePosition*vector_mirror + TLM.M[3] + offsetAndLongOffset, TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7]) end
+                if not self.Left or self.Double then self:SpawnPointerLamps(ID, self.BasePosition + TLM.M[4] + offsetAndLongOffset, TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
+                if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", self.BasePosition*vector_mirror + TLM.M[4] + offsetAndLongOffset, TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
             end
             ID = ID + 1
         end
@@ -610,8 +621,8 @@ function ENT:UpdateModels(CurrentTime)
                 if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
             else
                 if Metrostroi.RoutePointerFont[self.Num[self.rnIdx]] and (not self.NumLit[ID] or self.NumLit[ID] ~= self.Num[self.rnIdx]) then
-                    if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, TLM.M[8], TLM.M[9]) end
-                    if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."il", TLM.M[8], TLM.M[9]) end
+                    if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, TLM.M[9], TLM.M[10]) end
+                    if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."il", TLM.M[9], TLM.M[10]) end
                     self.NumLit[ID] = self.Num[self.rnIdx]
                 end
             end

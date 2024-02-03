@@ -113,7 +113,7 @@ ENT.TrafficLightModels[0] = {
 				}
 				}},
 
-	M = { Vector(0,0,24), "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.1,2, 19.5), 1.75, 2.05, 4},
+	M = { Vector(0,0,24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(13.1,2, 19.5), 1.75, 2.05, 4},
 	arsletter = true,
 }
 
@@ -153,7 +153,7 @@ ENT.TrafficLightModels[1] = {
 					{"models/metrostroi/signals/mus/lamp_lens.mdl",Vector(0,13.3,7.97 )},
 				}
 				}},
-	M = { Vector(0,0,40), "models/metrostroi/signals/mus/light_pathindicator3.mdl",  Vector(7,11, 25), 3.6, 3.4, 5},
+	M = { Vector(0,0,40), "models/metrostroi/signals/mus/light_pathindicator3.mdl", {}, Vector(7,11, 25), 3.6, 3.4, 5},
 	noleft = true,
 }
 
@@ -200,7 +200,7 @@ ENT.TrafficLightModels[2] = {
 				}
 				}},
 
-	M = { Vector(0,0,24), "models/metrostroi/signals/mus/light_pathindicator.mdl",  Vector(13.8,2, 22.8), 1.8, 2.1, 4},
+	M = { Vector(0,0,24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(13.8,2, 22.8), 1.8, 2.1, 4},
 }
 
 --------------------------------------------------------------------------------
@@ -297,7 +297,7 @@ ENT.TrafficLightModels[5] = {
 				}
 				}},
 
-	M = { Vector(0,0,24.5), "models/virus/new_signals/path_ind.mdl",  Vector(13.1,2, 19.5), 1.75, 2.05, 4},
+	M = { Vector(0,0,24.5), "models/virus/new_signals/path_ind.mdl", {}, Vector(13.1,2, 19.5), 1.75, 2.05, 4},
 }
 
 ENT.SignalConverter = {
