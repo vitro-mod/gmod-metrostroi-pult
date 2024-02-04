@@ -100,10 +100,12 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft)
     if rouid and not IsValid(self.Models[1][rouid]) then
         local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 2 or 1) or 5)
         local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
-        self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd],RENDERGROUP_OPAQUE)
-        self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset+(self.Left and LampIndicator[1] or LampIndicator[2])))
-        self.Models[1][rouid]:SetAngles(self:GetAngles())
-        self.Models[1][rouid]:SetParent(self)
+        if LampIndicator.models[rnadd] then
+            self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd],RENDERGROUP_OPAQUE)
+            self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset+(self.Left and LampIndicator[1] or LampIndicator[2])))
+            self.Models[1][rouid]:SetAngles(self:GetAngles())
+            self.Models[1][rouid]:SetParent(self)
+        end
         if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset+(self.Left and LampIndicator[1] or LampIndicator[2]) end
         self.RN = self.RN + 1
     end
