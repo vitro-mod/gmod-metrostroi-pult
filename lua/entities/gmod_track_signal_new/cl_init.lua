@@ -98,13 +98,13 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft)
     local id = self.RN
     local rouid = id and "rou"..id
     if rouid and not IsValid(self.Models[1][rouid]) then
-        local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "2" or "") or "5")
+        local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 2 or 1) or 5)
         local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
-        self.Models[1][rouid] = ClientsideModel(LampIndicator.model..rnadd..".mdl",RENDERGROUP_OPAQUE)
-        self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset*(self.Left and LampIndicator[1] or LampIndicator[2])))
+        self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd],RENDERGROUP_OPAQUE)
+        self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset+(self.Left and LampIndicator[1] or LampIndicator[2])))
         self.Models[1][rouid]:SetAngles(self:GetAngles())
         self.Models[1][rouid]:SetParent(self)
-        if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset*(self.Left and LampIndicator[1] or LampIndicator[2]) end
+        if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset+(self.Left and LampIndicator[1] or LampIndicator[2]) end
         self.RN = self.RN + 1
     end
     for k,v in pairs(TLM[head][3]) do
@@ -338,10 +338,10 @@ function ENT:CreateModels()
         end
         if self.RouteNumbers.sep and self.RouteNumbers[self.RouteNumbers.sep][1] ~= "X" then
             local id = self.RouteNumbers.sep
-            local rnadd = self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and "3" or "4"
-            self.Models[1]["rous"] = ClientsideModel(TLM.LampIndicator.model..rnadd..".mdl",RENDERGROUP_OPAQUE)
+            local rnadd = self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 3 or 4
+            self.Models[1]["rous"] = ClientsideModel(TLM.LampIndicator.models[rnadd],RENDERGROUP_OPAQUE)
             self.RouteNumbers[id].pos = (self.BasePosition+offset+self.LongOffset-TLM.LampIndicator[3])
-            if self.Left then self.RouteNumbers[id].pos = self.RouteNumbers[id].pos*TLM.LampIndicator[4] end
+            if self.Left then self.RouteNumbers[id].pos = self.RouteNumbers[id].pos*vector_mirror+TLM.LampIndicator[4] end
             self.Models[1]["rous"]:SetPos(self:LocalToWorld(self.RouteNumbers[id].pos))
             self.Models[1]["rous"]:SetAngles(self:GetAngles())
             self.Models[1]["rous"]:SetParent(self)
@@ -443,7 +443,7 @@ function ENT:CreateModels()
         end
         if self.Arrow then
             local id = self.Arrow
-            self.Models[1]["roua"] = ClientsideModel(TLM.LampIndicator.model.."4.mdl",RENDERGROUP_OPAQUE)
+            self.Models[1]["roua"] = ClientsideModel(TLM.LampIndicator.models[4],RENDERGROUP_OPAQUE)
             self.SpecRouteNumbers.pos = (self.BasePosition+offset+self.LongOffset-TLM.LampIndicator[5])*(self.Left and TLM.LampIndicator[6] or 1) - (self.RouteNumberOffset or vector_origin)
             self.Models[1]["roua"]:SetPos(self:LocalToWorld(self.SpecRouteNumbers.pos))
             self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-90,0,0) or Angle(90,0,0)))
@@ -641,8 +641,8 @@ function ENT:UpdateModels(CurrentTime)
         ID = ID + 1
     end
 
-    local LampIndicatorModels_numb_mdl = TLM.LampIndicator.model.."_numb_l.mdl"
-    local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.model.."_lamp.mdl"
+    local LampIndicatorModels_numb_mdl = TLM.LampIndicator.models['numb']
+    local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.models['lamp']
     for k,v in pairs(self.RouteNumbers) do
         if k == "sep" then continue end
         local rou1k = "rou1"..k

@@ -339,7 +339,23 @@ for i = 0,(#ENT.TrafficLightModels) do
 	end
 	
 	--CLIENT
-	ENT.TrafficLightModels[i].LampIndicator = {model = "models/metrostroi/signals/mus/light_lampindicator", Vector(0.2), Vector(1), Vector(8), Vector(-0.9,1,1), Vector(3,0,3), Vector(-1,1,0.85)}
+	ENT.TrafficLightModels[i].LampIndicator = {
+		models = {
+			"models/metrostroi/signals/mus/light_lampindicator.mdl",
+			"models/metrostroi/signals/mus/light_lampindicator2.mdl",
+			"models/metrostroi/signals/mus/light_lampindicator3.mdl",
+			"models/metrostroi/signals/mus/light_lampindicator4.mdl",
+			"models/metrostroi/signals/mus/light_lampindicator5.mdl",
+			numb = "models/metrostroi/signals/mus/light_lampindicator_numb_l.mdl",
+			lamp = "models/metrostroi/signals/mus/light_lampindicator_lamp.mdl",
+		},
+		Vector(7.9), -- Indicator model offset if left
+		Vector(0), -- Indicator model offset
+		Vector(8), -- Sep (on short kron) Indicator model offset
+		Vector(-12,0,0), -- Sep (on short kron) Indicator model offset if left
+		Vector(3,0,3), -- Arrow offset
+		Vector(-1,1,0.85), -- Arrow offset if left
+	}
 	ENT.TrafficLightModels[i].LampBase = {model = "models/metrostroi/signals/mus/lamp_base.mdl"}
 	ENT.TrafficLightModels[i].SignLetterSmall = {model = "models/metrostroi/signals/mus/sign_letter_small.mdl", Vector(1.5,0,0), Vector(-1.5,0,0)}
 	ENT.TrafficLightModels[i].SignLetter = {model = "models/metrostroi/signals/mus/sign_letter.mdl", z = 5.85}
