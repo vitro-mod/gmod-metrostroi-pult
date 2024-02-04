@@ -84,6 +84,7 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft)
     local TLM = self.TrafficLightModels[self.LightType]
     local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(".mdl","_mirror.mdl") or TLM[head][2]
     local glass = TLM[head][3] and TLM[head][3].glass
+    local longKron = #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep)
 
     if not IsValid(self.Models[1][ID]) then
         self.Models[1][ID] = ClientsideModel(model,RENDERGROUP_OPAQUE)
@@ -114,6 +115,8 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft)
             if IsValid(self.Models[1][ID_modeli]) then continue end
             if tbl.left and not isLeft then continue end
             if tbl.right and isLeft then continue end
+            if tbl.long and not longKron then continue end
+            if tbl.short and longKron then continue end
             self.Models[1][ID_modeli] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
             self.Models[1][ID_modeli]:SetPos(self:LocalToWorld(pos+tbl[2]*(isLeft and vector_mirror or 1)))
             self.Models[1][ID_modeli]:SetAngles(self:LocalToWorldAngles(ang))
