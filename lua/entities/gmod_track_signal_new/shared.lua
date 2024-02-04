@@ -298,6 +298,7 @@ ENT.TrafficLightModels[5] = {
 				}},
 
 	M = { Vector(0,0,24.5), "models/virus/new_signals/path_ind.mdl", {}, Vector(13.1,2, 19.5), 1.75, 2.05, 4},
+	M_single = { Vector(0,0,24.5), "models/virus/new_signals/path_ind_single.mdl", {}},
 }
 
 ENT.SignalConverter = {

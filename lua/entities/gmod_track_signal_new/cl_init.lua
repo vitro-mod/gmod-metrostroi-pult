@@ -421,9 +421,8 @@ function ENT:CreateModels()
                 for i = 1,#v do
                     local lnum = assembled and 1 or i
                     local lenOff = data[3][i-1]
-                    local lenM = v[#v-i] == 'M'
-                    local lenMdl = TLM.single
-                    if lenM then lenMdl = TLM.M end
+                    local head = 'single'
+                    if v[#v-i] == 'M' then head = 'M_single' end
                     if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i-#v) end
                     --if assembled then lenOff = Vector(0,0,100) end
                     ID2 = ID2 + 1
