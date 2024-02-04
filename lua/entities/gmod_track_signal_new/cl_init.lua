@@ -757,6 +757,7 @@ function ENT:Think()
     end
     return true
 end
+
 local cols = {
     R = Color(200,0,0),
     Y = Color(200,200,0),
@@ -764,6 +765,7 @@ local cols = {
     W = Color(200,200,200),
     B = Color(0,0,200),
 }
+
 function ENT:Draw()
     -- Draw model
     self:DrawModel()
