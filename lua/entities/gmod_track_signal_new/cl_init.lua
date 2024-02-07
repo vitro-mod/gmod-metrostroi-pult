@@ -80,7 +80,7 @@ function ENT:SpawnMainModels(pos,ang,LenseNum,add)
     end
 end
 
-function ENT:SpawnHead(ID,head,pos,ang,isLeft)
+function ENT:SpawnHead(ID,head,pos,ang,isLeft,isLast)
     local TLM = self.TrafficLightModels[self.LightType]
     local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(".mdl","_mirror.mdl") or TLM[head][2]
     local glass = TLM[head][3] and TLM[head][3].glass
@@ -119,6 +119,8 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft)
             if tbl.right and isLeft then continue end
             if tbl.long and not longKron then continue end
             if tbl.short and longKron then continue end
+            if tbl.middle and isLast then continue end
+            if tbl.last and not isLast then continue end
             self.Models[1][ID_modeli] = ClientsideModel(tbl[1],RENDERGROUP_OPAQUE)
             self.Models[1][ID_modeli]:SetPos(self:LocalToWorld(pos+tbl[2]*(isLeft and vector_mirror or 1)))
             self.Models[1][ID_modeli]:SetAngles(self:LocalToWorldAngles(ang))
@@ -427,8 +429,8 @@ function ENT:CreateModels()
                     --if assembled then lenOff = Vector(0,0,100) end
                     ID2 = ID2 + 1
                     if assembled and i < #v then
-                        if not self.Left or self.Double then self:SpawnHead(ID..ID2,head,self.BasePosition + offsetAndLongOffset + TLM['step']*i,angle_zero) end
-                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,self.BasePosition*vector_mirror + offsetAndLongOffset + TLM['step']*i,angle_zero,true) end					
+                        if not self.Left or self.Double then self:SpawnHead(ID..ID2,head,self.BasePosition + offsetAndLongOffset + TLM['step']*i,angle_zero,false,i == #v-1) end
+                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,self.BasePosition*vector_mirror + offsetAndLongOffset + TLM['step']*i,angle_zero,true,i == #v-1) end					
                     end						
                     if not self.Signals[ID2] then self.Signals[ID2] = {} end
                     
