@@ -128,6 +128,11 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft,isLast)
             self.Models[1][ID_modeli]:SetModelScale(tbl[3] or 1)
         end
     end
+
+    if self.UseRoutePointerFont[self.LightType] and (head == 'M' or head == 'M_single') then
+        if not self.Left or self.Double then self:SpawnPointerLamps(ID, pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
+        if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
+    end
 end
 
 function ENT:SetLight(ID,ID2,pos,ang,skin,State,Change)
@@ -439,9 +444,6 @@ function ENT:CreateModels()
                         self.PixVisibleHandlers[ID..ID2.."x"] = util.GetPixelVisibleHandle()
                     end
                 end
-            elseif self.UseRoutePointerFont[self.LightType] then
-                if not self.Left or self.Double then self:SpawnPointerLamps(ID, self.BasePosition + TLM.M[4] + offsetAndLongOffset, TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
-                if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", self.BasePosition*vector_mirror + TLM.M[4] + offsetAndLongOffset, TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
             end
             ID = ID + 1
         end
@@ -596,9 +598,7 @@ function ENT:UpdateModels(CurrentTime)
                 local lenOff = data[3][i-1]
                 if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i-#v) end
                 if v[#v-i] == "M" then
-                    if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]] and IsValid(self.Models[1][ID..ID2]) then self.Models[1][ID..ID2]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]]) end
-                    if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]] and IsValid(self.Models[1][ID..ID2.."d"]) then self.Models[1][ID..ID2.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnNums[v] + 1 - self.rnIdx]]) end
-                    self.rnIdx = self.rnIdx + 1
+                    self:UpdateRoutePointers(ID..ID2)
                 end
                 local n = tonumber(self.Sig[ID2])
                 if n and self.Signals[ID2].RealState ~= (n > 0) then
@@ -627,22 +627,10 @@ function ENT:UpdateModels(CurrentTime)
                 self.Signals[ID2].State = State
             end
         else
-            if not self.UseRoutePointerFont[self.LightType] then
-                if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-                if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-            else
-                if Metrostroi.RoutePointerFont[self.Num[self.rnIdx]] and (not self.NumLit[ID] or self.NumLit[ID] ~= self.Num[self.rnIdx]) then
-                    if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, TLM.M[9], TLM.M[10]) end
-                    if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."il", TLM.M[9], TLM.M[10]) end
-                    self.NumLit[ID] = self.Num[self.rnIdx]
-                end
-            end
-            self.rnIdx = self.rnIdx + 1
+            self:UpdateRoutePointers(ID)
         end
         if v[#v] == "M" and assembled then
-            if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-            if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-            self.rnIdx = self.rnIdx + 1
+            self:UpdateRoutePointers(ID)
         end
         ID = ID + 1
     end
@@ -851,6 +839,22 @@ function ENT:UpdatePointerLamps(ID, SpriteColor, SpriteMultiplier)
             }
         end
     end
+end
+
+function ENT:UpdateRoutePointers(ID)
+    local TLM = self.TrafficLightModels[self.LightType]
+
+    if not self.UseRoutePointerFont[self.LightType] then
+        if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+        if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
+    else
+        if Metrostroi.RoutePointerFont[self.Num[self.rnIdx]] and (not self.NumLit[ID] or self.NumLit[ID] ~= self.Num[self.rnIdx]) then
+            if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, TLM.M[9], TLM.M[10]) end
+            if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."il", TLM.M[9], TLM.M[10]) end
+            self.NumLit[ID] = self.Num[self.rnIdx]
+        end
+    end
+    self.rnIdx = self.rnIdx + 1
 end
 
 local debug = GetConVar("metrostroi_drawsignaldebug")
