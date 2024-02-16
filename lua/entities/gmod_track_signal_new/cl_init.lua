@@ -131,7 +131,7 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft,isLast)
 
     if self.UseRoutePointerFont[self.LightType] and (head == 'M' or head == 'M_single') then
         if not self.Left or self.Double then self:SpawnPointerLamps(ID, pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
-        if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
+        if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", pos*vector_mirror + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
     end
 end
 
@@ -409,11 +409,10 @@ function ENT:CreateModels()
                 else offset = offset - curoffset end
             end
             self.NamesOffset = self.NamesOffset + vec
-            if assembled then self.LongOffset = vector_origin end
             local offsetAndLongOffset = offset + self.LongOffset
             --SpawnHead(ID,model,pos,ang,isLeft)
             if not self.Left or self.Double then self:SpawnHead(ID,head,self.BasePosition + offsetAndLongOffset,angle_zero,false,#v == 1) end
-            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,self.BasePosition*vector_mirror + offsetAndLongOffset,angle_zero,true,#v == 1) end
+            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,(self.BasePosition + offsetAndLongOffset)*vector_mirror ,angle_zero,true,#v == 1) end
 
             if v ~= "M" then
                 for i = 1,#v do
@@ -426,7 +425,7 @@ function ENT:CreateModels()
                     ID2 = ID2 + 1
                     if assembled and i < #v then
                         if not self.Left or self.Double then self:SpawnHead(ID..ID2,head,self.BasePosition + offsetAndLongOffset + TLM['step']*(#v-i),angle_zero,false,i == #v-1) end
-                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,self.BasePosition*vector_mirror + offsetAndLongOffset + TLM['step']*(#v-i),angle_zero,true,i == #v-1) end					
+                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,(self.BasePosition + offsetAndLongOffset)*vector_mirror + TLM['step']*(#v-i),angle_zero,true,i == #v-1) end					
                     end						
                     if not self.Signals[ID2] then self.Signals[ID2] = {} end
                     
@@ -606,10 +605,10 @@ function ENT:UpdateModels(CurrentTime)
                 if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[lID2].State = nil end
                 local offsetAndLongOffset = offset + self.LongOffset
                 if not self.DoubleL then
-                    self:SetLight(ID,ID2,self.BasePosition*(self.Left and vector_mirror or 1) + offsetAndLongOffset + lenOff*(self.Left and vector_mirror or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
+                    self:SetLight(ID,ID2,(self.BasePosition + offsetAndLongOffset)*(self.Left and vector_mirror or 1) + lenOff*(self.Left and vector_mirror or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
                 else
                     self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + lenOff,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
-                    self:SetLight(ID,ID2.."x",self.BasePosition*vector_mirror + offsetAndLongOffset + lenOff*vector_mirror,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
+                    self:SetLight(ID,ID2.."x",(self.BasePosition+offsetAndLongOffset)*vector_mirror + lenOff*vector_mirror,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
                 end
                 self.Signals[ID2].State = State
             end
