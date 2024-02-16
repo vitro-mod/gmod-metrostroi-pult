@@ -392,21 +392,12 @@ function ENT:CreateModels()
                     assembled = true
                 end
             else
-                if v == "M" then
-                    self.RouteNumber = ID
-                end
-                if v[#v] == "M" then
-                    self.RouteNumber = ID
-                end
                 data = TLM[v]
                 head = v
             end
-            local notM = v~="M"
             if assembled and v[#v] == 'M' then 
                 data = TLM['M'] 
                 head = 'M'
-                notM = false 
-                self.RouteNumber = ID 
             end
             if not data then continue end			
             local vec = data[1]
@@ -421,21 +412,21 @@ function ENT:CreateModels()
             if assembled then self.LongOffset = vector_origin end
             local offsetAndLongOffset = offset + self.LongOffset
             --SpawnHead(ID,model,pos,ang,isLeft)
-            if not self.Left or self.Double then self:SpawnHead(ID,head,self.BasePosition + offsetAndLongOffset,angle_zero) end
-            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,self.BasePosition*vector_mirror + offsetAndLongOffset,angle_zero,true) end
+            if not self.Left or self.Double then self:SpawnHead(ID,head,self.BasePosition + offsetAndLongOffset,angle_zero,false,#v == 1) end
+            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,self.BasePosition*vector_mirror + offsetAndLongOffset,angle_zero,true,#v == 1) end
 
             if v ~= "M" then
                 for i = 1,#v do
                     local lnum = assembled and 1 or i
                     local lenOff = data[3][i-1]
                     local head = 'single'
-                    if v[#v-i] == 'M' then head = 'M_single' end
+                    if v[i] == 'M' then head = 'M_single' end
                     if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i-#v) end
                     --if assembled then lenOff = Vector(0,0,100) end
                     ID2 = ID2 + 1
                     if assembled and i < #v then
-                        if not self.Left or self.Double then self:SpawnHead(ID..ID2,head,self.BasePosition + offsetAndLongOffset + TLM['step']*i,angle_zero,false,i == #v-1) end
-                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,self.BasePosition*vector_mirror + offsetAndLongOffset + TLM['step']*i,angle_zero,true,i == #v-1) end					
+                        if not self.Left or self.Double then self:SpawnHead(ID..ID2,head,self.BasePosition + offsetAndLongOffset + TLM['step']*(#v-i),angle_zero,false,i == #v-1) end
+                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,self.BasePosition*vector_mirror + offsetAndLongOffset + TLM['step']*(#v-i),angle_zero,true,i == #v-1) end					
                     end						
                     if not self.Signals[ID2] then self.Signals[ID2] = {} end
                     
@@ -558,6 +549,7 @@ function ENT:UpdateModels(CurrentTime)
     if self.RouteNumberOffset then offset = offset + self.RouteNumberOffset*(self.Left and vector_mirror or Vector(1,1)) end
     local ID = 0
     local ID2 = 0
+    local lID2 = 0
     local first = true
     local assembled = false
     self.rnIdx = 1
@@ -574,8 +566,7 @@ function ENT:UpdateModels(CurrentTime)
             data = TLM[v]
         end
         if not data then continue end
-        local notM = v~="M"
-        if assembled and v[#v] == 'M' then data = TLM['M'] notM = false end			
+        if assembled and v[#v] == 'M' then data = TLM['M'] end			
         local vec = data[1]
         
         if assembled then curoffset = TLM['kronOff'] + TLM['step'] * #v end
@@ -586,53 +577,50 @@ function ENT:UpdateModels(CurrentTime)
             else offset = offset - curoffset end
         end			
         
-        self.rnNums = {}
-        --self.NamesOffset = self.NamesOffset + data[1]
         if v~="M" then
-            self.rnNums[v] = 0
-            for i = 1,#v-1 do
-                if v[i] == "M" then self.rnNums[v] = self.rnNums[v] + 1 end
-            end
             for i = 1,#v do
                 ID2 = ID2 + 1
+                if v[i] ~= "M" then
+                    lID2 = lID2 + 1
+                end
                 local lenOff = data[3][i-1]
-                if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i-#v) end
-                if v[#v-i] == "M" then
-                    self:UpdateRoutePointers(ID..ID2)
+                if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i) + TLM['step'] * #v end
+
+                if v[i] == "M" then
+                    if i == #v then continue end
+                    self:UpdateRoutePointer(ID..ID2, self.Num[self.rnIdx])
+                    continue
                 end
-                local n = tonumber(self.Sig[ID2])
-                if n and self.Signals[ID2].RealState ~= (n > 0) then
-                    self.Signals[ID2].RealState = n > 0
+                local n = tonumber(self.Sig[lID2])
+                if n and self.Signals[lID2].RealState ~= (n > 0) then
+                    self.Signals[lID2].RealState = n > 0
                     --0.5 время между началом погасания выключаемого и началом включения включаемого
-                    self.Signals[ID2].Stop = CurrentTime + 0.1
+                    self.Signals[lID2].Stop = CurrentTime + 0.1
                 end
-                if self.Signals[ID2].Stop and CurrentTime - self.Signals[ID2].Stop > 0 then
-                    self.Signals[ID2].Stop = nil
+                if self.Signals[lID2].Stop and CurrentTime - self.Signals[lID2].Stop > 0 then
+                    self.Signals[lID2].Stop = nil
                 end
                 --Animate(clientProp, value, min, max, speed, damping, stickyness)
-                if v[i] == "M" then 
-                    i = i - 1
-                    continue 
-                end
                 --local State = self:Animate(ID.."/"..i,  ((n == 1 or (n == 2 and blink)) and not self.Signals[ID2].Stop) and 1 or 0,  0,1, blink and 256 or 128)
-                local State = ((n == 1 or (n == 2 and blink)) and not self.Signals[ID2].Stop) and 1 or 0
-                if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[ID2].State = nil end
+                local State = ((n == 1 or (n == 2 and blink)) and not self.Signals[lID2].Stop) and 1 or 0
+                if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[lID2].State = nil end
                 local offsetAndLongOffset = offset + self.LongOffset
                 if not self.DoubleL then
-                    self:SetLight(ID,ID2,self.BasePosition*(self.Left and vector_mirror or 1) + offsetAndLongOffset + lenOff*(self.Left and vector_mirror or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State, self.Signals[ID2].Stop)
+                    self:SetLight(ID,ID2,self.BasePosition*(self.Left and vector_mirror or 1) + offsetAndLongOffset + lenOff*(self.Left and vector_mirror or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
                 else
-                    self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + lenOff,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
-                    self:SetLight(ID,ID2.."x",self.BasePosition*vector_mirror + offsetAndLongOffset + lenOff*vector_mirror,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[ID2].State ~= State)
+                    self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + lenOff,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
+                    self:SetLight(ID,ID2.."x",self.BasePosition*vector_mirror + offsetAndLongOffset + lenOff*vector_mirror,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
                 end
                 self.Signals[ID2].State = State
             end
         else
-            self:UpdateRoutePointers(ID)
+            self:UpdateRoutePointer(ID, self.Num[self.rnIdx])
         end
         if v[#v] == "M" and assembled then
-            self:UpdateRoutePointers(ID)
+            self:UpdateRoutePointer(ID, self.Num[self.rnIdx])
         end
         ID = ID + 1
+        
     end
 
     local LampIndicatorModels_numb_mdl = TLM.LampIndicator.models['numb']
@@ -799,35 +787,40 @@ function ENT:Sprite(pos, ang, col, bri, mul, handlerKey )
 end
 
 function ENT:SpawnPointerLamps(ID, InitPos, StepX, StepY, Scale, mdl)
+    local TLM = self.TrafficLightModels[self.LightType]
+
     local xf = 0;
     local yf = 0;
+    local width = self.RoutePointerFontWidth[self.LightType] or 5
+    self.Font = TLM.RoutePointerFont or Metrostroi.RoutePointerFont
 
-    for i=1,#Metrostroi.RoutePointerFont[""] do
-        self.Models[4][ID..i] = ClientsideModel(mdl,RENDERGROUP_OPAQUE)
-        self.Models[4][ID..i]:SetPos(self:LocalToWorld((InitPos - Vector(xf * StepX, 0, yf * StepY)) ))
-        self.Models[4][ID..i]:SetAngles(self:LocalToWorldAngles(Angle(0,90,0)))
-        self.Models[4][ID..i]:SetModelScale(Scale)
-        self.Models[4][ID..i]:SetParent(self)
-        self.Models[4][ID..i]:SetNoDraw(true)
-        self.PixVisibleHandlers['m'..ID..i] = util.GetPixelVisibleHandle()
+    for i=1,#self.Font[""] do
+        local IDi = ID.."i"..i
+        self.Models[4][IDi] = ClientsideModel(mdl,RENDERGROUP_OPAQUE)
+        self.Models[4][IDi]:SetPos(self:LocalToWorld((InitPos - Vector(xf * StepX, 0, yf * StepY)) ))
+        self.Models[4][IDi]:SetAngles(self:LocalToWorldAngles(Angle(0,90,0)))
+        self.Models[4][IDi]:SetModelScale(Scale)
+        self.Models[4][IDi]:SetParent(self)
+        self.Models[4][IDi]:SetNoDraw(true)
+        self.PixVisibleHandlers[ID..'s'..i] = util.GetPixelVisibleHandle()
 
         xf = xf + 1
-        if xf == 5 then
+        if xf == width then
             xf = 0
             yf = yf + 1
         end
     end
 end
 
-function ENT:UpdatePointerLamps(ID, SpriteColor, SpriteMultiplier)
-    local pos = Vector(0,0.5,0)
+function ENT:UpdatePointerLamps(ID, rnState, SpriteColor, SpriteMultiplier)
+    local pos = Vector(0,SpriteMultiplier*2,0)
     pos:Rotate(self:GetAngles())
 
-    for i=1,#Metrostroi.RoutePointerFont[""] do
-        if not IsValid(self.Models[4][ID..i]) then return end
-        local state = Metrostroi.RoutePointerFont[self.Num[self.rnIdx]][i]
-        local IDi = ID..i
-        local mIDi = 'm'..ID..i
+    for i=1,#self.Font[""] do
+        local IDi = ID.."i"..i
+        if not IsValid(self.Models[4][IDi]) then return end
+        local state = self.Font[rnState][i]
+        local mIDi = ID..'s'..i
         self.Models[4][IDi]:SetSkin(state and 1 or 0)
         self.Models[4][IDi]:SetNoDraw(not state)
         if state or self.Sprites[mIDi] then
@@ -841,18 +834,16 @@ function ENT:UpdatePointerLamps(ID, SpriteColor, SpriteMultiplier)
     end
 end
 
-function ENT:UpdateRoutePointers(ID)
+function ENT:UpdateRoutePointer(ID, rnState)
     local TLM = self.TrafficLightModels[self.LightType]
 
     if not self.UseRoutePointerFont[self.LightType] then
-        if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-        if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[self.Num[self.rnIdx]] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[self.Num[self.rnIdx]]) end
-    else
-        if Metrostroi.RoutePointerFont[self.Num[self.rnIdx]] and (not self.NumLit[ID] or self.NumLit[ID] ~= self.Num[self.rnIdx]) then
-            if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, TLM.M[9], TLM.M[10]) end
-            if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."il", TLM.M[9], TLM.M[10]) end
-            self.NumLit[ID] = self.Num[self.rnIdx]
-        end
+        if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[rnState] and IsValid(self.Models[1][ID]) then self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[rnState]) end
+        if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[rnState] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[rnState]) end
+    elseif self.Font[rnState] and (not self.NumLit[ID] or self.NumLit[ID] ~= rnState) then
+        if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, rnState, TLM.M[9], TLM.M[10]) end
+        if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."il", rnState, TLM.M[9], TLM.M[10]) end
+        self.NumLit[ID] = rnState
     end
     self.rnIdx = self.rnIdx + 1
 end
