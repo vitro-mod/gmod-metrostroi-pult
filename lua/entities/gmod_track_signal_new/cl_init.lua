@@ -412,7 +412,7 @@ function ENT:CreateModels()
             local offsetAndLongOffset = offset + self.LongOffset
             --SpawnHead(ID,model,pos,ang,isLeft)
             if not self.Left or self.Double then self:SpawnHead(ID,head,self.BasePosition + offsetAndLongOffset,angle_zero,false,#v == 1) end
-            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,(self.BasePosition + offsetAndLongOffset)*vector_mirror ,angle_zero,true,#v == 1) end
+            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,(self.BasePosition + offsetAndLongOffset)*vector_mirror,angle_zero,true,#v == 1) end
 
             if v ~= "M" then
                 for i = 1,#v do
@@ -583,7 +583,7 @@ function ENT:UpdateModels(CurrentTime)
                     lID2 = lID2 + 1
                 end
                 local lenOff = data[3][i-1]
-                if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i) + TLM['step'] * #v end
+                if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i-#v) end
 
                 if v[i] == "M" then
                     if i == #v then continue end
