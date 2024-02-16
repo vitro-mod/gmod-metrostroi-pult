@@ -335,7 +335,6 @@ function ENT:CreateModels()
         --     LenseNum = LenseNum + oneItemHeadCount
         -- end
         local offset = self.RenderOffset[self.LightType] or vector_origin
-        if self.Left then offset = offset * vector_mirror end
         self.LongOffset = self.LongOffset or vector_origin
         if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,angle_zero,LenseNum) end
         if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*vector_mirror,Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
@@ -544,8 +543,7 @@ function ENT:UpdateModels(CurrentTime)
     
     if self.ARSOnly then return true end
     local offset = (self.RenderOffset[self.LightType] or vector_origin)
-    if self.Left then offset = offset * vector_mirror end
-    if self.RouteNumberOffset then offset = offset + self.RouteNumberOffset*(self.Left and vector_mirror or Vector(1,1)) end
+    if self.RouteNumberOffset then offset = offset + self.RouteNumberOffset*(self.Left and Vector(-1,1) or Vector(1,1)) end
     local ID = 0
     local ID2 = 0
     local lID2 = 0
