@@ -46,7 +46,7 @@ local function loadTrigs(name, keep)
          end
 		 --PrintTable(triggers)
      end
-	--VitroMod.trigSendAll()
+	VitroMod.trigSendAll()
 end
 
 local function loadBells(name, keep)
