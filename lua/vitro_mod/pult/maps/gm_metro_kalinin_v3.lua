@@ -45,13 +45,17 @@ VitroMod.Pult.Map = {
 		if name == 'depo5' then sw('depo6',to) end
 		if name == 'depo7' then sw('depo8',not to) end
 		if name == 'depo9' then sw('depo11',not to) end
-		if name == 'depo13' then sw('depo15',not to) end
-		if name == 'tr6' then WriteToSocket('SWtr6_'..(to and '2' or '0')) end
+		if name == 'depo13' then sw('depo15',to) end
+		-- if name == 'tr6' then WriteToSocket('SWtr6_'..(to and '2' or '0')) end
 	end,
 	OnConnect = function()
 		local cleanup = {'sw','b_sw','ad','ao','b_ad','trig','relay','br','block','unblock','pribytie','nb','b_nb','on','off'}
 		local stations = {'nv','nk','se','mr','tr','tretyak'}
 		local wildcard = {'dep_'}
+		local modelsToClear = {
+			['models/metrostroi/signals/mus/lamp_lens.mdl'] = true,
+			['models/metrostroi/signals/mus/fixed_outside_2.mdl'] = true,
+		}
 		for _,v in pairs(ents.GetAll()) do
 			if v:GetClass() == 'trigger_multiple' then SafeRemoveEntity(v) end
 			for _,s in pairs(stations) do
@@ -66,8 +70,11 @@ VitroMod.Pult.Map = {
 					SafeRemoveEntity(v)
 				end
 			end
+			if v:GetClass() == 'prop_dynamic' and modelsToClear[v:GetModel()] then
+				SafeRemoveEntity(v)
+			end
 		end
-		for i = 11,20 do
+		for i = 1,20 do
 			local ent = ents.FindByName("depo_door_"..i)[1]
 			ent:Fire("Open")
 			ent:Fire("Lock")
