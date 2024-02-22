@@ -519,6 +519,7 @@ function ENT:Think(my)
 		self:SetNW2Bool("LinkedToController",self.Controllers ~= nil)
 		self:SetNW2Int("ControllersNumber",self.Controllers ~= nil and #self.Controllers or -1)
 		self:SetNW2Bool("BlockedByController",self.ControllerLogic)
+		self:SetNW2Bool("Red",self.Red)
 		for i=0,8 do
 			if i==3 or i==5 then continue end
 			self:SetNW2Bool("CurrentARS"..i,self:GetARS(i))
