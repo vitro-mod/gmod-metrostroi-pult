@@ -55,6 +55,14 @@ VitroMod.Pult.Map = {
 		local modelsToClear = {
 			['models/metrostroi/signals/mus/lamp_lens.mdl'] = true,
 			['models/metrostroi/signals/mus/fixed_outside_2.mdl'] = true,
+			['models/kalininskaya/tunnel_5_l.mdl'] = true,
+			['models/kalininskaya/tunnel_5_r.mdl'] = true,
+			['models/kalininskaya/tunnel_c_l.mdl'] = true,
+			['models/kalininskaya/tunnel_c_r.mdl'] = true,
+			['models/kalininskaya/tunnel_!_l.mdl'] = true,
+			['models/kalininskaya/tunnel_!_r.mdl'] = true,
+			['models/kalininskaya/tunnel_35_l.mdl'] = true,
+			['models/kalininskaya/tunnel_35_r.mdl'] = true,
 		}
 		for _,v in pairs(ents.GetAll()) do
 			if v:GetClass() == 'trigger_multiple' then SafeRemoveEntity(v) end
@@ -74,11 +82,26 @@ VitroMod.Pult.Map = {
 				SafeRemoveEntity(v)
 			end
 		end
-		for i = 1,20 do
-			local ent = ents.FindByName("depo_door_"..i)[1]
+		for k,ent in pairs(ents.FindByName("depo_door_*")) do
+			print(ent:GetName())
 			ent:Fire("Open")
 			ent:Fire("Lock")
-		end		
+		end	
+		for k,ent in pairs(ents.FindByName("depo_moika_door*")) do
+			print(ent:GetName())
+			ent:Fire("Open")
+			ent:Fire("Lock")
+		end	
+		for k,ent in pairs(ents.FindByName("depo_metroserv*")) do
+			print(ent:GetName())
+			ent:Fire("Open")
+			ent:Fire("Lock")
+		end	
+		for k,ent in pairs(ents.FindByName("motodepo_door*")) do
+			print(ent:GetName())
+			ent:Fire("Open")
+			ent:Fire("Lock")
+		end	
 		sbor = nil
 	end
 }
