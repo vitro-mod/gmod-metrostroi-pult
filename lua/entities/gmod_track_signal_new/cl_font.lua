@@ -117,4 +117,13 @@ Metrostroi.RoutePointerFont = {
 	true ,false ,false ,false ,true ,
 	true ,true,true,true,false ,
 	},
+	["M"] = {
+	true,false ,false ,false ,true,
+	true,true ,false,true ,true,
+	true,false ,true,false ,true,
+	true,false ,true,false ,true,
+	true,false ,false,false ,true,
+	true ,false ,false ,false ,true ,
+	true ,false,false,false,true ,
+	},
 }
