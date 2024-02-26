@@ -130,8 +130,7 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft,isLast)
     end
 
     if self.UseRoutePointerFont[self.LightType] and (head == 'M' or head == 'M_single') then
-        if not self.Left or self.Double then self:SpawnPointerLamps(ID, pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
-        if self.Left or self.Double then self:SpawnPointerLamps(ID.."il", pos*vector_mirror + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8]) end
+        self:SpawnPointerLamps(ID, pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8])
     end
 end
 
@@ -839,7 +838,7 @@ function ENT:UpdateRoutePointer(ID, rnState)
         if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[rnState] and IsValid(self.Models[1][ID.."d"]) then self.Models[1][ID.."d"]:SetSkin(Metrostroi.RoutePointer[rnState]) end
     elseif self.Font[rnState] and (not self.NumLit[ID] or self.NumLit[ID] ~= rnState) then
         if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, rnState, TLM.M[9], TLM.M[10]) end
-        if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."il", rnState, TLM.M[9], TLM.M[10]) end
+        if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID.."d", rnState, TLM.M[9], TLM.M[10]) end
         self.NumLit[ID] = rnState
     end
     self.rnIdx = self.rnIdx + 1
