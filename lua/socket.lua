@@ -12,7 +12,10 @@ include('vitro_mod/pult/Maps.lua')
 local mapName = game.GetMap()
 local handshake = VitroMod.Pult.Name..'! '..VitroMod.Pult.Key
 VitroMod.Pult.IsMaster = string.Explode(":", VitroMod.Pult.Name)[1] == 'MASTER'
-if sck then sck:closeNow() sck=nil end
+if sck then 
+	sck:closeNow() 
+	sck=nil 
+end
 if VitroMod.Pult.Urls[mapName] and not sck then 
 	sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) 
 end
