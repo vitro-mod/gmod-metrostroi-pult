@@ -117,7 +117,7 @@ function sck:onMessage(txt)
 						signal.ARSSpeedLimit = tonumber(signBoxFreq)
 						signal.FreeBS = tonumber(signBoxFreeBS)
 						signal.Override325Hz = false
-						if signal.ARSLastNextLimit and signal.ARSLastNextLimit >= signal.ARSSpeedLimit and signal.ARSSpeedLimit > 2 then
+						if signal.ARSLastNextLimit and signal.ARSSpeedLimit and signal.ARSLastNextLimit >= signal.ARSSpeedLimit and signal.ARSSpeedLimit > 2 then
 							--signal.ARSLastNextLimit = signal.ARSNextSpeedLimit
 							--signal.ARSNextSpeedLimit = nil
 							signal.Override325Hz = true
