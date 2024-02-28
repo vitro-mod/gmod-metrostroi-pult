@@ -83,22 +83,18 @@ VitroMod.Pult.Map = {
 			end
 		end
 		for k,ent in pairs(ents.FindByName("depo_door_*")) do
-			print(ent:GetName())
 			ent:Fire("Open")
 			ent:Fire("Lock")
 		end	
 		for k,ent in pairs(ents.FindByName("depo_moika_door*")) do
-			print(ent:GetName())
 			ent:Fire("Open")
 			ent:Fire("Lock")
 		end	
 		for k,ent in pairs(ents.FindByName("depo_metroserv*")) do
-			print(ent:GetName())
 			ent:Fire("Open")
 			ent:Fire("Lock")
 		end	
 		for k,ent in pairs(ents.FindByName("motodepo_door*")) do
-			print(ent:GetName())
 			ent:Fire("Open")
 			ent:Fire("Lock")
 		end	
