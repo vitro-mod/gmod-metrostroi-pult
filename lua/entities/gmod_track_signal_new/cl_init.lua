@@ -102,11 +102,11 @@ function ENT:SpawnHead(ID,head,pos,ang,isLeft,isLast)
         local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
         if LampIndicator.models[rnadd] then
             self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd],RENDERGROUP_OPAQUE)
-            self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset+(self.Left and LampIndicator[1] or LampIndicator[2])))
+            self.Models[1][rouid]:SetPos(self:LocalToWorld(pos-self.RouteNumberOffset+(isLeft and LampIndicator[1] or LampIndicator[2])))
             self.Models[1][rouid]:SetAngles(self:GetAngles())
             self.Models[1][rouid]:SetParent(self)
         end
-        if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset+(self.Left and LampIndicator[1] or LampIndicator[2]) end
+        if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos-self.RouteNumberOffset+(isLeft and LampIndicator[1] or LampIndicator[2]) end
         self.RN = self.RN + 1
     end
     for k,v in pairs(TLM[head][3]) do
@@ -357,7 +357,7 @@ function ENT:CreateModels()
         if #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep) then
             self.RN = 1
             self.RouteNumberOffset = TLM.RouteNumberOffset
-            offset = offset + self.RouteNumberOffset*(self.Left and vector_mirror or 1)
+            offset = offset + self.RouteNumberOffset
         else
             self.RouteNumberOffset = nil
             self.RN = nil
@@ -408,7 +408,7 @@ function ENT:CreateModels()
             end
             self.NamesOffset = self.NamesOffset + vec
             local offsetAndLongOffset = offset + self.LongOffset
-            --SpawnHead(ID,model,pos,ang,isLeft)
+            --SpawnHead(ID,model,pos,ang,isLeft,isLast)
             if not self.Left or self.Double then self:SpawnHead(ID,head,self.BasePosition + offsetAndLongOffset,angle_zero,false,#v == 1) end
             if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,(self.BasePosition + offsetAndLongOffset)*vector_mirror,angle_zero,true,#v == 1) end
 
@@ -542,7 +542,9 @@ function ENT:UpdateModels(CurrentTime)
     
     if self.ARSOnly then return true end
     local offset = (self.RenderOffset[self.LightType] or vector_origin)
-    if self.RouteNumberOffset then offset = offset + self.RouteNumberOffset*(self.Left and Vector(-1,1) or Vector(1,1)) end
+    if self.RouteNumberOffset then
+        offset = offset + self.RouteNumberOffset
+    end
     local ID = 0
     local ID2 = 0
     local lID2 = 0
