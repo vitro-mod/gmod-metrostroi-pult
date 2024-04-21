@@ -9,6 +9,7 @@ ENT.TrafficLightModels = {}
 ENT.RenderOffset = {}
 ENT.LongThreshold = {}
 ENT.UseRoutePointerFont = {}
+ENT.RoutePointerFontWidth = {}
 ENT.BasePosition = Vector(-110,32,0)
 if (game.GetMap() == "gm_metro_minsk_1984") then
 	ENT.BasePosition = Vector(-97,32,0)
@@ -68,10 +69,10 @@ ENT.AutostopModel = {
 
 ENT.OldRouteNumberSetup = {
 	"1234DPABVGEZIklMNOSTot",
-	"WKFX","LR",
+	"WKFXd","LR",
 	Vector(6,0,10.5),
 	{D=4,P=5,A=6,B=7,V=8,G=9,E=10,Z=11,I=12,k=13,l=14,M=15,N=16,O=17,S=18,T=19,o=20,t=21},
-	{["F"]=0,["L"]=0,["R"]=2,W=3,K=4},
+	{["F"]=0,["L"]=2,["R"]=0,W=3,K=4,d=1},
 }
 ENT.SpriteMat = Material( "sprites/light_ignorez" )
 
