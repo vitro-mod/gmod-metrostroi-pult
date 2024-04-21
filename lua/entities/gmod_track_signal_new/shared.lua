@@ -10,6 +10,7 @@ ENT.RenderOffset = {}
 ENT.LongThreshold = {}
 ENT.UseRoutePointerFont = {}
 ENT.RoutePointerFontWidth = {}
+ENT.BasePos = {}
 ENT.BasePosition = Vector(-110,32,0)
 if (game.GetMap() == "gm_metro_minsk_1984") then
 	ENT.BasePosition = Vector(-97,32,0)
@@ -341,6 +342,7 @@ for i = 0,(#ENT.TrafficLightModels) do
 	end
 	
 	--CLIENT
+	ENT.BasePos[i] = ENT.BasePos[i] or ENT.BasePosition
 	ENT.TrafficLightModels[i].LampIndicator = {
 		models = {
 			"models/metrostroi/signals/mus/light_lampindicator.mdl",

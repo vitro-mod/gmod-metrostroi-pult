@@ -194,7 +194,7 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
     if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
         self.Models[2][i] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
-        self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePosition+pos))
+        self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePos[self.LightType]+pos))
         self.Models[2][i]:SetParent(self)
         for k,v in pairs(self.Models[2][i]:GetMaterials()) do
             if v:find(LetMaterialsStart) then
@@ -206,7 +206,7 @@ function ENT:SpawnLetter(i,model,pos,letter,double)
     if not double and not IsValid(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
         self.Models[2][id] = ClientsideModel(model,RENDERGROUP_OPAQUE)
         self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle(0,180,0)))
-        self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePosition+pos)*vector_mirror))
+        self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePos[self.LightType]+pos)*vector_mirror))
         self.Models[2][id]:SetParent(self)
         for k,v in pairs(self.Models[2][id]:GetMaterials()) do
             if v:find(LetMaterialsStart) then
@@ -335,8 +335,8 @@ function ENT:CreateModels()
         -- end
         local offset = self.RenderOffset[self.LightType] or vector_origin
         self.LongOffset = self.LongOffset or vector_origin
-        if not self.Left or self.Double then self:SpawnMainModels(self.BasePosition,angle_zero,LenseNum) end
-        if self.Left or self.Double then self:SpawnMainModels(self.BasePosition*vector_mirror,Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
+        if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType],angle_zero,LenseNum) end
+        if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType]*vector_mirror,Angle(0,180,0),LenseNum,self.Double and "d" or nil) end
 
 
         if not self.RouteNumbers.sep and #self.RouteNumbers > 1 then
@@ -348,7 +348,7 @@ function ENT:CreateModels()
             local id = self.RouteNumbers.sep
             local rnadd = self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 3 or 4
             self.Models[1]["rous"] = ClientsideModel(TLM.LampIndicator.models[rnadd],RENDERGROUP_OPAQUE)
-            self.RouteNumbers[id].pos = (self.BasePosition+offset+self.LongOffset-TLM.LampIndicator[3])
+            self.RouteNumbers[id].pos = (self.BasePos[self.LightType]+offset+self.LongOffset-TLM.LampIndicator[3])
             if self.Left then self.RouteNumbers[id].pos = self.RouteNumbers[id].pos*vector_mirror+TLM.LampIndicator[4] end
             self.Models[1]["rous"]:SetPos(self:LocalToWorld(self.RouteNumbers[id].pos))
             self.Models[1]["rous"]:SetAngles(self:GetAngles())
@@ -365,7 +365,7 @@ function ENT:CreateModels()
         if self.AutostopPresent then
             if not IsValid(self.Models[1]["autostop"]) then
                 self.Models[1]["autostop"] = ClientsideModel(self.AutostopModel[1],RENDERGROUP_OPAQUE)
-                self.Models[1]["autostop"]:SetPos(self:LocalToWorld(self.BasePosition+self.AutostopModel[2]))
+                self.Models[1]["autostop"]:SetPos(self:LocalToWorld(self.BasePos[self.LightType]+self.AutostopModel[2]))
                 self.Models[1]["autostop"]:SetAngles(self:GetAngles())
                 self.Models[1]["autostop"]:SetParent(self)
             end
@@ -409,8 +409,8 @@ function ENT:CreateModels()
             self.NamesOffset = self.NamesOffset + vec
             local offsetAndLongOffset = offset + self.LongOffset
             --SpawnHead(ID,model,pos,ang,isLeft,isLast)
-            if not self.Left or self.Double then self:SpawnHead(ID,head,self.BasePosition + offsetAndLongOffset,angle_zero,false,#v == 1) end
-            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,(self.BasePosition + offsetAndLongOffset)*vector_mirror,angle_zero,true,#v == 1) end
+            if not self.Left or self.Double then self:SpawnHead(ID,head,self.BasePos[self.LightType] + offsetAndLongOffset,angle_zero,false,#v == 1) end
+            if self.Left or self.Double then self:SpawnHead((self.Double and ID.."d" or ID),head,(self.BasePos[self.LightType] + offsetAndLongOffset)*vector_mirror,angle_zero,true,#v == 1) end
 
             if v ~= "M" then
                 for i = 1,#v do
@@ -422,8 +422,8 @@ function ENT:CreateModels()
                     --if assembled then lenOff = Vector(0,0,100) end
                     ID2 = ID2 + 1
                     if assembled and i < #v then
-                        if not self.Left or self.Double then self:SpawnHead(ID..ID2,head,self.BasePosition + offsetAndLongOffset + TLM['step']*(#v-i),angle_zero,false,i == #v-1) end
-                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,(self.BasePosition + offsetAndLongOffset)*vector_mirror + TLM['step']*(#v-i),angle_zero,true,i == #v-1) end					
+                        if not self.Left or self.Double then self:SpawnHead(ID..ID2,head,self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step']*(#v-i),angle_zero,false,i == #v-1) end
+                        if self.Left or self.Double then self:SpawnHead((self.Double and ID..ID2.."d" or ID..ID2),head,(self.BasePos[self.LightType] + offsetAndLongOffset)*vector_mirror + TLM['step']*(#v-i),angle_zero,true,i == #v-1) end					
                     end						
                     if not self.Signals[ID2] then self.Signals[ID2] = {} end
                     
@@ -438,7 +438,7 @@ function ENT:CreateModels()
         if self.Arrow then
             local id = self.Arrow
             self.Models[1]["roua"] = ClientsideModel(TLM.LampIndicator.models[4],RENDERGROUP_OPAQUE)
-            self.SpecRouteNumbers.pos = (self.BasePosition+offset+self.LongOffset-TLM.LampIndicator[5])+(self.Left and TLM.LampIndicator[6] or vector_origin) - (self.RouteNumberOffset or vector_origin)
+            self.SpecRouteNumbers.pos = (self.BasePos[self.LightType]+offset+self.LongOffset-TLM.LampIndicator[5])+(self.Left and TLM.LampIndicator[6] or vector_origin) - (self.RouteNumberOffset or vector_origin)
             if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos * vector_mirror end
             self.Models[1]["roua"]:SetPos(self:LocalToWorld(self.SpecRouteNumbers.pos))
             self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-90,0,0) or Angle(90,0,0)))
@@ -505,7 +505,7 @@ function ENT:CreateModels()
         if not IsValid(self.Models[1][k]) then
             local v = TLM["m1"]
             self.Models[1][k] = ClientsideModel(v,RENDERGROUP_OPAQUE)
-            self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePosition*(self.Left and vector_mirror or 1)))
+            self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePos[self.LightType]*(self.Left and vector_mirror or 1)))
             self.Models[1][k]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-1,1,1) or Angle(1,1,1)))
             self.Models[1][k]:SetParent(self)
         end
@@ -604,10 +604,10 @@ function ENT:UpdateModels(CurrentTime)
                 if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[lID2].State = nil end
                 local offsetAndLongOffset = offset + self.LongOffset
                 if not self.DoubleL then
-                    self:SetLight(ID,ID2,(self.BasePosition + offsetAndLongOffset)*(self.Left and vector_mirror or 1) + lenOff*(self.Left and vector_mirror or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
+                    self:SetLight(ID,ID2,(self.BasePos[self.LightType] + offsetAndLongOffset)*(self.Left and vector_mirror or 1) + lenOff*(self.Left and vector_mirror or 1),angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
                 else
-                    self:SetLight(ID,ID2,self.BasePosition + offsetAndLongOffset + lenOff,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
-                    self:SetLight(ID,ID2.."x",(self.BasePosition+offsetAndLongOffset)*vector_mirror + lenOff*vector_mirror,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
+                    self:SetLight(ID,ID2,self.BasePos[self.LightType] + offsetAndLongOffset + lenOff,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
+                    self:SetLight(ID,ID2.."x",(self.BasePos[self.LightType]+offsetAndLongOffset)*vector_mirror + lenOff*vector_mirror,angle_zero,self.SignalConverter[v[i]]-1,State,self.Signals[lID2].State ~= State)
                 end
                 self.Signals[ID2].State = State
             end
@@ -668,7 +668,7 @@ function ENT:UpdateModels(CurrentTime)
         local State = self:Animate("roua",self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0,   0,1, 256)
         if not IsValid(self.Models[3]["roua"]) and State > 0 then
             self.Models[3]["roua"] = ClientsideModel(LampIndicatorModels_lamp_mdl,RENDERGROUP_OPAQUE)
-            self.SpecRouteNumbers.pos = (self.BasePosition+offset-TLM.SpecRouteNumberOffset)-(self.RouteNumberOffset or vector_origin)+TLM.RouteNumberOffset3
+            self.SpecRouteNumbers.pos = (self.BasePos[self.LightType]+offset-TLM.SpecRouteNumberOffset)-(self.RouteNumberOffset or vector_origin)+TLM.RouteNumberOffset3
             if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos*TLM.SpecRouteNumberOffset2 end
             self.Models[3]["roua"]:SetPos(self.Models[1]["roua"]:LocalToWorld(TLM.RouaOffset))
             self.Models[3]["roua"]:SetAngles(self.Models[1]["roua"]:LocalToWorldAngles(Angle(180,0,0)))
