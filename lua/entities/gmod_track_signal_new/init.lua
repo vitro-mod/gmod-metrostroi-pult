@@ -606,7 +606,7 @@ function ENT:Think(my)
 			if v ~= "M" then
 				--get the some models data
 				local data = #v ~= 0 and self.TrafficLightModels[self.SignalType][#v-1] or self.TrafficLightModels[self.SignalType][self.Signal_IS]
-				if not data then continue end
+				-- if not data then continue end
 				for i = 1,#v do
 					--Get the LightID and check, is this light must light up
 					local LightID = IsValid(self.NextSignalLink) and math.min(#Route.LightsExploded,self.FreeBS+1) or 1
