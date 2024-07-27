@@ -24,7 +24,6 @@ VitroMod.Pult.Map = {
 		VitroMod.Pult.SwitchesInvert['ns4'] = true
 		VitroMod.Pult.SwitchesInvert['ln3'] = true
 		VitroMod.Pult.SwitchesInvert['ln4'] = true
-		--include('ksProps.lua')
 		
 		rcASNP['TC177'] = true
 		rcASNP['TC277'] = true
@@ -57,31 +56,50 @@ VitroMod.Pult.Map = {
 		rcASNP['TC612'] = true
 	end,
 	OnSwitch = function(name, to)
-		if name == 'ks5' then WriteToSocket('SWks5_'..(to and '2' or '0')) end
 	end,	
 	OnConnect = function()
-		for k,v in pairs(ents.FindByModel('models/mus/subwaystation/a_red_sign_tripod.mdl')) do
-			SafeRemoveEntity(v)
+		local cleanup = {
+			byClass = {
+				wildcards = {'trigger_multiple', 'logic_*', 'prop_physics_multiplayer'},
+				exclude = {},
+			},
+			byName = {
+				wildcards = {'dep_*','*_sw_*','*pult_*','tupik*','lukh*','gok*','*_ob*'},
+				exclude = {['lukh1p'] = true, ['lukh2p'] = true},
+			},
+			byModel = {
+				wildcards = {
+					'*a_red_sign_tripod.mdl',
+					'*nekrasovskaya/depo_signals_*', 
+					'*nekrasovskaya/lamp_lens*', 
+					'*nekrasovskaya/park_liters*',
+					'*nekrasovskaya/depot_liter.mdl*',
+					'*fixed_outside_2.mdl',
+					'*lamp_lens.mdl',
+					'*nekrasovskaya/6sign_*',
+				},
+				exclude = {},
+			}
+		}
+
+		for _,c in pairs(cleanup.byClass.wildcards) do
+			for k,v in pairs(ents.FindByClass(c)) do
+				if cleanup.byClass.exclude[v:GetName()] ~= nil then continue end
+				SafeRemoveEntity(v)
+			end
 		end
-		for k,v in pairs(ents.FindByClass('trigger_multiple')) do
-			SafeRemoveEntity(v)
-		end		
-		for k,v in pairs(ents.FindByClass('logic_*')) do
-			SafeRemoveEntity(v)
-		end
-		for k,v in pairs(ents.FindByClass('prop_physics_multiplayer')) do
-			SafeRemoveEntity(v)
-		end
-		
-		local cleanup = {'dep_*','*_sw_*','*pult_*','tupik*','lukh*','gok*','*_ob*'}
-		local exclude = {}
-		exclude['lukh1p'] = true
-		exclude['lukh2p'] = true
-		for _,c in pairs(cleanup) do
+
+		for _,c in pairs(cleanup.byName.wildcards) do
 			for k,v in pairs(ents.FindByName(c)) do
-				if exclude[v:GetName()] == nil then 
-					SafeRemoveEntity(v)
-				end
+				if cleanup.byName.exclude[v:GetName()] ~= nil then continue end
+				SafeRemoveEntity(v)
+			end
+		end
+
+		for _,c in pairs(cleanup.byModel.wildcards) do
+			for k,v in pairs(ents.FindByModel(c)) do
+				if cleanup.byModel.exclude[v:GetName()] ~= nil then continue end
+				SafeRemoveEntity(v)
 			end
 		end
 	end
