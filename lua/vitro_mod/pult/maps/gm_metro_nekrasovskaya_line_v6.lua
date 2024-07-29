@@ -84,7 +84,7 @@ VitroMod.Pult.Map = {
 
 		for _,c in pairs(cleanup.byClass.wildcards) do
 			for k,v in pairs(ents.FindByClass(c)) do
-				if cleanup.byClass.exclude[v:GetName()] ~= nil then continue end
+				if cleanup.byClass.exclude[v:GetClass()] ~= nil then continue end
 				SafeRemoveEntity(v)
 			end
 		end
@@ -98,7 +98,7 @@ VitroMod.Pult.Map = {
 
 		for _,c in pairs(cleanup.byModel.wildcards) do
 			for k,v in pairs(ents.FindByModel(c)) do
-				if cleanup.byModel.exclude[v:GetName()] ~= nil then continue end
+				if cleanup.byModel.exclude[v:GetModel()] ~= nil then continue end
 				SafeRemoveEntity(v)
 			end
 		end
