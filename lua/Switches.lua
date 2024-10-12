@@ -39,6 +39,16 @@ function sw(name, input)
 	return true
 end
 
+function swEpk(name)
+	if not VitroMod.Pult.Switches[name] then return false end
+	for k,v in pairs(VitroMod.Pult.Switches[name]) do
+		if not IsValid(v) then continue end
+
+		v:Ignite(4)
+	end
+	return true
+end
+
 -- function swLost(name)
 	-- if not VitroMod.Pult.Switches[name] then return end
 	-- if not VitroMod.Pult.Switches[name] then return false end

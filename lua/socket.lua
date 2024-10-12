@@ -65,6 +65,13 @@ function sck:onMessage(txt)
 					VitroMod.Pult.Map.OnSwitch(name, to)
 				end
 			end
+		elseif string.sub(txt, 1, 2 ) == "EP" then
+			for k,v in pairs(string.Explode( ";", txt )) do
+				if v == '' then continue end
+				
+				local name = string.sub(string.Explode("_", v)[1], 3)
+				swEpk(name)
+			end
 		elseif string.sub(txt, 1, 2 ) == "LT" then
 			local ltmtMsg = string.Explode(":",txt)
 			for k,v in pairs(string.Explode(";",ltmtMsg[1])) do
