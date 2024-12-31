@@ -1,37 +1,53 @@
-VitroMod.Pult.IntervalClocks = VitroMod.Pult.IntervalClocks or {}
-VitroMod.Pult.IntervalSmall = VitroMod.Pult.IntervalSmall or {}
-for k,v in pairs(ents.FindByClass('gmod_track_clock_interval')) do
-	VitroMod.Pult.IntervalClocks[v:GetName()] = v
-end
-for k,v in pairs(ents.FindByClass('gmod_track_clock_small')) do
-	VitroMod.Pult.IntervalSmall[v:GetName()] = v
-end
+VitroMod.Pult.IntervalClocks = {
+	Entities = {},
+	Classes = {
+		'gmod_track_clock_interval',
+		'gmod_track_clock_small',
+		'gmod_track_clock_interval_nsk'
+	},
 
-VitroMod.Pult.ResetClock = function(name)
-	if IsValid(VitroMod.Pult.IntervalClocks[name]) then
-		VitroMod.Pult.IntervalClocks[name].NoAutoSearch = true
-		VitroMod.Pult.IntervalClocks[name].IntervalReset = false
-		VitroMod.Pult.IntervalClocks[name]:Fire("Reset")	
-	end
+	Init = function()
+		for _, class in pairs(VitroMod.Pult.IntervalClocks.Classes) do
+			for k,clock in pairs(ents.FindByClass(class)) do
+				VitroMod.Pult.IntervalClocks.Entities[clock:GetName()] = VitroMod.Pult.IntervalClocks.Entities[clock:GetName()] or {}
+				table.insert(VitroMod.Pult.IntervalClocks.Entities[clock:GetName()], clock)
+			end
+		end
+	end,
 
-	if IsValid(VitroMod.Pult.IntervalSmall[name]) then
-		VitroMod.Pult.IntervalSmall[name].NoAutoSearch = true
-		VitroMod.Pult.IntervalSmall[name].IntervalReset = false
-		VitroMod.Pult.IntervalSmall[name]:Fire("Reset")	
-		VitroMod.Pult.Intervals[name] = 0	
-	end
-end
+	Reset = function(name)
+		VitroMod.Pult.Intervals[name] = 0
+		if not VitroMod.Pult.IntervalClocks.Entities[name] then return end
 
-VitroMod.Pult.GetInterval = function(name)
-	if not IsValid(VitroMod.Pult.IntervalClocks[name]) then return false end
-	local it = math.floor(Metrostroi.GetSyncTime() - VitroMod.Pult.IntervalClocks[name]:GetIntervalResetTime() - GetGlobalFloat("MetrostroiTY"))
-	if it < 0 then it = false end
-	return it
-end
+		for k,clock in pairs(VitroMod.Pult.IntervalClocks.Entities[name]) do
+			if not IsValid(clock) then continue end
+			clock.NoAutoSearch = true
+			clock.IntervalReset = false
+			clock:Fire("Reset")
+		end
+	end,
 
-VitroMod.Pult.Intervals = VitroMod.Pult.Intervals or {}
-VitroMod.Pult.UpdateIntervals = function()
-	for k,v in pairs(VitroMod.Pult.IntervalClocks) do
-		VitroMod.Pult.Intervals[k] = VitroMod.Pult.GetInterval(k)
-	end
-end
+	GetInterval = function(name)
+		if not VitroMod.Pult.IntervalClocks.Entities[name] then return false end
+		local clock = VitroMod.Pult.IntervalClocks.Entities[name][1]
+		if not IsValid(clock) then return false end
+
+		local it = math.floor(Metrostroi.GetSyncTime() - clock:GetIntervalResetTime() - GetGlobalFloat("MetrostroiTY"))
+		if it < 0 then it = false end
+
+		return it
+	end,
+
+	Update = function()
+		VitroMod.Pult.Intervals = VitroMod.Pult.Intervals or {}
+		for name,clock in pairs(VitroMod.Pult.IntervalClocks.Entities) do
+			VitroMod.Pult.Intervals[name] = VitroMod.Pult.IntervalClocks.GetInterval(name)
+		end
+	end,
+
+	Get = function()
+		return VitroMod.Pult.Intervals
+	end,
+}
+
+VitroMod.Pult.IntervalClocks.Init()

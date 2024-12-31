@@ -32,11 +32,11 @@ function sck:onConnected()
 	--RunConsoleCommand("say","WebSocket connected to server")
 	self:write(handshake)
 	if VitroMod.Pult.IsMaster then
-		VitroMod.Pult.UpdateIntervals()
 		self:write("RCs_"..util.TableToJSON(rcTriggers))
 		self:write("SWS_"..util.TableToJSON(VitroMod.Pult.SwitchesControl))
 		self:write("BUs_"..util.TableToJSON(rcNamesOcc))
 		self:write("INs_"..util.TableToJSON(VitroMod.Pult.Intervals))
+		VitroMod.Pult.IntervalClocks.Update()
 	end
 	SendRNs()
 	if Minsk and Minsk.MK then self:write("MKs_"..util.TableToJSON(Minsk.MK.GetTableMKInfo())) end
@@ -190,7 +190,7 @@ function sck:onMessage(txt)
 	elseif string.sub(txt, 1, 2) == "IN" then
 		local msg = string.sub(txt, 3)
 		local name = string.Explode(";",msg)[2]
-		VitroMod.Pult.ResetClock(name)
+		VitroMod.Pult.IntervalClocks.Reset(name)
 	elseif txt == "OKFIRST" then
 		firstConnect = true		
 	elseif txt == "ASNP_UPD" then
