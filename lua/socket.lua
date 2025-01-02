@@ -7,6 +7,7 @@ VitroMod.Pult.SwitchesInvertAll = false
 require("gwsockets")
 pings = 0
 timer.Remove("ping")
+include('Switches.lua')
 include('vitro_mod/pult/config.lua')
 local mapName = game.GetMap()
 if not file.Exists("vitro_mod/pult/maps/"..mapName..".lua","LUA") then
@@ -346,8 +347,6 @@ function invCtrl(ctrl)
 	end
 	return ctrl
 end
-
-include('Switches.lua')
 
 hook.Add( "PostCleanupMap", "PostCleanup_InitSwitches", initSwitches )
 initSwitches()
