@@ -13,6 +13,7 @@ VitroMod.Pult.IntervalClocks = {
 				table.insert(VitroMod.Pult.IntervalClocks.Entities[clock:GetName()], clock)
 			end
 		end
+		VitroMod.Pult.IntervalClocks.Update()
 	end,
 
 	Reset = function(name)

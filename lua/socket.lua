@@ -15,6 +15,8 @@ if not file.Exists("vitro_mod/pult/maps/"..mapName..".lua","LUA") then
 	return
 end
 include('vitro_mod/pult/Maps.lua')
+include('IntervalClocks.lua')
+
 local handshake = VitroMod.Pult.Name..'! '..VitroMod.Pult.Key
 VitroMod.Pult.IsMaster = string.Explode(":", VitroMod.Pult.Name)[1] == 'MASTER'
 if sck then 
@@ -36,8 +38,7 @@ function sck:onConnected()
 		self:write("RCs_"..util.TableToJSON(rcTriggers))
 		self:write("SWS_"..util.TableToJSON(VitroMod.Pult.SwitchesControl))
 		self:write("BUs_"..util.TableToJSON(rcNamesOcc))
-		self:write("INs_"..util.TableToJSON(VitroMod.Pult.Intervals))
-		VitroMod.Pult.IntervalClocks.Update()
+		self:write("INs_"..util.TableToJSON(VitroMod.Pult.IntervalClocks.Get()))
 	end
 	SendRNs()
 	if Minsk and Minsk.MK then self:write("MKs_"..util.TableToJSON(Minsk.MK.GetTableMKInfo())) end
@@ -324,8 +325,6 @@ function SendAutomaticRC(signal)
 		WriteToSocket("BU"..signal.Name..(signal.Occupied and "_1" or "_0"))
 	end
 end
-
-include('IntervalClocks.lua')
 
 -------------------------------------------
 
