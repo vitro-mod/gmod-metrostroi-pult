@@ -13,6 +13,18 @@ VitroMod.Pult.Map = {
                 v:SetName(r.pult)
             end
         end
+
+        rcASNP['TC277'] = true
+        rcASNP['TC377'] = true
+        rcASNP['TC477'] = true
+        rcASNP['TC577'] = true
+        rcASNP['TC677'] = true
+
+        rcASNP['TC378'] = true
+        rcASNP['TC478'] = true
+        rcASNP['TC578'] = true
+        rcASNP['TC678'] = true
+        rcASNP['TC778'] = true
     end,
     OnSwitch = function(name, to)
     end,
