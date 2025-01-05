@@ -27,8 +27,6 @@ VitroMod.Pult.GermoGates = {
             if not IsValid(ent) then continue end
             VitroMod.Pult.GermoGates.Locked[name] = lockState != 1
         end
-
-        PrintTable(VitroMod.Pult.GermoGates.Locked)
     end,
     GetAll = function()
         return VitroMod.Pult.GermoGates.States
