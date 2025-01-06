@@ -30,5 +30,13 @@ VitroMod.Pult.Map = {
     end,
     OnConnect = function()
         VitroMod.Pult.GermoGates.Init(ents.FindByName('gate_*'))
+
+        for k, ent in pairs(ents.FindByClass('gmod_track_signal_controller')) do
+            if not IsValid(ent) then continue end
+            if not IsValid(ent.SignalEntity) then continue end
+
+            ent.SignalEntity.Controllers = {}
+            ent:Remove()
+        end
     end
 }
