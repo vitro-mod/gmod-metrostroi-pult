@@ -18,7 +18,7 @@ include('vitro_mod/pult/Maps.lua')
 include('Switches.lua')
 include('IntervalClocks.lua')
 include('GermoGates.lua')
-local handshake = VitroMod.Pult.Name .. '! ' .. VitroMod.Pult.Key
+local handshake = VitroMod.Pult.Name .. '! ' .. VitroMod.Pult.Key .. '|' .. mapName
 VitroMod.Pult.IsMaster = string.Explode(':', VitroMod.Pult.Name)[1] == 'MASTER'
 if sck then
 	sck:closeNow()
