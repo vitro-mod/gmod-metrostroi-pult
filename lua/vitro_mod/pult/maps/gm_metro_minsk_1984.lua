@@ -14,6 +14,7 @@ VitroMod.Pult.Map = {
 		rcTriggersExclude = {}
 		rcTriggersExclude['RCIK377'] = true
 		rcTriggersExclude['RCIK379'] = true
+		rcTriggersExclude['RCIK411'] = true
 		rcTriggersExclude['RCIK470'] = true
 		rcTriggersExclude['RCIK472'] = true
 		rcTriggersExclude['RCIK474'] = true
@@ -26,6 +27,7 @@ VitroMod.Pult.Map = {
 		rcTriggersExclude['RCMS1079'] = true
 		rcTriggersExclude['RCMS1176'] = true
 		rcTriggersExclude['RCMS1178'] = true
+		rcTriggersExclude['RCMS1010'] = true
 		rcNames['   IK30M'] = nil
 	end,
 	OnSwitch = function(name, to)
