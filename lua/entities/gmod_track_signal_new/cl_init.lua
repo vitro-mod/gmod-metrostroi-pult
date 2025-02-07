@@ -218,7 +218,7 @@ end
 
 function ENT:OnRemove()
     self:RemoveModels()
-	hook.Remove( "PostDrawTranslucentRenderables", self)
+	hook.Remove( "PostDrawTranslucentRenderables", "Sprites_"..self:EntIndex())
 	self:RemovePTs()
 end
 
@@ -512,7 +512,8 @@ function ENT:CreateModels()
     end
     self.Models.have = true
     self.ModelsCreated = true
-    hook.Add( "PostDrawTranslucentRenderables", self, self.LightSprites)
+    local signal = self
+    hook.Add( "PostDrawTranslucentRenderables", "Sprites_"..self:EntIndex(), function() signal:LightSprites() end)
 
     return true
 end
