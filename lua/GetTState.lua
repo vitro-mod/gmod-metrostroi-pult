@@ -30,6 +30,10 @@ function GetTrainState(wagon, signal)
         if train.VRU.Value == 1 then CS = 2 end
     end
 
+    local type720 = class:find("81-720", 1, true)
+    local type760 = class:find("81-760", 1, true)
+    local type722 = class:find("81-722", 1, true)
+
     if class == 'gmod_subway_81-502' then
         if train.Electric.Type == 2 then
             if CS ~= 0 and train.RCAV5.Value == 1 and train.RCAV4.Value == 1 and train.RCAV3.Value == 1 then ARS = 1 end
@@ -44,10 +48,10 @@ function GetTrainState(wagon, signal)
         if train.KRU.Position ~= 0 then CS = 2 end
         if CS ~= 0 and train.RC.Value == 1 then ARS = 1 end
         if CS ~= 0 and train:ReadTrainWire(87) > 0 then ARS = 2 end
-    elseif class == 'gmod_subway_81-720' or class == 'gmod_subway_81-720_1' or class == 'gmod_subway_81-760' or class == 'gmod_subway_81-760a' then
+    elseif type720 or type760 then
         if CS ~= 0 and train.BARSBlock.Value == 0 and train.ALS.Value == 0 then ARS = 1 end
         if CS ~= 0 and train.ALS.Value == 0 and (train.BARSBlock.Value == 1 or train.BARSBlock.Value == 2) then ARS = 2 end
-    elseif class == 'gmod_subway_81-722' or class == 'gmod_subway_81-722_new' or class == 'gmod_subway_81-722_1' then
+    elseif type722 then
         if CS ~= 0 and train.RCARS.Value == 1 then
             ARS = 1
             if train.BARSMode.Value ~= 1 then ARS = 2 end
