@@ -762,27 +762,22 @@ end
 function ENT:Sprite(pos, ang, col, bri, mul, handlerKey )
     local TLM = self.TrafficLightModels[self.LightType]
     if bri <= 0 then return end
-    local Visible = 0
-    if self.PixVisibleHandlers[handlerKey] then
-	    Visible = util.PixelVisible( pos, 1, self.PixVisibleHandlers[handlerKey] )
-    end
-	if ( ( Visible ) and ( Visible > 0.1 ) ) then
-		local fw = ang:Forward()
-		fw:Rotate(Angle(0,90,0))
-		local view = EyePos() - pos
-		local dist = view:LengthSqr()
-		view:Normalize()
-		local viewdot = view:Dot( fw )
-		viewdot = viewdot
-		if ( viewdot > 0 ) then
-			Visible = Visible * viewdot
-			local s = bri ^ 0.5 * math.Clamp(dist ^ 0.5 /32,64,384) * mul * (TLM.lense_scale or 1)
-			--local s = bri ^ 0.5 * math.Clamp(dist/20,48,256)
-			s = s * Visible
-			render.SetMaterial( self.SpriteMat )
-			render.DrawSprite( pos, s, s, col )
-		end
-	end	
+    
+    local Visible = util.PixelVisible( pos, 1, self.PixVisibleHandlers[handlerKey] )
+
+    if Visible <= 0.1 then return end
+
+    local lense_scale = self.TrafficLightModels[self.LightType].lense_scale
+    local fw = -ang:Right()
+    local view = EyePos() - pos
+    local dist = view:Length()
+    view:Normalize()
+    local viewdot = math.Clamp(view:Dot( fw ), 0, 1)
+
+    local s = Visible * (viewdot + math.exp(-20 * (1 - viewdot))) * bri * math.Clamp(dist / 32, 64, 256) * mul * (lense_scale or 1)
+
+    render.SetMaterial( self.SpriteMat )
+    render.DrawSprite( pos, s, s, col )
 end
 
 function ENT:SpawnPointerLamps(ID, InitPos, StepX, StepY, Scale, mdl)
