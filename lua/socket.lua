@@ -85,15 +85,16 @@ function sck:onMessage(txt)
 		local ltmtMsg = string.Explode(':', txt)
 		for k, v in pairs(string.Explode(';', ltmtMsg[1])) do
 			--RunConsoleCommand('say',string.Explode('-',v)[1],string.Explode('-',v)[2])
-			local signal = Metrostroi.GetSignalByName(string.Explode('-', v)[1])
+			local signalParams = string.Explode('-', v)
+			local signalName = signalParams[1]
+			local signal = Metrostroi.GetSignalByName(signalName)
 			if signal then
 				signal.ControllerLogic = true
-				signal.Sig = tostring(string.Explode('-', v)[2])
+				signal.Sig = tostring(signalParams[2])
 				signal:SetNW2String('Signal', signal.Sig)
-				signal.Red = tobool(string.Explode('-', v)[3])
-				signal.AutoEnabled = not tobool(string.Explode('-', v)[4])
+				signal.Red = tobool(signalParams[3])
+				signal.AutoEnabled = not tobool(signalParams[4])
 				signal:SetNW2Bool('Autostop', signal.AutoEnabled)
-				signal:SetNW2Bool("ForceFade", tobool(string.Explode("-", v)[5]))
 				signal.ControllerLogicCheckOccupied = true
 			end
 		end
