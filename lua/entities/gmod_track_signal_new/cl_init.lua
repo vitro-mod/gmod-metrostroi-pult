@@ -601,7 +601,9 @@ function ENT:UpdateModels(CurrentTime)
                 end
                 --Animate(clientProp, value, min, max, speed, damping, stickyness)
                 --local State = self:Animate(ID.."/"..i,  ((n == 1 or (n == 2 and blink)) and not self.Signals[ID2].Stop) and 1 or 0,  0,1, blink and 256 or 128)
-                local State = ((n == 1 or (n == 2 and blink)) and not self.Signals[lID2].Stop) and 1 or 0
+                -- local State = ((n == 1 or (n == 2 and blink)) and not self.Signals[lID2].Stop) and 1 or 0
+                local enableLense = ((n == 1 or n == 3) or (n == 2 and blink)) and not self.Signals[ID2].Stop
+                local State = self:Animate(ID .. "/" .. i, enableLense and 1 or 0, 0, 1, blink and 256 or 128)
                 if not IsValid(self.Models[3][ID..ID2]) and State > 0 then self.Signals[lID2].State = nil end
                 local offsetAndLongOffset = offset + self.LongOffset
                 if not self.DoubleL then
