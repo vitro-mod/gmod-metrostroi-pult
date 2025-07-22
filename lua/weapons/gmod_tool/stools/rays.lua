@@ -27,9 +27,7 @@ function TOOL:LeftClick(trace)
 	if not VitroMod then return false end
 	if not self.settings then return false end
 	if not self.settings.name then return false end
-	local userOffset = Vector(self.settings.XOffset, self.settings.YOffset, self.settings.ZOffset)
-	local userAngle = Angle(self.settings.pitch, self.settings.yaw, self.settings.roll)
-	VitroMod.Rays.atLook(trace, ply, self.settings.name, userOffset, userAngle)
+	VitroMod.Rays.atLook(trace, ply, self.settings.name, self.settings)
 	return true
 end
 
@@ -105,40 +103,32 @@ function TOOL:BuildCPanel()
 		tool.settings.name = self:GetValue()
 		SendSettings(tool)
 	end
-	local VXOffT = CPanel:NumSlider("X Offset:",nil,-100,100,0)
-	VXOffT:SetValue(tool.settings.YOffset or 0)
-	VXOffT.OnValueChanged = function(num)
-		tool.settings.XOffset = VXOffT:GetValue()
+
+	local lampXOffset = CPanel:NumSlider("Lamp X Offset:",nil,-100,100,0)
+	lampXOffset:SetValue(tool.settings.lampXOffset or 0)
+	lampXOffset.OnValueChanged = function(num)
+		tool.settings.lampXOffset = lampXOffset:GetValue()
 		SendSettings(tool)
 	end
-	local VYOffT = CPanel:NumSlider("Y Offset:",nil,-100,100,0)
-	VYOffT:SetValue(tool.settings.YOffset or 0)
-	VYOffT.OnValueChanged = function(num)
-		tool.settings.YOffset = VYOffT:GetValue()
+
+	local lampZOffset = CPanel:NumSlider("Lamp Z Offset:",nil,-100,100,0)
+	lampZOffset:SetValue(tool.settings.lampZOffset or 0)
+	lampZOffset.OnValueChanged = function(num)
+		tool.settings.lampZOffset = lampZOffset:GetValue()
 		SendSettings(tool)
 	end
-	local VZOffT = CPanel:NumSlider("Z Offset:",nil,-100,100,0)
-	VZOffT:SetValue(tool.settings.ZOffset or 0)
-	VZOffT.OnValueChanged = function(num)
-		tool.settings.ZOffset = VZOffT:GetValue()
-		SendSettings(tool)
-	end	
-	local pitch = CPanel:NumSlider("Pitch",nil,0,360,0)
-	pitch:SetValue(tool.settings.pitch or 0)
-	pitch.OnValueChanged = function(num)
-		tool.settings.pitch = pitch:GetValue()
-		SendSettings(tool)
-	end	
-	local yaw = CPanel:NumSlider("Yaw",nil,0,360,0)
-	yaw:SetValue(tool.settings.yaw or 0)
-	yaw.OnValueChanged = function(num)
-		tool.settings.yaw = yaw:GetValue()
+
+	local sensorXOffset = CPanel:NumSlider("Sensor X Offset:",nil,-100,100,0)
+	sensorXOffset:SetValue(tool.settings.sensorXOffset or 0)
+	sensorXOffset.OnValueChanged = function(num)
+		tool.settings.sensorXOffset = sensorXOffset:GetValue()
 		SendSettings(tool)
 	end
-	local roll = CPanel:NumSlider("Roll",nil,0,360,0)
-	roll:SetValue(tool.settings.roll or 0)
-	roll.OnValueChanged = function(num)
-		tool.settings.roll = roll:GetValue()
+
+	local sensorZOffset = CPanel:NumSlider("Sensor Z Offset:",nil,-100,100,0)
+	sensorZOffset:SetValue(tool.settings.sensorZOffset or 0)
+	sensorZOffset.OnValueChanged = function(num)
+		tool.settings.sensorZOffset = sensorZOffset:GetValue()
 		SendSettings(tool)
 	end
 end
