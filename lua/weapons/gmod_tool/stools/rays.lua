@@ -27,7 +27,7 @@ function TOOL:LeftClick(trace)
 	if not VitroMod then return false end
 	if not self.settings then return false end
 	if not self.settings.name then return false end
-	VitroMod.Rays.atLook(trace, ply, self.settings.name, self.settings)
+	VitroMod.Rays.atLook(trace, ply, self.settings)
 	return true
 end
 
