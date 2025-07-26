@@ -46,7 +46,6 @@ function TOOL:Deploy()
 	local ply = self:GetOwner()
 	if (ply:IsValid()) and (not ply:IsAdmin()) then return false end
 	if SERVER then
-		VitroMod.Rays.send(ply)
 		VitroMod.Rays.Caption = true
 		VitroMod.Rays.sendCap(ply)
 	end

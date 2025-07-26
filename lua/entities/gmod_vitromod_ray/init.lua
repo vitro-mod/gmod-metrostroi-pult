@@ -1,68 +1,55 @@
 AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
-include('trig_init.lua')
 VitroMod = VitroMod or {}
 VitroMod.Rays = VitroMod.Rays or {}
 VitroMod.Rays.Name = VitroMod.Rays.Name or 'ray1'
 VitroMod.Rays.Status = VitroMod.Rays.Status or {}
 VitroMod.Rays.Caption = false
-
 function ENT:Initialize()
+	self.Name = self:GetName()
+	self:InitializeRays()
 	self:SetModel('models/mn_signs/light_sensor.mdl')
 	self:SetNW2String('Name', self:GetName())
-	self:CreateTrigger()
+	self.FirstTrace = true
+	hook.Add('VitroMod.Rays.FL', 'VitroMod.Rays.FL.' .. self:EntIndex(), function(name, status)
+		if not IsValid(self) then return end
+		if name ~= self:GetName() then return end
+		if not status then
+			self.FirstTrace = true
+		end
+		self:SetIsActive(status)
+	end)
+	-- self:CreateTrigger()
 end
 
 function ENT:Think()
+	if not self:GetIsActive() then return end
+	local oldHit = self:GetHit()
+	local startPos = self.LampOffsetWorld
+	local endPos = self.SensorOffsetWorld
+	local tr = util.TraceLine({
+		start = startPos,
+		endpos = endPos,
+		filter = self,
+		mask = MASK_SHOT
+	})
+
+	if tr.Hit and (not oldHit or self.FirstTrace) then
+		self.tr = tr
+		-- print('Ray ' .. self:GetName() .. ' hit something: ' .. tostring(tr.Entity))
+		hook.Run('VitroMod.Rays.FS', self:GetName(), false)
+	elseif not tr.Hit and (oldHit or self.FirstTrace) then
+		-- print('Ray ' .. self:GetName() .. ' stopped hitting ' .. tostring(self.tr and self.tr.Entity or 'something'))
+		-- if self.tr and IsValid(self.tr.Entity) then print(self.tr.Entity:GetVelocity():Length() * 0.01875 * 3.6) end
+		hook.Run('VitroMod.Rays.FS', self:GetName(), true)
+	end
+
+	self.FirstTrace = false
+	self:SetHit(tr.Hit)
 end
 
-
-function ENT:CreateTrigger()
-	local ray = self
-	local initialOffset = Vector(0, -82.3, 67.9 + 2)
-	local sensorOffset = Vector(-94, -15, -30) + Vector(0, -ray.options.sensorXOffset or 0, ray.options.sensorZOffset or 0)
-	local lampOffset = Vector(0, 80, 40) + Vector(0, -ray.options.lampXOffset or 0, ray.options.lampZOffset or 0)
-	self.Trigger = ents.Create('gmod_vitromod_ray_trig')
-	self.Trigger:SetParent(self)
-	self.Trigger:Spawn()
-	self.Trigger:SetAngles(self:GetAngles())
-	local cbMax = sensorOffset + initialOffset
-	local direction = cbMax - lampOffset
-	local length = direction:Length()
-	local angle = direction:Angle()
-	self.Trigger:SetPos(self:LocalToWorld(lampOffset))
-	self.Trigger:SetAngles(self:LocalToWorldAngles(angle))
-	self.Trigger:SetCollisionBounds(Vector(-0.5,-0.5,-0.5), Vector(length * 1.75 + 0.5, 0.5, 0.5))
-
-	local trig = self.Trigger
-	function trig:StartTouch(ent)
-		trig.Touching = trig.Touching or {}
-		local count = table.Count(trig.Touching)
-		if IsValid(ent) then trig.Touching[ent] = true end
-		if count == 0 and ray:GetIsActive() then runUpdateHook(ray, false) end
-	end
-	function trig:EndTouch(ent)
-		trig.Touching = trig.Touching or {}
-		trig.Touching[ent] = nil
-		local count = table.Count(trig.Touching)
-		if count == 0 and ray:GetIsActive() then runUpdateHook(ray, true) end
-	end
-	function runUpdateHook(ray, status)
-		hook.Run('VitroMod.Rays.FS', ray:GetName(), status)
-		RunConsoleCommand('say', 'Ray ' .. ray:GetName() .. (status and ' FS1' or ' FS0'))
-	end
-	hook.Add('VitroMod.Rays.FL', 'VitroMod.Rays.FL.' .. ray:EntIndex(), function(name, status)
-		if not IsValid(ray) then return end
-		if name ~= ray:GetName() then return end
-
-		ray:SetIsActive(status)
-		local count = table.Count(trig.Touching or {})
-		if count == 0 then runUpdateHook(ray, status) end
-	end)
-end
-
-VitroMod.Rays.atLook = function(trace, ply, options )
+VitroMod.Rays.atLook = function(trace, ply, options)
 	local name = options.name
 	local needSpawn = true
 	for k, v in pairs(ents.FindInSphere(trace.HitPos, 100)) do
@@ -81,8 +68,10 @@ VitroMod.Rays.atLook = function(trace, ply, options )
 	if tr then ang = tr.forward:Angle() end
 	ray:SetPos(pos)
 	ray:SetAngles(ang)
-	ray.options = options or {}
-
+	ray:SetSensorXOffset(options.sensorXOffset or 0)
+	ray:SetSensorZOffset(options.sensorZOffset or 0)
+	ray:SetLampXOffset(options.lampXOffset or 0)
+	ray:SetLampZOffset(options.lampZOffset or 0)
 	local nm = VitroMod.Rays.Name
 	if name then nm = name end
 	if needSpawn then
@@ -95,8 +84,6 @@ VitroMod.Rays.atLook = function(trace, ply, options )
 		undo.SetPlayer(ply)
 		undo.Finish()
 	end
-
-	VitroMod.Rays.send()
 end
 
 VitroMod.Rays.remove = function(trace)
@@ -108,30 +95,6 @@ end
 VitroMod.Rays.flush = function()
 	for k, v in pairs(ents.FindByClass('gmod_vitromod_ray')) do
 		SafeRemoveEntity(v)
-	end
-end
-
-VitroMod.Rays.send = function(ply)
-	if not VitroMod.RayNWAdded then
-		util.AddNetworkString('vitromod_ray_data')
-		VitroMod.RayNWAdded = true
-	end
-
-	local clientData = {}
-	for k, v in pairs(ents.FindByClass('gmod_vitromod_ray')) do
-		local name = v:GetName()
-		clientData[name] = {}
-		clientData[name]['pos'] = v:GetPos()
-		clientData[name]['status'] = VitroMod.Rays.Status[name] or false
-		clientData[name]['options'] = v.options or {}
-	end
-
-	net.Start('vitromod_ray_data')
-	net.WriteTable(clientData)
-	if not ply then
-		net.Broadcast()
-	else
-		net.Send(ply)
 	end
 end
 
@@ -148,8 +111,28 @@ VitroMod.Rays.sendCap = function(ply)
 	net.Send(ply)
 end
 
-hook.Add('PlayerSpawn', 'VitroMod.Rays', function(ply) VitroMod.Rays.send(ply) end)
 function ENT:OnRemove()
-	VitroMod.Rays.send(ply)
 	SafeRemoveEntity(self.Trigger)
+end
+
+function ENT:GetMetrostroiSaveTable()
+	return {
+		Name = self:GetName(),
+		Pos = self:GetPos(),
+		Angles = self:GetAngles(),
+		SensorXOffset = self:GetSensorXOffset(),
+		SensorZOffset = self:GetSensorZOffset(),
+		LampXOffset = self:GetLampXOffset(),
+		LampZOffset = self:GetLampZOffset(),
+	}
+end
+
+function ENT:MetrostroiLoad(data)
+	self:SetName(data.Name)
+	self:SetPos(data.Pos)
+	self:SetAngles(data.Angles)
+	self:SetSensorXOffset(data.SensorXOffset)
+	self:SetSensorZOffset(data.SensorZOffset)
+	self:SetLampXOffset(data.LampXOffset)
+	self:SetLampZOffset(data.LampZOffset)
 end

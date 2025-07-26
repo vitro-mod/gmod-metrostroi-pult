@@ -1,26 +1,14 @@
 include('shared.lua')
 VitroMod = VitroMod or {}
-VitroMod.Rays = VitroMod.Rays or {}
 VitroMod.RayCap = VitroMod.RayCap or false
-net.Receive('vitromod_ray_data', function(len, ply)
-	VitroMod.Rays = net.ReadTable()
-	for k, v in pairs(ents.FindByClass('gmod_vitromod_ray')) do
-		v:RemoveModels()
-		v.ModelsCreated = false
-	end
-end)
-
 net.Receive('vitromod_ray_cap', function(len, ply) VitroMod.RayCap = net.ReadBool() end)
-
-local function hudName(name, ent)
-	if not ent then return end
+function ENT:HudName()
+	if not self.Name then return end
 	if not VitroMod.RayCap then return end
-	--for name,ent in pairs( VitroMod.Rays ) do
-	local point = ent.pos
+	local point = self:GetPos()
 	local data2D = point:ToScreen() -- Gets the position of the entity on your screen
 	if not data2D.visible then return end
-	draw.SimpleText(name, 'DermaLarge', data2D.x, data2D.y, Color(ent.status and 0 or 255, 255, ent.status and 0 or 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	--end
+	draw.SimpleText(self.Name, 'DermaLarge', data2D.x, data2D.y, Color(255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end
 
 function ENT:LightSprites()
@@ -38,24 +26,36 @@ function ENT:Sprite(pos, ang, col, bri, mul)
 	local dist = view:Length()
 	view:Normalize()
 	local viewdot = math.Clamp(view:Dot(fw), 0, 1)
-	-- local s = Visible * (viewdot + math.exp(-20 * (1 - viewdot))) * bri * math.Clamp(dist / 32, 64, 256) * mul
 	local s = Visible * viewdot * bri * math.Clamp(dist / 32, 64, 256) * mul
 	render.SetMaterial(self.SpriteMat)
 	render.DrawSprite(pos, s, s, col)
 end
 
+function ENT:Initialize(arguments)
+	self.Name = self:GetNW2String('Name', 'Ray')
+	self.DebugConvar = GetConVar('metrostroi_drawsignaldebug')
+	self:InitializeRays()
+	self:SetRenderBounds(self.LampOffset, self.SensorOffset)
+	local ray = self
+	hook.Add('HUDPaint', 'VitroMod.Rays.Caption' .. self:EntIndex(), function()
+		-- if not IsValid(ray) then return end
+		if ray:IsDormant() then return end
+		ray:HudName()
+	end)
+	self.IdleColor = Color(255, 255, 255)
+	self.ClearColor = Color(0, 255, 0)
+	self.HitColor = Color(255, 0, 0)
+end
+
 function ENT:Think()
+	if self:IsDormant() then
+		self:OnRemove()
+		return
+	end
+
 	self.PrevTime = self.PrevTime or RealTime()
 	self.DeltaTime = RealTime() - self.PrevTime
 	self.PrevTime = RealTime()
-	self.name = self.name or self:GetNW2String('Name')
-	if not VitroMod.Rays[self.name] then return false end
-	if self:IsDormant() then
-		hook.Remove('HUDPaint', 'VitroMod.Rays.Caption' .. self:EntIndex())
-	else
-		hook.Add('HUDPaint', 'VitroMod.Rays.Caption' .. self:EntIndex(), function() hudName(self.name, VitroMod.Rays[self.name]) end)
-	end
-
 	if not self.ModelsCreated then
 		self:CreateModels()
 		self.ModelsCreated = true
@@ -69,23 +69,21 @@ function ENT:Think()
 end
 
 function ENT:Draw()
-	-- self:DrawModel()
+	if not self.DebugConvar:GetBool() then return end
+	-- print('Drawing ray from ' .. tostring(startPos) .. ' to ' .. tostring(endPos))
+	render.SetColorMaterial()
+	render.DrawLine(self.LampOffsetWorld, self.SensorOffsetWorld, self:GetIsActive() and (self:GetHit() and self.HitColor or self.ClearColor) or self.IdleColor, true)
 end
-ENT.SpriteMat = Material("sprites/light_ignorez")
+
+ENT.SpriteMat = Material('sprites/light_ignorez')
 ENT.Anims = ENT.Anims or {}
 ENT.LampColor = ENT.LampColor or Color(0, 0, 0, 0)
-
 function ENT:CreateModels()
 	self.Color = Color(0, 0, 0, 0)
-	local sensorOffset = self.Models['Sensor'].Offset + Vector(0, -(VitroMod.Rays[self.name].options.sensorXOffset or 0), VitroMod.Rays[self.name].options.sensorZOffset or 0)
-	-- local sensorOffset = self.Models['Sensor'].Offset
-	local lampOffset = self.Models['Lamp'].Offset + Vector(0, -(VitroMod.Rays[self.name].options.lampXOffset or 0), VitroMod.Rays[self.name].options.lampZOffset or 0)
-	-- local lampOffset = self.Models['Lamp'].Offset
-	-- print(sensorOffset, lampOffset)
-	local direction = (self.InitialOffset + sensorOffset - lampOffset):GetNormalized()
+	local sensorOffset = self.SensorOffset - self.InitialOffset
+	local lampOffset = self.LampOffset
+	local direction = (sensorOffset + self.InitialOffset - lampOffset):GetNormalized()
 	local directionAngle = direction:Angle()
-	-- print('Direction:', direction)
-	-- print('Direction Angle:', directionAngle)
 	self.ClientSideModels = {}
 	for k, v in pairs(self.Models) do
 		self.ClientSideModels[k] = ClientsideModel(v.Model)
@@ -101,6 +99,7 @@ function ENT:CreateModels()
 				childModel:Spawn()
 				childModel:SetLocalPos(childData.Offset)
 				childModel:SetLocalAngles(childData.Angle)
+				childModel:SetNoDraw(true)
 				if childData.Skin then childModel:SetSkin(childData.Skin) end
 				self.ClientSideModels[childName] = childModel
 			end
@@ -127,25 +126,18 @@ function ENT:CreateModels()
 	end
 
 	if not IsValid(self.PT) then self.PT = ProjectedTexture() end
-	local angle = Angle(-directionAngle[1], 180 + directionAngle[2], 0)
+	-- local angle = Angle(-directionAngle[1], 180 + directionAngle[2], 0)
 	local lmpang = self:LocalToWorldAngles(Angle(-directionAngle[1], 180 + directionAngle[2], 0))
 	local ptang = Angle(lmpang[1] + 180, lmpang[2], lmpang[3])
 	local ptpos = self.ClientSideModels['Light']:GetPos()
 	self:CreateProjectedTexture(ptpos, ptang)
-
 	local ray = self
-	hook.Add("PostDrawTranslucentRenderables", "RaySprites_" .. self:EntIndex(), function() ray:LightSprites() end)
-	-- local State = self:AnimateFade('PT', 5, 0, 5, 256)
-	-- self:UpdateProjectedTexture(State)
-	-- self:UpdateProjectedTexture(5)
+	hook.Add('PostDrawTranslucentRenderables', 'RaySprites_' .. self:EntIndex(), function() ray:LightSprites() end)
 end
 
 local function ColorLerp(color, brightness)
 	local minBrightness = 0
 	local maxBrightness = 5
-	-- Интерполяция цвета от тёплого красного (при тусклом свете) до белого (при ярком)
-	-- Красный/оранжевый: (255, 100, 50)
-	-- Нормальная лампа: (255, 220, 180)
 	local t = math.Clamp((brightness - minBrightness) / (maxBrightness - minBrightness), 0, 1)
 	color.r = Lerp(t, 255, 255)
 	color.g = Lerp(t, 80, 200)
@@ -168,7 +160,6 @@ function ENT:UpdateProjectedTexture(brightness)
 	if not self.Color then return end
 	ColorLerp(self.Color, brightness)
 	local lightModel = self.ClientSideModels['Light']
-
 	self.LightSprite = {
 		pos = lightModel:GetPos(),
 		ang = lightModel:GetAngles(),
@@ -199,11 +190,13 @@ function ENT:RemoveModels()
 	end
 
 	self.ClientSideModels = {}
+	self.ModelsCreated = false
 end
 
 function ENT:OnRemove()
 	self:RemoveModels()
-	hook.Remove("PostDrawTranslucentRenderables", "RaySprites_" .. self:EntIndex())
+	hook.Remove('HUDPaint', 'VitroMod.Rays.Caption' .. self:EntIndex())
+	hook.Remove('PostDrawTranslucentRenderables', 'RaySprites_' .. self:EntIndex())
 end
 
 function ENT:AnimateFade(clientProp, value, min, max, speed, damping, stickyness)
