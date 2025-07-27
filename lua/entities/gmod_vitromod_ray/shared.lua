@@ -33,10 +33,12 @@ ENT.Models = {
 function ENT:SetupDataTables()
     self:NetworkVar('Bool', 0, 'IsActive')
     self:NetworkVar('Bool', 1, 'Hit')
-    self:NetworkVar('Float', 0, 'SensorXOffset')
-    self:NetworkVar('Float', 1, 'SensorZOffset')
-    self:NetworkVar('Float', 2, 'LampXOffset')
-    self:NetworkVar('Float', 3, 'LampZOffset')
+    self:NetworkVar('Int', 0, 'TrackID')
+    self:NetworkVar('Float', 0, 'TrackX')
+    self:NetworkVar('Float', 1, 'SensorXOffset')
+    self:NetworkVar('Float', 2, 'SensorZOffset')
+    self:NetworkVar('Float', 3, 'LampXOffset')
+    self:NetworkVar('Float', 4, 'LampZOffset')
 end
 
 function ENT:InitializeRays()
