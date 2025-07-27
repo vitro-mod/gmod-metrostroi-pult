@@ -31,9 +31,11 @@ ENT.Models = {
 }
 
 function ENT:SetupDataTables()
+    self:NetworkVar('String', 0, 'AdjacentSignalName')
     self:NetworkVar('Bool', 0, 'IsActive')
     self:NetworkVar('Bool', 1, 'Hit')
-    self:NetworkVar('Int', 0, 'TrackID')
+    self:NetworkVar('Int', 0, 'TrackID')  
+    self:NetworkVar('Int', 1, 'RequiredSpeed')  
     self:NetworkVar('Float', 0, 'TrackX')
     self:NetworkVar('Float', 1, 'SensorXOffset')
     self:NetworkVar('Float', 2, 'SensorZOffset')

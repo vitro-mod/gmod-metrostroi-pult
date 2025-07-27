@@ -103,6 +103,22 @@ function TOOL:BuildCPanel()
 		SendSettings(tool)
 	end
 
+	local AdjacentSignalName = CPanel:TextEntry("Adjacent Signal Name:")
+	tool.settings = tool.settings or {}
+	tool.settings.adjacentSignalName = tool.settings.adjacentSignalName or ''
+	AdjacentSignalName:SetValue(tool.settings.adjacentSignalName)
+	function AdjacentSignalName:OnChange()
+		tool.settings.adjacentSignalName = self:GetValue()
+		SendSettings(tool)
+	end
+
+	local requiredSpeed = CPanel:NumSlider("Required Speed:", nil, 0, 100, 0)
+	requiredSpeed:SetValue(tool.settings.requiredSpeed or 0)
+	requiredSpeed.OnValueChanged = function(num)
+		tool.settings.requiredSpeed = requiredSpeed:GetValue()
+		SendSettings(tool)
+	end
+
 	local lampXOffset = CPanel:NumSlider("Lamp X Offset:",nil,-100,100,0)
 	lampXOffset:SetValue(tool.settings.lampXOffset or 0)
 	lampXOffset.OnValueChanged = function(num)
