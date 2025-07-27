@@ -42,6 +42,7 @@ function ENT:Initialize(arguments)
 		if ray:IsDormant() then return end
 		ray:HudName()
 	end)
+
 	self.IdleColor = Color(255, 255, 255)
 	self.ClearColor = Color(0, 255, 0)
 	self.HitColor = Color(255, 0, 0)
@@ -73,6 +74,16 @@ function ENT:Draw()
 	-- print('Drawing ray from ' .. tostring(startPos) .. ' to ' .. tostring(endPos))
 	render.SetColorMaterial()
 	render.DrawLine(self.LampOffsetWorld, self.SensorOffsetWorld, self:GetIsActive() and (self:GetHit() and self.HitColor or self.ClearColor) or self.IdleColor, true)
+	
+	cam.Start3D2D(self:GetPos(), self:LocalToWorldAngles(Angle(0, -90, 90)), 0.25)
+	surface.SetDrawColor(125, 125, 0, 255)
+	surface.DrawRect(-40, -20, 80, 20)
+	draw.DrawText('Hit: ' .. (tostring(self:GetHit())), 'Trebuchet24', -70, -130, Color(255, 100, 0))
+	draw.DrawText('Status: ' .. (tostring(self:GetIsActive())), 'Trebuchet24', -70, -110, Color(255, 100, 0))
+	draw.DrawText(self.Name, 'Trebuchet24', -35, -22, Color(0, 0, 0))
+	draw.DrawText('TrackID: ' .. self:GetTrackID(), 'Trebuchet24', -70, -80, Color(0, 238, 0))
+	draw.DrawText(Format('TrackPos: %.02f', self:GetTrackX()), 'Trebuchet24', -70, -50, Color(0, 238, 0))
+	cam.End3D2D()
 end
 
 ENT.SpriteMat = Material('sprites/light_ignorez')

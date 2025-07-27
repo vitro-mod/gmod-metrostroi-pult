@@ -40,9 +40,10 @@ function ENT:Think()
 		-- print('Ray ' .. self:GetName() .. ' hit something: ' .. tostring(tr.Entity))
 		hook.Run('VitroMod.Rays.FS', self:GetName(), false)
 	elseif not tr.Hit and (oldHit or self.FirstTrace) then
+		local speed = (self.tr and IsValid(self.tr.Entity)) and self.tr.Entity:GetVelocity():Length() * 0.01875 * 3.6 or 0
 		-- print('Ray ' .. self:GetName() .. ' stopped hitting ' .. tostring(self.tr and self.tr.Entity or 'something'))
 		-- if self.tr and IsValid(self.tr.Entity) then print(self.tr.Entity:GetVelocity():Length() * 0.01875 * 3.6) end
-		hook.Run('VitroMod.Rays.FS', self:GetName(), true)
+		hook.Run('VitroMod.Rays.FS', self:GetName(), true, speed)
 	end
 
 	self.FirstTrace = false
@@ -124,6 +125,8 @@ function ENT:GetMetrostroiSaveTable()
 		SensorZOffset = self:GetSensorZOffset(),
 		LampXOffset = self:GetLampXOffset(),
 		LampZOffset = self:GetLampZOffset(),
+		TrackID = self:GetTrackID() or 0,
+		TrackX = self:GetTrackX() or 0
 	}
 end
 
@@ -135,4 +138,6 @@ function ENT:MetrostroiLoad(data)
 	self:SetSensorZOffset(data.SensorZOffset)
 	self:SetLampXOffset(data.LampXOffset)
 	self:SetLampZOffset(data.LampZOffset)
+	self:SetTrackID(data.TrackID or 0)
+	self:SetTrackX(data.TrackX or 0)
 end
