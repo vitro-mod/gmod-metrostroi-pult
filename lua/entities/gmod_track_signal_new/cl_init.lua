@@ -898,7 +898,7 @@ local function enableDebug()
                                 draw.DrawText(Format("Current route: %d",sig:GetNW2Int("CurrentRoute",-1)),"Trebuchet24",   15, 120,Color(0, 0, 0, 255))
 
                                 draw.DrawText("AB info","Trebuchet24",5,160,Color(200,0,0,255))
-                                draw.DrawText(Format("Occupied: %s  VKSReducted: %s",sig:GetNW2Bool("Occupied",false) and "Y" or "N", sig:GetNW2Bool("VKSReducted", false) and "Y" or "N"),"Trebuchet24",5,180,Color(0, 0, 0, 255))
+                                draw.DrawText(Format("Occupied: %s  VKSMet: %s",sig:GetNW2Bool("Occupied",false) and "Y" or "N", sig:GetNW2Bool("VKSMet", false) and "Y" or "N"),"Trebuchet24",5,180,Color(0, 0, 0, 255))
                                 draw.DrawText(Format("Linked to controller: %s",sig:GetNW2Bool("LinkedToController",false) and "Y" or "N"),"Trebuchet24",5,200,Color(0, 0, 0, 255))
                                 draw.DrawText(Format("Num: %d",sig:GetNW2Int("ControllersNumber",0)),"Trebuchet24",10,220,Color(0, 0, 0, 255))
                                 draw.DrawText(Format("Controller logic: %s",sig:GetNW2Bool("BlockedByController",false) and "Y" or "N"),"Trebuchet24",5,240,Color(0, 0, 0, 255))
