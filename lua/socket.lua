@@ -9,7 +9,7 @@ pings = 0
 timer.Remove('ping')
 include('vitro_mod/pult/config.lua')
 local mapName = game.GetMap()
-if not file.Exists('vitro_mod/pult/maps/' .. mapName .. '.lua', 'LUA') then
+if not file.Exists('vitro_mod/pult/maps/' .. mapName .. '.lua', 'LUA') or not VitroMod.Pult.Urls[mapName] then
 	print('VitroPult: map ' .. mapName .. ' is not configured for SCB server!')
 	return
 end
@@ -25,7 +25,7 @@ if sck then
 	sck = nil
 end
 
-if VitroMod.Pult.Urls[mapName] and not sck then sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) end
+if not sck then sck = GWSockets.createWebSocket(VitroMod.Pult.Urls[mapName]) end
 if not sck then return end
 -- sck:closeNow()
 function sck:onConnected()
@@ -42,7 +42,7 @@ function sck:onConnected()
 		self:write('BV_' .. util.TableToJSON(VitroMod.Pult.GermoGates.GetAll()))
 	end
 
-	SendRNs()
+	if SendRNs then SendRNs() end
 	if Minsk and Minsk.MK then self:write('MKs_' .. util.TableToJSON(Minsk.MK.GetTableMKInfo())) end
 	if not firstConnect then
 		WriteToSocket('FIRST')
@@ -199,10 +199,19 @@ function sck:onMessage(txt)
 		local json = string.Explode(';', string.sub(txt, 4))[1]
 		local bvs = util.JSONToTable(json)
 		VitroMod.Pult.GermoGates.UpdateLocks(bvs)
+	elseif string.sub(txt, 1, 2) == 'FL' then
+		local ltmtMsg = string.sub(txt, 3)
+		for k, v in pairs(string.Explode(';', ltmtMsg)) do
+			if string.len(v) > 0 then
+				local name = 'FS' .. string.Explode('_', v)[1]
+				local status = string.Explode('_', v)[2] == '1'
+				hook.Run('VitroMod.Rays.FL', name, status)
+			end
+		end
 	elseif txt == 'OKFIRST' then
 		firstConnect = true
 	elseif txt == 'ASNP_UPD' then
-		SendRNs(true)
+		if SendRNs then SendRNs(true) end
 	end
 
 	pings = 0
@@ -220,7 +229,7 @@ function wsConnect(reconnect)
 		else
 			sck:write('ping')
 			pings = 1
-			SendRNs()
+			if SendRNs then SendRNs() end
 		end
 	else
 		--print('initConnect')
@@ -279,6 +288,7 @@ for k, v in pairs(ents.FindByClass('gmod_track_signal')) do
 end
 
 VitroMod.Pult.Map.Init()
+VitroMod.Pult.IntervalClocks.Init()
 initSwitches()
 
 function SendRCInfo(ACTIVATOR, CALLER, INFO)
@@ -289,8 +299,10 @@ function SendRCInfo(ACTIVATOR, CALLER, INFO)
 end
 
 hook.Add('VitroMod_Trigger_Update', 'VitroMod_socket', function(ACTIVATOR, CALLER, INFO) SendRCInfo(ACTIVATOR, CALLER, INFO) end)
---hook.Add('Metrostroi.Signaling.ChangeRCState','VitroModRcHook', function(name, occ) RunConsoleCommand('say',name..' '..(occ and '1' or '0')) end)
 hook.Add('Metrostroi.Signaling.ChangeRCState', 'VitroModRcHook', function(name, occ, signal) SendBU(name, occ, signal) end)
+hook.Remove('VitroMod.Rays.FS', 'VitroMod.Pult.Rays.FS')
+hook.Add('VitroMod.Rays.FS', 'VitroMod.Pult.Rays.FS', function(name, status) SendFS(name, status) end)
+
 function SendBU(name, occ, signal)
 	rcNamesOcc[name] = occ and true or nil
 	local sendRN = rcASNP[name] and IsValid(signal.OccupiedBy) and occ
@@ -326,15 +338,13 @@ function SendAutomaticRC(signal)
 	end
 end
 
--------------------------------------------
-function SendMKinfo(ACTIVATOR, CALLER, INFO) -- металлоконструкции
-	if INFO == 0 then
-		--RunConsoleCommand('say','GERMOGATE CLOSE START',string.sub(CALLER:GetName(),1,-4),INFO)
-		WriteToSocket(string.sub(CALLER:GetName(), 1, -4) .. '_0')
-	else
-		--RunConsoleCommand('say','GERMOGATE OPEN END',string.sub(CALLER:GetName(),1,-4),INFO)
-		WriteToSocket(string.sub(CALLER:GetName(), 1, -4) .. '_1')
-	end
+-- Minsk MK
+function SendMKinfo(ACTIVATOR, CALLER, INFO)
+	WriteToSocket(string.sub(CALLER:GetName(), 1, -4) .. Either(INFO == 0, '_0', '_1'))
+end
+
+function SendFS(name, status)
+	WriteToSocketSimple(name .. (status and '_1' or '_0'))
 end
 
 hook.Add('VitroModWhiteList', 'VitroModWhiteListSend', function() WriteToSocketSimple('WL' .. util.TableToJSON(VitroMod.Pult.WhiteList)) end)
