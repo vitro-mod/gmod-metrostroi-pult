@@ -30,18 +30,19 @@ function ENT:Think()
 end
 
 function ENT:MetrostroiVKSLogic()
-	if not self.Signal.ControllerLogic and self.Signal.Occupied and self.Signal.PrevSig and self.Signal.PrevSig.Occupied and not self.UV then
+	if not self.Signal.PrevSig then return end
+	if self.Signal.Occupied and self.Signal.PrevSig.Occupied and not self.UV then
 		RunConsoleCommand('say', 'Signal ' .. self.Signal.Name .. ' UV true')
 		self.UV = true
 	end
 
-	if not self.Signal.ControllerLogic and self.Signal.Occupied and self.Signal.PrevSig and not self.Signal.PrevSig.Occupied and self.UV then
+	if self.Signal.Occupied and not self.Signal.PrevSig.Occupied and self.UV then
 		RunConsoleCommand('say', 'Signal ' .. self.Signal.Name .. ' Lamp turn on')
 		self.UV = false
 		self:SetIsActive(true)
 	end
 
-	if not self.Signal.ControllerLogic and not self.Signal.Occupied and self.Signal.PrevSig and not self.Signal.PrevSig.Occupied and self:GetIsActive() then
+	if not self.Signal.Occupied and not self.Signal.PrevSig.Occupied and self:GetIsActive() then
 		RunConsoleCommand('say', 'Signal ' .. self.Signal.Name .. ' Lamp turn off')
 		self:SetIsActive(false)
 	end
@@ -59,7 +60,6 @@ function ENT:RayTrace()
 	})
 
 	print(tr.Hit, oldHit, self.FirstTrace)
-
 	if tr.Hit and (not oldHit or self.FirstTrace) then
 		self.tr = tr
 		self:OnRayBlocked()
@@ -73,10 +73,11 @@ function ENT:RayTrace()
 end
 
 function ENT:OnRayBlocked()
-	if not self.Signal.ControllerLogic and self.Signal.VKSReducted then
-		self.Signal.VKSReducted = false
+	if not self.Signal.ControllerLogic and self.Signal.VKSMet then
+		self.Signal.VKSMet = false
 		self:SetIsActive(false)
 	end
+
 	hook.Run('VitroMod.Rays.FS', self:GetName(), false)
 	RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' hit something')
 end
@@ -89,11 +90,11 @@ function ENT:OnRayCleared(speed)
 			self:SetIsActive(false)
 			RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' cleared at speed ' .. speed .. ', but required speed is ' .. reqSpeed)
 		elseif not self.Signal.ControllerLogic and speed >= reqSpeed then
-			self.Signal.VKSReducted = true
+			self.Signal.VKSMet = true
 			RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' cleared at speed ' .. speed .. ' VKS Reducted!, required speed is ' .. reqSpeed)
 		end
 	end
-	
+
 	hook.Run('VitroMod.Rays.FS', self:GetName(), true)
 end
 
