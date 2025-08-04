@@ -32,18 +32,16 @@ end
 function ENT:MetrostroiVKSLogic()
 	if not self.Signal.PrevSig then return end
 	if self.Signal.Occupied and self.Signal.PrevSig.Occupied and not self.UV then
-		RunConsoleCommand('say', 'Signal ' .. self.Signal.Name .. ' UV true')
+		-- RunConsoleCommand('say', 'Signal ' .. self.Signal.Name .. ' UV true')
 		self.UV = true
 	end
 
 	if self.Signal.Occupied and not self.Signal.PrevSig.Occupied and self.UV then
-		RunConsoleCommand('say', 'Signal ' .. self.Signal.Name .. ' Lamp turn on')
 		self.UV = false
 		self:SetIsActive(true)
 	end
 
 	if not self.Signal.Occupied and not self.Signal.PrevSig.Occupied and self:GetIsActive() then
-		RunConsoleCommand('say', 'Signal ' .. self.Signal.Name .. ' Lamp turn off')
 		self:SetIsActive(false)
 	end
 end
@@ -59,7 +57,6 @@ function ENT:RayTrace()
 		mask = MASK_SHOT
 	})
 
-	print(tr.Hit, oldHit, self.FirstTrace)
 	if tr.Hit and (not oldHit or self.FirstTrace) then
 		self.tr = tr
 		self:OnRayBlocked()
@@ -79,19 +76,19 @@ function ENT:OnRayBlocked()
 	end
 
 	hook.Run('VitroMod.Rays.FS', self:GetName(), false)
-	RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' hit something')
+	-- RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' hit something')
 end
 
 function ENT:OnRayCleared(speed)
-	RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' cleared at speed ' .. speed)
+	-- RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' cleared at speed ' .. speed)
 	if not self.Signal.ControllerLogic then
 		local reqSpeed = self:GetRequiredSpeed() or 100
 		if not self.Signal.ControllerLogic and speed < reqSpeed then
 			self:SetIsActive(false)
-			RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' cleared at speed ' .. speed .. ', but required speed is ' .. reqSpeed)
+			-- RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' cleared at speed ' .. speed .. ', but required speed is ' .. reqSpeed)
 		elseif not self.Signal.ControllerLogic and speed >= reqSpeed then
 			self.Signal.VKSMet = true
-			RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' cleared at speed ' .. speed .. ' VKS Reducted!, required speed is ' .. reqSpeed)
+			-- RunConsoleCommand('say', 'Ray ' .. self:GetName() .. ' cleared at speed ' .. speed .. ' VKS Reducted!, required speed is ' .. reqSpeed)
 		end
 	end
 
