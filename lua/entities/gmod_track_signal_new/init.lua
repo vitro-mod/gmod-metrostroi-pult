@@ -546,6 +546,7 @@ function ENT:Think(my)
 		--end
 		self.RouteNumberOverrite = nil
 		local number = ""
+		if self.NextSignalLink and not self.NextSignalLink.PrevSig then self.NextSignalLink.PrevSig = self end
 		if self.MU or self.ARSOnly or self.RouteNumberSetup and self.RouteNumberSetup ~= "" or self.RouteNumber and self.RouteNumber ~= "" then
 			if self.NextSignalLink then
 				if not self.NextSignalLink.Red and not self.Red then
