@@ -1,12 +1,17 @@
 function initSwitches()
 	VitroMod.Pult.Switches = {}
+	VitroMod.Pult.SwitchesInvertControl = function(ctrl)
+		if ctrl == 0 then return 2 end
+		if ctrl == 2 then return 0 end
+		return ctrl
+	end
 	VitroMod.Pult.SwitchesControl = VitroMod.Pult.SwitchesControl or {}
 	for k, v in pairs(ents.FindByClass('prop_door_rotating')) do
 		if string.Explode('_', v:GetName())[1] == 'trackswitch' then
 			local ctrl = v:GetSaveTable().m_eDoorState
 			local name = string.Explode('_', v:GetName())[2]
-			if VitroMod.Pult.SwitchesInvert[name] ~= nil then ctrl = invCtrl(ctrl) end
-			if VitroMod.Pult.SwitchesInvertAll then ctrl = invCtrl(ctrl) end
+			if VitroMod.Pult.SwitchesInvert[name] ~= nil then ctrl = VitroMod.Pult.SwitchesInvertControl(ctrl) end
+			if VitroMod.Pult.SwitchesInvertAll then ctrl = VitroMod.Pult.SwitchesInvertControl(ctrl) end
 			VitroMod.Pult.Switches[string.Explode('_', v:GetName())[2]] = VitroMod.Pult.Switches[string.Explode('_', v:GetName())[2]] or {}
 			--if v:GetSaveTable().m_eDoorState ~= 0 then
 			VitroMod.Pult.SwitchesControl[name] = ctrl or {}
@@ -58,8 +63,8 @@ end
 function SendSWInfo(ACTIVATOR, CALLER) --писать
 	local ctrl = CALLER:GetSaveTable().m_eDoorState
 	local name = string.Explode('_', CALLER:GetName())[2]
-	if VitroMod.Pult.SwitchesInvert[name] ~= nil then ctrl = invCtrl(ctrl) end
-	if VitroMod.Pult.SwitchesInvertAll then ctrl = invCtrl(ctrl) end
+	if VitroMod.Pult.SwitchesInvert[name] ~= nil then ctrl = VitroMod.Pult.SwitchesInvertControl(ctrl) end
+	if VitroMod.Pult.SwitchesInvertAll then ctrl = VitroMod.Pult.SwitchesInvertControl(ctrl) end
 	VitroMod.Pult.SwitchesControl[name] = ctrl
 	local swmsg = 'SW' .. name .. '_' .. ctrl
 	if VitroMod.Pult.IsMaster then WriteToSocket(swmsg) end
@@ -69,14 +74,5 @@ hook.Add('swSend', 'swSendInfo', function()
 	--RunConsoleCommand('say',CALLER:GetName()..'ss') 
 	SendSWInfo(ACTIVATOR, CALLER)
 end)
-
-function invCtrl(ctrl)
-	if ctrl == 0 then
-		ctrl = 2
-	elseif ctrl == 2 then
-		ctrl = 0
-	end
-	return ctrl
-end
 
 hook.Add('PostCleanupMap', 'PostCleanup_InitSwitches', initSwitches)
