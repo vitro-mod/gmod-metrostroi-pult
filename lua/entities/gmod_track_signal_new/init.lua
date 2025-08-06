@@ -374,9 +374,10 @@ function ENT:ARSLogic(tim)
 			if self.Routes[self.Route or 1].Manual then self.Routes[self.Route or 1].IsOpened = false end
 		end
 		if self.Occupied or not self.NextSignalLink or not self.NextSignalLink.FreeBS then
-			self.FreeBS = 0
+			self.FreeBS = self.VKSMet and 1 or 0
 		else
 			self.FreeBS = math.min(30,self.NextSignalLink.FreeBS + 1) -- old 10 freebs - костыль
+			self.VKSMet = false
 		end
 		if self.FreeBS - (self.OldBSState or self.FreeBS) > 1 then
 			local Free = self.FreeBS
@@ -512,6 +513,7 @@ function ENT:Think(my)
 		self:SetNW2Bool("CurrentRoute",self.Route or -1)
 		self:SetNW2Bool("Occupied",self.Occupied)
 		self:SetNW2Bool("2/6",self.TwoToSix)
+		self:SetNW2Bool("VKSMet", self.VKSMet)
 		self:SetNW2Int("FreeBS",self.FreeBS)
 		--self:SetNW2Bool("CLCheckOcc",false)
 		self:SetNW2Int("ArsThis",self.ARSSpeedLimit)
@@ -544,6 +546,7 @@ function ENT:Think(my)
 		--end
 		self.RouteNumberOverrite = nil
 		local number = ""
+		if self.NextSignalLink and not self.NextSignalLink.PrevSig then self.NextSignalLink.PrevSig = self end
 		if self.MU or self.ARSOnly or self.RouteNumberSetup and self.RouteNumberSetup ~= "" or self.RouteNumber and self.RouteNumber ~= "" then
 			if self.NextSignalLink then
 				if not self.NextSignalLink.Red and not self.Red then

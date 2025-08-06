@@ -1,0 +1,10 @@
+VertexlitGeneric
+{
+	$basetexture models/mn_signs/light_sensor_white
+	$bumpmap models/mn_signs/light_sensor_n
+	
+	$phong 1
+	$phongexponenttexture models/mn_signs/light_sensor_s
+    $phongboost 0.5
+    $phongfresnelranges "[.1 .1 .1]"
+}
