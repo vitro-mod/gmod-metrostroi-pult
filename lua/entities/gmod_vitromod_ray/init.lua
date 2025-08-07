@@ -24,6 +24,7 @@ end
 
 function ENT:Think()
 	if not IsValid(self.Signal) then self.Signal = Metrostroi.GetSignalByName(self:GetAdjacentSignalName()) end
+	if not self.Signal then return end
 	if not self.Signal.ControllerLogic then self:MetrostroiVKSLogic() end
 	if not self:GetIsActive() then return end
 	self:RayTrace()
