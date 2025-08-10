@@ -1,5 +1,6 @@
 AddCSLuaFile("cl_font.lua")
 AddCSLuaFile("cl_init.lua")
+AddCSLuaFile("cl_debug.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 util.AddNetworkString "metrostroi-signal"
