@@ -12,7 +12,7 @@ VitroMod.Pult.GermoGates = {
             VitroMod.Pult.GermoGates.Entities[entity:GetName()] = entity
             VitroMod.Pult.GermoGates.Inverted[entity:GetName()] = invertAll
 
-            local state = entity:GetSaveTable().m_toggle_state
+            local state = entity:GetInternalVariable( "m_toggle_state" )
 
             VitroMod.Pult.GermoGates.States[entity:GetName()] = invertAll and VitroMod.Pult.GermoGates.InvertControl(state) or state
             VitroMod.Pult.GermoGates.Locked[entity:GetName()] = false
@@ -25,7 +25,7 @@ VitroMod.Pult.GermoGates = {
     end,
     UpdateState = function(entity)
         if not IsValid(entity) then return false end
-        local state = entity:GetSaveTable().m_toggle_state
+        local state = entity:GetInternalVariable( "m_toggle_state" )
         local inverted = VitroMod.Pult.GermoGates.Inverted[entity:GetName()] or false
         VitroMod.Pult.GermoGates.States[entity:GetName()] = inverted and VitroMod.Pult.GermoGates.InvertControl(state) or state
     end,
@@ -56,7 +56,7 @@ VitroMod.Pult.GermoGates = {
 }
 
 function sendMKInfoV2()
-    local ctrl = CALLER:GetSaveTable().m_toggle_state
+    local ctrl = CALLER:GetInternalVariable( "m_toggle_state" )
     if VitroMod.Pult.GermoGates.Inverted[CALLER:GetName()] then
         ctrl = VitroMod.Pult.GermoGates.InvertControl(ctrl)
     end

@@ -17,7 +17,7 @@ VitroMod.Pult.Switches = {
                 VitroMod.Pult.Switches.Inverted[entity:GetName()] = VitroMod.Pult.SwitchesInvert[entity:GetName()]
             end
 
-            local state = entity:GetSaveTable().m_eDoorState
+            local state = entity:GetInternalVariable( "m_eDoorState" )
 
             VitroMod.Pult.Switches.States[entity:GetName()] = invertAll and VitroMod.Pult.Switches.InvertControl(state) or state
             VitroMod.Pult.Switches.Locked[entity:GetName()] = false
@@ -30,7 +30,7 @@ VitroMod.Pult.Switches = {
     end,
     UpdateState = function(entity)
         if not IsValid(entity) then return false end
-        local state = entity:GetSaveTable().m_eDoorState
+        local state = entity:GetInternalVariable( "m_eDoorState" )
         local inverted = VitroMod.Pult.Switches.Inverted[entity:GetName()] or false
         VitroMod.Pult.Switches.States[entity:GetName()] = inverted and VitroMod.Pult.Switches.InvertControl(state) or state
     end,

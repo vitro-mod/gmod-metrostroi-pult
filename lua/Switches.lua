@@ -8,12 +8,12 @@ function initSwitches()
 	VitroMod.Pult.SwitchesControl = VitroMod.Pult.SwitchesControl or {}
 	for k, v in pairs(ents.FindByClass('prop_door_rotating')) do
 		if string.Explode('_', v:GetName())[1] == 'trackswitch' then
-			local ctrl = v:GetSaveTable().m_eDoorState
+			local ctrl = v:GetInternalVariable( "m_eDoorState" )
 			local name = string.Explode('_', v:GetName())[2]
 			if VitroMod.Pult.SwitchesInvert[name] ~= nil then ctrl = VitroMod.Pult.SwitchesInvertControl(ctrl) end
 			if VitroMod.Pult.SwitchesInvertAll then ctrl = VitroMod.Pult.SwitchesInvertControl(ctrl) end
 			VitroMod.Pult.Switches[string.Explode('_', v:GetName())[2]] = VitroMod.Pult.Switches[string.Explode('_', v:GetName())[2]] or {}
-			--if v:GetSaveTable().m_eDoorState ~= 0 then
+			--if v:GetInternalVariable( "m_eDoorState" ) ~= 0 then
 			VitroMod.Pult.SwitchesControl[name] = ctrl or {}
 			--end
 			table.insert(VitroMod.Pult.Switches[string.Explode('_', v:GetName())[2]], v)
@@ -61,7 +61,7 @@ end
 -- end
 -- end
 function SendSWInfo(ACTIVATOR, CALLER) --писать
-	local ctrl = CALLER:GetSaveTable().m_eDoorState
+	local ctrl = CALLER:GetInternalVariable( "m_eDoorState" )
 	local name = string.Explode('_', CALLER:GetName())[2]
 	if VitroMod.Pult.SwitchesInvert[name] ~= nil then ctrl = VitroMod.Pult.SwitchesInvertControl(ctrl) end
 	if VitroMod.Pult.SwitchesInvertAll then ctrl = VitroMod.Pult.SwitchesInvertControl(ctrl) end
