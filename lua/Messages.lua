@@ -153,6 +153,10 @@ VitroMod.Pult.HandleMessage = function(txt)
                 hook.Run('VitroMod.Rays.FL', name, status)
             end
         end
+    elseif string.sub(txt, 1, 3) == 'AL_' then
+        local json = string.Explode(';', string.sub(txt, 4))[1]
+        local asnp_list = util.JSONToTable(json)
+        VitroMod.Pult.ASNP.ApplyList(asnp_list)
     elseif txt == 'OKFIRST' then
         firstConnect = true
     elseif txt == 'ASNP_UPD' then

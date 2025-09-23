@@ -144,6 +144,8 @@ for k, v in pairs(ents.FindByClass('gmod_track_signal')) do
 	--end    
 end
 
+include('ASNP.lua')
+
 VitroMod.Pult.Map.Init()
 VitroMod.Pult.IntervalClocks.Init()
 initSwitches()
