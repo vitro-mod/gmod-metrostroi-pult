@@ -1,5 +1,10 @@
-function AllSeats(train)
-    if not IsValid(train) then return {} end
+function AllSeats(wagon)
+    if not IsValid(wagon) then return {} end
+
+    local train = wagon
+    if MetrostroiExt and MetrostroiExt.DetectHeadWagon then
+        train = MetrostroiExt.DetectHeadWagon( wagon, true )
+    end
 
     local drv = train:GetDriver()
     local seats = {}

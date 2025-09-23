@@ -1,5 +1,11 @@
-function GetTrainState(train, signal)
-    if not IsValid(train) then return end
+function GetTrainState(wagon, signal)
+    if not IsValid(wagon) then return end
+    
+    local train = wagon
+    if MetrostroiExt and MetrostroiExt.DetectHeadWagon then
+        train = MetrostroiExt.DetectHeadWagon( wagon, true )
+    end
+    
     local RN = nil
     local CS = 0 --control state
     local ARS = 0
