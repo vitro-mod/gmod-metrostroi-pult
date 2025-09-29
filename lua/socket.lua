@@ -38,6 +38,7 @@ function sck:onConnected()
 		self:write('RCs_' .. util.TableToJSON(rcTriggers))
 		self:write('SWS_' .. util.TableToJSON(VitroMod.Pult.SwitchesControl))
 		self:write('BUs_' .. util.TableToJSON(rcNamesOcc))
+		VitroMod.Pult.IntervalClocks.Update()
 		self:write('INs_' .. util.TableToJSON(VitroMod.Pult.IntervalClocks.Get()))
 		self:write('BV_' .. util.TableToJSON(VitroMod.Pult.GermoGates.GetAll()))
 	end
