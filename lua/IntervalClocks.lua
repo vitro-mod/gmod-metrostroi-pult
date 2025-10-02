@@ -4,10 +4,8 @@ VitroMod.Pult.IntervalClocks = {
 	Init = function()
 		for _, class in pairs(VitroMod.Pult.IntervalClocks.Classes) do
 			for k, clock in pairs(ents.FindByClass(class)) do
-				local clockName = clock:GetName()
-				if clockName == '' then clockName = tostring(clock:EntIndex()) end
-				VitroMod.Pult.IntervalClocks.Entities[clockName] = VitroMod.Pult.IntervalClocks.Entities[clockName] or {}
-				table.insert(VitroMod.Pult.IntervalClocks.Entities[clockName], clock)
+				VitroMod.Pult.IntervalClocks.Entities[clock:GetName()] = VitroMod.Pult.IntervalClocks.Entities[clock:GetName()] or {}
+				table.insert(VitroMod.Pult.IntervalClocks.Entities[clock:GetName()], clock)
 			end
 		end
 
