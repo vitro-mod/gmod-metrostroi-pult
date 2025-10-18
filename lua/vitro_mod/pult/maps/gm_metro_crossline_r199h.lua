@@ -60,7 +60,13 @@ VitroMod.Pult.Map = {
         VitroMod.Pult.GermoGates.Init(ents.FindByName('metalgate_*'), true)
         local cleanup = {
             byName = {
-                wildcards = {'wt_*'},
+                wildcards = {'wt_*', 'signal_depot_*'},
+                exclude = {},
+            },
+            byModel = {
+                wildcards = {
+                    'models/metrostroi/signals/mus/lamp_lens.mdl',
+                },
                 exclude = {},
             },
         }
@@ -68,6 +74,12 @@ VitroMod.Pult.Map = {
         for _, c in pairs(cleanup.byName.wildcards) do
             for k, v in pairs(ents.FindByName(c)) do
                 if cleanup.byName.exclude[v:GetName()] ~= nil then continue end
+                SafeRemoveEntity(v)
+            end
+        end
+        for _, c in pairs(cleanup.byModel.wildcards) do
+            for k, v in pairs(ents.FindByModel(c)) do
+                if cleanup.byModel.exclude[v:GetModel()] ~= nil then continue end
                 SafeRemoveEntity(v)
             end
         end
