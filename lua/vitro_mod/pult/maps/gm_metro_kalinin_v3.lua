@@ -5,6 +5,8 @@ VitroMod.Pult.Map = {
 		VitroMod.Pult.SwitchesInvert['nv4'] = true
 		VitroMod.Pult.SwitchesInvert['nk3'] = true
 		VitroMod.Pult.SwitchesInvert['nk4'] = true
+		VitroMod.Pult.SwitchesInvert['depo8'] = true
+		VitroMod.Pult.SwitchesInvert['depo11'] = true
 		rcASNP['TC777'] = true
 		rcASNP['TC385'] = true
 		rcASNP['TC369A'] = true
@@ -39,15 +41,7 @@ VitroMod.Pult.Map = {
             ply:SendLua('hook.Remove( "PlayerButtonDown", "menu")')
         end)
 	end,
-	OnSwitch = function(name, to)
-		if name == 'depo1' then sw('depo3',to) end
-		if name == 'depo2' then sw('depo4',to) end
-		if name == 'depo5' then sw('depo6',to) end
-		if name == 'depo7' then sw('depo8',not to) end
-		if name == 'depo9' then sw('depo11',not to) end
-		if name == 'depo13' then sw('depo15',to) end
-		-- if name == 'tr6' then WriteToSocket('SWtr6_'..(to and '2' or '0')) end
-	end,
+	OnSwitch = function(name, to) end,
 	OnConnect = function()
 		local cleanup = {'sw','b_sw','ad','ao','b_ad','trig','relay','br','block','unblock','pribytie','nb','b_nb','on','off'}
 		local stations = {'nv','nk','se','mr','tr','tretyak'}

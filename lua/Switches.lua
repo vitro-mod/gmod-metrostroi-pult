@@ -44,11 +44,15 @@ function sw(name, input)
 	return true
 end
 
-function swEpk(name)
+function swEpk(name, mode)
 	if not VitroMod.Pult.Switches[name] then return false end
 	for k, v in pairs(VitroMod.Pult.Switches[name]) do
 		if not IsValid(v) then continue end
-		v:Ignite(4)
+		if not mode then
+			v:Ignite(4)
+		else
+			v:Extinguish()
+		end
 	end
 	return true
 end
@@ -68,6 +72,7 @@ function SendSWInfo(ACTIVATOR, CALLER) --писать
 	VitroMod.Pult.SwitchesControl[name] = ctrl
 	local swmsg = 'SW' .. name .. '_' .. ctrl
 	if VitroMod.Pult.IsMaster then WriteToSocket(swmsg) end
+	if ctrl == 0 or ctrl == 2 then swEpk(name, true) end
 end
 
 hook.Add('swSend', 'swSendInfo', function()
