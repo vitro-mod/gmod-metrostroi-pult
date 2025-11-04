@@ -593,9 +593,10 @@ function ENT:UpdateModels(CurrentTime)
                 end
                 if v[i] == "X" then continue end
                 local n = tonumber(self.Sig[lID2])
-                if n and self.Signals[lID2].RealState ~= (n > 0) then
-                    self.Signals[lID2].RealState = n > 0
-                    --0.5 время между началом погасания выключаемого и началом включения включаемого
+                -- условия для короткого погасания сигнала
+                local fadeCondition = n == 1 or n == 2
+                if n ~= nil and self.Signals[lID2].RealState ~= fadeCondition then
+                    self.Signals[lID2].RealState = fadeCondition
                     self.Signals[lID2].Stop = CurrentTime + 0.1
                 end
                 if self.Signals[lID2].Stop and CurrentTime - self.Signals[lID2].Stop > 0 then
