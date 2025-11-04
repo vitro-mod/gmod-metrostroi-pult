@@ -69,6 +69,30 @@ local function loadBells(name, keep)
     --hook.Run("VitroModBellsLoaded")
 end
 
+local function loadDevices(name, keep)
+    if keep then return end
+    local mapName = game.GetMap()
+    if not VitroMod or not VitroMod.Devices then return end
+    for k, v in pairs(VitroMod.Devices) do
+        v:flush()
+    end
+
+    local devices = getFile("metrostroi_data/devices_%s", mapName, "Device")
+    if not devices then return end
+    for k, v in pairs(devices) do
+        local deviceConfig = VitroMod.Devices[v.Type]
+        if not deviceConfig then continue end
+        local ent = ents.Create(deviceConfig.class)
+        if not IsValid(ent) then continue end
+        ent:SetPos(v.Pos)
+        ent:SetAngles(v.Angles)
+        ent:SetName(v.Name)
+        ent:SetNW2String('Name', v.Name or '')
+        ent.config = v.Config
+        ent:Spawn()
+    end
+end
+
 local function loadRays(name, keep)
     name = name or game.GetMap()
     VitroMod.Rays.flush()
@@ -133,10 +157,30 @@ local function saveRays(map)
     file.Write(string.format("metrostroi_data/rays_%s.txt", map), json)
 end
 
+local function saveDevices(map)
+    if not VitroMod or not VitroMod.Devices then return end
+    local devices = {}
+    for device, data in pairs(VitroMod.Devices) do
+        for k, v in pairs(ents.FindByClass(data.class)) do
+            table.insert(devices, {
+                Type = device,
+                Name = v:GetName(),
+                Pos = v:GetPos(),
+                Angles = v:GetAngles(),
+                Config = v.config,
+            })
+        end
+    end
+
+    local json = util.TableToJSON(devices, true)
+    file.Write(string.format("metrostroi_data/devices_%s.txt", map), json)
+end
+
 hook.Add("Initialize", "Metrostroi_VitroModInitialize", function()
     timer.Simple(2.0, function()
         loadTrigs()
         loadBells()
+        loadDevices()
         loadRays()
     end)
 end)
@@ -149,6 +193,7 @@ timer.Simple(2, function()
         name = name or game.GetMap()
         saveTriggers(name)
         saveBells(name)
+        saveDevices(name)
         saveRays(name)
     end
 
@@ -157,6 +202,7 @@ timer.Simple(2, function()
         m_load(name, keep_signs)
         loadTrigs(name, keep_signs)
         loadBells(name, keep_signs)
+        loadDevices(name, keep_signs)
         loadRays(name, keep_signs)
         timer.Simple(1, function() hook.Run("Metrostroi.Signalling.AfterLoad") end)
     end
