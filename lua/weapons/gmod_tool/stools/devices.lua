@@ -20,6 +20,7 @@ if SERVER then util.AddNetworkString("vitromod_devicestool_send") end
 TOOL.settings = TOOL.settings or {}
 function TOOL:LeftClick(trace)
     if not self:CheckAction() then return false end
+    local ply = self:GetOwner()
     VitroMod.Devices[self.settings.Type].atLook(trace, ply, self.settings)
     return true
 end
@@ -32,6 +33,7 @@ end
 
 function TOOL:Reload(trace)
     if not self:CheckAction() then return false end
+    local ply = self:GetOwner()
     if VitroMod.Devices[self.settings.Type].scan then
         self.settings = VitroMod.Devices[self.settings.Type].scan(trace, ply, self.settings)
     else
