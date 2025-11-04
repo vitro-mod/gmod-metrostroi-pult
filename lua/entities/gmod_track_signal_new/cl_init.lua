@@ -363,13 +363,11 @@ function ENT:CreateModels()
             self.RouteNumberOffset = nil
             self.RN = nil
         end
-        if self.AutostopPresent then
-            if not IsValid(self.Models[1]["autostop"]) then
-                self.Models[1]["autostop"] = ClientsideModel(self.AutostopModel[1],RENDERGROUP_OPAQUE)
-                self.Models[1]["autostop"]:SetPos(self:LocalToWorld(self.BasePos[self.LightType]+self.AutostopModel[2]))
-                self.Models[1]["autostop"]:SetAngles(self:GetAngles())
-                self.Models[1]["autostop"]:SetParent(self)
-            end
+        if self.AutostopPresent and not IsValid(self.Models[1]["autostop"]) then
+            self.Models[1]["autostop"] = ClientsideModel(self.AutostopModel[self.LightType][1],RENDERGROUP_OPAQUE)
+            self.Models[1]["autostop"]:SetPos(self:LocalToWorld(self.BasePos[self.LightType]+self.AutostopModel[self.LightType][2]))
+            self.Models[1]["autostop"]:SetAngles(self:GetAngles())
+            self.Models[1]["autostop"]:SetParent(self)
         end
         self.NamesOffset = vector_origin
         -- Create traffic light models

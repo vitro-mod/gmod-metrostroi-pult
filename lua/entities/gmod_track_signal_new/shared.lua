@@ -6,6 +6,7 @@ ENT.Spawnable		= false
 ENT.AdminSpawnable	= false
 
 ENT.TrafficLightModels = {}
+ENT.AutostopModel = {}
 ENT.RenderOffset = {}
 ENT.LongThreshold = {}
 ENT.UseRoutePointerFont = {}
@@ -63,10 +64,6 @@ ENT.OnlyARS = false
 ENT.Routes = {
 }
 ]]
-ENT.AutostopModel = {
-	"models/metrostroi/signals/mus/autostop.mdl",
-	Vector(41,-0.5,1.5)
-}
 
 ENT.OldRouteNumberSetup = {
 	"1234DPABVGEZIklMNOSTot",
@@ -372,4 +369,6 @@ for i = 0,(#ENT.TrafficLightModels) do
 	ENT.TrafficLightModels[i].RouteNumberOffset3 = Vector(10.5,0,-6)
 	ENT.TrafficLightModels[i].SpecRouteNumberOffset2 = Vector(-0.8,1,0.94)
 	ENT.TrafficLightModels[i].RouaOffset = Vector(6.2,0,24.5)
+
+	ENT.AutostopModel[i] = {"models/metrostroi/signals/mus/autostop.mdl", Vector(41, -0.5, 1.5)}
 end
