@@ -413,7 +413,7 @@ function ENT:CreateModels()
             if not self.Left or self.Double then self:SpawnHead(ID..(#v+ID2),head,self.BasePos[self.LightType] + offsetAndLongOffset,angle_zero,false,#v == 1) end
             if self.Left or self.Double then self:SpawnHead((self.Double and ID..(#v+ID2).."d" or ID),head,(self.BasePos[self.LightType] + offsetAndLongOffset)*vector_mirror,angle_zero,true,#v == 1) end
 
-            if v ~= "M" then
+            if v ~= "M" and v ~= "X" then
                 for i = 1,#v do
                     local lnum = assembled and 1 or i
                     local lenOff = data[3][i-1]
@@ -577,7 +577,7 @@ function ENT:UpdateModels(CurrentTime)
             else offset = offset - curoffset end
         end			
         
-        if v~="M" then
+        if v ~= "M" and v ~= "X" then
             for i = 1,#v do
                 ID2 = ID2 + 1
                 if v[i] ~= "M" then
@@ -591,6 +591,7 @@ function ENT:UpdateModels(CurrentTime)
                     self:UpdateRoutePointer(ID..ID2, self.Num[self.rnIdx])
                     continue
                 end
+                if v[i] == "X" then continue end
                 local n = tonumber(self.Sig[lID2])
                 if n and self.Signals[lID2].RealState ~= (n > 0) then
                     self.Signals[lID2].RealState = n > 0
