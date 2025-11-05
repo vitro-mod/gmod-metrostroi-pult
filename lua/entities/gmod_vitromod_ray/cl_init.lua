@@ -124,6 +124,7 @@ function ENT:CreateModels()
 				local mat = ent:GetBoneMatrix(1)
 				if not mat then return end
 				-- x - across track,  y - vertical, z - along track
+				if not IsValid(self) then return end
 				mat:SetAngles(self:LocalToWorldAngles(Angle(0, 90 + directionAngle[2], 90 + directionAngle[1])))
 				ent:SetBoneMatrix(1, mat)
 			end)
