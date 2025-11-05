@@ -19,6 +19,7 @@ VitroMod.Devices.VitroModAutostop = {
             name = "Signal name",
             varName = "SignalName",
             varType = "text",
+            offset = Vector(0,0,9.5-1.5-1.5),
         },
     },
 }

@@ -1,5 +1,7 @@
 include("shared.lua")
 
+ENT.mirror_angle = Angle(0, 180, 0)
+
 function ENT:Initialize()
     self.AnimState = 0
     self.Pitch = math.random(75, 110)
@@ -32,14 +34,14 @@ function ENT:CreateModels()
     if not IsValid(signal) then return false end
     if signal.LightType == nil then return false end
     self.Model = ClientsideModel(signal.AutostopModel[signal.LightType][1], RENDERGROUP_OPAQUE)
-    local pos = signal.BasePos[signal.LightType] + signal.AutostopModel[signal.LightType][2]
-    self.Model:SetPos(self:LocalToWorld(pos))
-    self.Model:SetAngles(self:GetAngles())
+    local pos = signal.BasePos[signal.LightType] + signal.AutostopModel[signal.LightType][2] + VitroMod.Devices.VitroModAutostop.config[1].offset
+    self.Model:SetPos(self:LocalToWorld(-pos))
+    self.Model:SetAngles(self:GetAngles() + self.mirror_angle)
     self.Model:SetParent(self)
     return true
 end
 
 function ENT:OnRemove()
-    SafeRemoveEntity(self.Model)
+    self.Model:Remove()
     self.ModelsCreated = false
 end
