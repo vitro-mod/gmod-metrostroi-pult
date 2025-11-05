@@ -72,13 +72,13 @@ end
 VitroMod.Devices.VitroModAutostop.atLook = function(trace, ply, settings)
     local autostop
     for k, v in pairs(ents.FindInSphere(trace.HitPos, 50)) do
-        if v:GetClass() == "gmod_vitromod_autostop" then
+        if v:GetClass() == VitroMod.Devices.VitroModAutostop.class then
             autostop = v
             break
         end
     end
 
-    if not autostop then autostop = ents.Create("gmod_vitromod_autostop") end
+    if not autostop then autostop = ents.Create(VitroMod.Devices.VitroModAutostop.class) end
     local pos = trace.HitPos
     local angles = Angle(0, 0, 0)
     local tr = Metrostroi.RerailGetTrackData(trace.HitPos, ply:GetAimVector())
@@ -99,12 +99,12 @@ end
 
 VitroMod.Devices.VitroModAutostop.remove = function(trace)
     for k, v in pairs(ents.FindInSphere(trace.HitPos, 50)) do
-        if v:GetClass() == "gmod_vitromod_autostop" then v:Remove() end
+        if v:GetClass() == VitroMod.Devices.VitroModAutostop.class then v:Remove() end
     end
 end
 
 VitroMod.Devices.VitroModAutostop.flush = function()
-    for k, v in pairs(ents.FindByClass("gmod_vitromod_autostop")) do
+    for k, v in pairs(ents.FindByClass(VitroMod.Devices.VitroModAutostop.class)) do
         SafeRemoveEntity(v)
     end
 end
