@@ -81,9 +81,9 @@ VitroMod.Devices.VitroModAutostop.atLook = function(trace, ply, settings)
     if not autostop then autostop = ents.Create(VitroMod.Devices.VitroModAutostop.class) end
     local pos = trace.HitPos
     local angles = Angle(0, 0, 0)
-    local tr = Metrostroi.RerailGetTrackData(trace.HitPos, ply:GetAimVector())
-    if tr then pos = tr.centerpos - tr.up * 9.5 end
-    if tr then angles = (-tr.right):Angle() end
+    local tr = Metrostroi.RerailGetTrackData(trace.HitPos,ply:GetAimVector())
+    if tr then pos = tr.centerpos end
+    if tr then angles = tr.right:Angle() end
     autostop:SetPos(pos)
     autostop:SetAngles(angles)
     autostop:SetName(settings.Name or '')
