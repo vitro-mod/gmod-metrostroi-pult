@@ -12,7 +12,7 @@ if SERVER then util.AddNetworkString "metrostroi-stool-signalling" end
 
 
 local Types = {"Signal","Sign","Autodrive",[0] = "Choose Type"}
-local TypesOfSignal = {"Inside","Outside big","Outside small","Small","Virus New","pz"}
+-- local TypesOfSignal = {"Inside","Outside big","Outside small","Small","Virus New","pz"}
 local TypesOfSign = {"NF","40","60","70","80","Station border","C(horn) Street","STOP Street","Dangerous","Deadlock",
     "Stop marker","!(stop)","X","T Start","T End","T Sbor(engage)","Engines off","Engines on","C(horn)","T stop emer","Shod",
     "Left doors","Phone▲","Phone▼","1up","STOP Street cyka","NF outside","35 outside","40 outside","60 outside","70 outside","80 outside",
@@ -544,15 +544,12 @@ function TOOL:BuildCPanelCustom()
     CPanel:AddItem(VType)
     if tool.Type == 1 then
         local VSType = vgui.Create("DComboBox")
-			print(tool.Signal.Type)
-            VSType:ChooseOption(TypesOfSignal[tool.Signal.Type or 1],tool.Signal.Type or 1)
             VSType:SetColor(color_black)
-            for i = 1,#TypesOfSignal do
-                VSType:AddChoice(TypesOfSignal[i])
+            for i = 0,#Metrostroi.SigTypeNames do
+                VSType:SetSortItems(false)
+                VSType:AddChoice(Metrostroi.SigTypeNames[i], nil, i == 0)
             end
             VSType.OnSelect = function(_, index, name)
-				print('select')
-				print(index)
                 VSType:SetValue(name)
                 tool.Signal.Type = index
                 tool:SendSettings()
