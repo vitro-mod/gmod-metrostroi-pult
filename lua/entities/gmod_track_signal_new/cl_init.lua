@@ -83,7 +83,11 @@ end
 
 function ENT:SpawnHead(ID,head,pos,ang,isLeft,isLast)
     local TLM = self.TrafficLightModels[self.LightType]
-    local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(".mdl","_mirror.mdl") or TLM[head][2]
+
+    local replaceFrom = TLM.left_replace and TLM.left_replace.from or ".mdl"
+    local replaceTo = TLM.left_replace and TLM.left_replace.to or "_mirror.mdl"
+
+    local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(replaceFrom,replaceTo) or TLM[head][2]
     local glass = TLM[head][3] and TLM[head][3].glass
     local longKron = #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep)
 
