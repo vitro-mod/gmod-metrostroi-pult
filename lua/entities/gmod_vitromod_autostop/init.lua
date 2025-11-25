@@ -31,7 +31,7 @@ function ENT:CreateTrigger()
         if not IsValid(train) or not train.SubwayTrain or (train.SubwayTrain.WagType ~= 1 and train.SubwayTrain.WagType ~= 0) then return end
         local dPos = self:WorldToLocal(bogey:GetPos()).y
         local right = dPos > 0 and bogey.SpeedSign == 1
-        print("Autostop trigger touched by", ent:GetClass(), dPos, right)
+        -- print("Autostop trigger touched by", ent:GetClass(), dPos, right)
         if right and autostop:GetNW2Bool("Closed") then
             train.Pneumatic:TriggerInput("Autostop", 0)
         end
