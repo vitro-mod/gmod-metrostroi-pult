@@ -42,6 +42,6 @@ function ENT:CreateModels()
 end
 
 function ENT:OnRemove()
-    self.Model:Remove()
+    SafeRemoveEntity(self.Model)
     self.ModelsCreated = false
 end
