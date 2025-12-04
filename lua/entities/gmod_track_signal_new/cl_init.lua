@@ -63,25 +63,22 @@ end
 -- MAIN SPAWN FUNCTIONS --
 --------------------------
 function ENT:SpawnMainModels(pos, ang, LenseNum, add)
-    local TLM = self.TrafficLightModels[self.LightType]
+    local TLM = self.MainModels[self.LightType]
     for k, v in pairs(TLM) do
-        if type(v) == "string" and not k:find("long") then
-            local idx = add and v .. add or v
-            if IsValid(self.Models[1][idx]) then
-                break
-            else
-                local k_long = k .. "_long"
-                if TLM[k_long] and LenseNum > (self.LongThreshold[self.LightType] or 2) then
-                    self.Models[1][idx] = ClientsideModel(TLM[k_long], RENDERGROUP_OPAQUE)
-                    self.LongOffset = TLM[k .. "_long_pos"]
-                else
-                    self.Models[1][idx] = ClientsideModel(v, RENDERGROUP_OPAQUE)
-                end
-                self.Models[1][idx]:SetPos(self:LocalToWorld(pos))
-                self.Models[1][idx]:SetAngles(self:LocalToWorldAngles(ang))
-                self.Models[1][idx]:SetParent(self)
-            end
+        if k:find("long") then continue end
+        local idx = add and k .. add or k
+        if IsValid(self.Models[1][idx]) then break end
+
+        local k_long = k .. "_long"
+        if TLM[k_long] and LenseNum > (self.LongThreshold[self.LightType] or 2) then
+            self.Models[1][idx] = ClientsideModel(TLM[k_long].model, RENDERGROUP_OPAQUE)
+            self.LongOffset = TLM[k .. "_long_pos"]
+        else
+            self.Models[1][idx] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
         end
+        self.Models[1][idx]:SetPos(self:LocalToWorld(pos))
+        self.Models[1][idx]:SetAngles(self:LocalToWorldAngles(ang))
+        self.Models[1][idx]:SetParent(self)
     end
 end
 
@@ -538,8 +535,8 @@ function ENT:CreateModels()
         end
 
         if not IsValid(self.Models[1][k]) then
-            local v = TLM["m1"]
-            self.Models[1][k] = ClientsideModel(v, RENDERGROUP_OPAQUE)
+            local v = self.MainModels[self.LightType]["m1"]
+            self.Models[1][k] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
             self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] * (self.Left and vector_mirror or 1)))
             self.Models[1][k]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-1, 1, 1) or Angle(1, 1, 1)))
             self.Models[1][k]:SetParent(self)

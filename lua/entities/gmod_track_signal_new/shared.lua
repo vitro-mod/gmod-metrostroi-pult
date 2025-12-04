@@ -5,6 +5,7 @@ ENT.Category              = "Metrostroi (utility)"
 ENT.Spawnable             = false
 ENT.AdminSpawnable        = false
 
+ENT.MainModels            = {}
 ENT.TrafficLightModels    = {}
 ENT.AutostopModel         = {}
 ENT.RenderOffset          = {}
@@ -90,7 +91,7 @@ ENT.OldRouteNumberSetup = {
 	"1234DPABVGEZIklMNOSTot",
 	"WKFXd", "LR",
 	Vector(6, 0, 10.5),
-	{ D = 4,   P = 5,   A = 6,   B = 7, V = 8, G = 9, E = 10, Z = 11, I = 12, k = 13, l = 14, M = 15, N = 16, O = 17, S = 18, T = 19, o = 20, t = 21 },
+	{ D = 4,     P = 5,     A = 6,     B = 7, V = 8, G = 9, E = 10, Z = 11, I = 12, k = 13, l = 14, M = 15, N = 16, O = 17, S = 18, T = 19, o = 20, t = 21 },
 	{ ["F"] = 0, ["L"] = 2, ["R"] = 0, W = 3, K = 4, d = 1 },
 }
 ENT.SpriteMat = Material("sprites/light_ignorez")
@@ -103,17 +104,19 @@ Metrostroi.SigTypeSpriteMul = {}
 Metrostroi.SigTypeNames[0] = 'Inside'
 Metrostroi.SigTypeSpriteMul[0] = 1
 ENT.RenderOffset[0] = Vector(0, 0.5, 113.35)
-ENT.TrafficLightModels[0] = {
-	m1          = "models/metrostroi/signals/mus/box.mdl",
-	m2          = "models/metrostroi/signals/mus/pole_2.mdl",
-	m2_long     = "models/metrostroi/signals/mus/pole_2_long.mdl",
+ENT.MainModels[0] = {
+	m1          = { model = "models/metrostroi/signals/mus/box.mdl" },
+	m2          = { model = "models/metrostroi/signals/mus/pole_2.mdl" },
+	m2_long     = { model = "models/metrostroi/signals/mus/pole_2_long.mdl" },
 	m2_long_pos = Vector(0, 0, 46),
-	name        = Vector(-1.75, 2.5, 3),
-	name_one    = Vector(7.41, 0.5, 1),
-	name_s      = Vector(112, 10, 0.5),
-	name_s_ang  = Angle(0, 0, -90),
-	name_out    = Vector(11.5, 2.5 + 30, 36.6 + 16),
-	[1]         = { Vector(0, 0, 32), "models/metrostroi/signals/mus/light_2.mdl", {
+}
+ENT.TrafficLightModels[0] = {
+	name       = Vector(-1.75, 2.5, 3),
+	name_one   = Vector(7.41, 0.5, 1),
+	name_s     = Vector(112, 10, 0.5),
+	name_s_ang = Angle(0, 0, -90),
+	name_out   = Vector(11.5, 2.5 + 30, 36.6 + 16),
+	[1]        = { Vector(0, 0, 32), "models/metrostroi/signals/mus/light_2.mdl", {
 		[0] = Vector(7.41, -27.54, 25.26),
 		[1] = Vector(7.41, -27.54, 14.2), --
 		["glass"] = {
@@ -121,7 +124,7 @@ ENT.TrafficLightModels[0] = {
 			{ "models/metrostroi/signals/mus/lamp_lens.mdl", Vector(7.43, 4.46, 14) },
 		}
 	} },
-	[2]         = { Vector(0, 0, 43), "models/metrostroi/signals/mus/light_3.mdl", {
+	[2]        = { Vector(0, 0, 43), "models/metrostroi/signals/mus/light_3.mdl", {
 		[0] = Vector(7.41, -27.54, 35.1),
 		[1] = Vector(7.41, -27.54, 25.26),
 		[2] = Vector(7.41, -27.54, 14.2), ---27.54
@@ -132,8 +135,8 @@ ENT.TrafficLightModels[0] = {
 		}
 	} },
 
-	M           = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(13.1, 2, 19.5), 1.75, 2.05, 4 },
-	arsletter   = true,
+	M          = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(13.1, 2, 19.5), 1.75, 2.05, 4 },
+	arsletter  = true,
 }
 
 
@@ -144,8 +147,10 @@ Metrostroi.SigTypeNames[1] = 'Outside'
 Metrostroi.SigTypeSpriteMul[1] = 0.75
 ENT.RenderOffset[1] = Vector(0, 0, 200)
 ENT.LongThreshold[1] = 1
+ENT.MainModels[1] = {
+	m1 = { model = "models/metrostroi/signals/mus/pole_1.mdl" },
+}
 ENT.TrafficLightModels[1] = {
-	["m1"] = "models/metrostroi/signals/mus/pole_1.mdl",
 	name = Vector(0, 3, 40),
 	[1] = { Vector(0, 0, 46), "models/metrostroi/signals/mus/light_outside_2.mdl", {
 		[0] = Vector(-0.51, -18.76, 19.95),
@@ -183,9 +188,11 @@ Metrostroi.SigTypeNames[2] = 'Outside box'
 Metrostroi.SigTypeSpriteMul[2] = 0.75
 ENT.RenderOffset[2] = Vector(0, 0., 112)
 ENT.LongThreshold[2] = 1
+ENT.MainModels[2] = {
+	m1 = { model = "models/metrostroi/signals/mus/box_outside.mdl" },
+	m2 = { model = "models/metrostroi/signals/mus/pole_3.mdl" },
+}
 ENT.TrafficLightModels[2] = {
-	["m1"] = "models/metrostroi/signals/mus/box_outside.mdl",
-	["m2"] = "models/metrostroi/signals/mus/pole_3.mdl",
 	["name"] = Vector(-3, 2.5, 7),
 	name_one = Vector(10.07, 0.5, 3),
 	[1] = { Vector(0, 0, 42), "models/metrostroi/signals/mus/light_outside2_2.mdl", {
@@ -258,9 +265,11 @@ ENT.TrafficLightModels[3] = {
 Metrostroi.SigTypeNames[4] = 'ARS'
 Metrostroi.SigTypeSpriteMul[4] = 1
 ENT.RenderOffset[4] = Vector(0, 0, 100)
+ENT.MainModels[4] = {
+	m1 = { model = "models/metrostroi/signals/mus/box.mdl" },
+	m2 = { model = "models/mn_r/mn_r_joint3.mdl" },
+}
 ENT.TrafficLightModels[4] = {
-	["m1"]         = "models/metrostroi/signals/mus/box.mdl",
-	["m2"]         = "models/mn_r/mn_r_joint3.mdl",
 	["name"]       = Vector(11.5, 19.5, 52.5),
 	["name_s"]     = Vector(0, 10, 0.5),
 	--["name_s_ang"]	= Angle(50, 0, -90),
@@ -275,11 +284,13 @@ ENT.TrafficLightModels[4] = {
 Metrostroi.SigTypeNames[5] = 'Virus New'
 Metrostroi.SigTypeSpriteMul[5] = 1
 ENT.RenderOffset[5] = Vector(1, 0, 113.35)
-ENT.TrafficLightModels[5] = {
-	m1 = "models/jar/ars_drossel.mdl",
-	m2 = "models/virus/new_signals/pole_2.mdl",
-	m2_long = "models/virus/new_signals/pole_2_long.mdl",
+ENT.MainModels[5] = {
+	m1 = { model = "models/jar/ars_drossel.mdl" },
+	m2 = { model = "models/virus/new_signals/pole_2.mdl" },
+	m2_long = { model = "models/virus/new_signals/pole_2_long.mdl" },
 	m2_long_pos = Vector(0, 0, 46),
+}
+ENT.TrafficLightModels[5] = {
 	name = Vector(-1.75, 2.5, 3),
 	name_one = Vector(-1.75, 2.5, 0),
 	kronOff = Vector(0, 0, 13),
@@ -369,16 +380,20 @@ for i = 0, (#ENT.TrafficLightModels) do
 			numb = "models/metrostroi/signals/mus/light_lampindicator_numb_l.mdl",
 			lamp = "models/metrostroi/signals/mus/light_lampindicator_lamp.mdl",
 		},
-		Vector(7.9), -- Indicator model offset if left
-		Vector(0),  -- Indicator model offset
-		Vector(8),  -- Sep (on short kron) Indicator model offset
+		Vector(7.9),  -- Indicator model offset if left
+		Vector(0),    -- Indicator model offset
+		Vector(8),    -- Sep (on short kron) Indicator model offset
 		Vector(-12, 0, 0), -- Sep (on short kron) Indicator model offset if left
 		Vector(3, 0, 3), -- Arrow offset
 		Vector(20, 0, -12), -- Arrow offset if left
 	}
 	ENT.TrafficLightModels[i].LampBase = { model = "models/metrostroi/signals/mus/lamp_base.mdl" }
-	ENT.TrafficLightModels[i].SignLetterSmall = { model = "models/metrostroi/signals/mus/sign_letter_small.mdl", Vector(
-	1.5, 0, 0), Vector(-1.5, 0, 0) }
+	ENT.TrafficLightModels[i].SignLetterSmall = {
+		model = "models/metrostroi/signals/mus/sign_letter_small.mdl",
+		Vector(
+			1.5, 0, 0),
+		Vector(-1.5, 0, 0)
+	}
 	ENT.TrafficLightModels[i].SignLetter = { model = "models/metrostroi/signals/mus/sign_letter.mdl", z = 5.85 }
 	ENT.TrafficLightModels[i].LetMaterials = { str = "models/metrostroi/signals/let/" }
 
