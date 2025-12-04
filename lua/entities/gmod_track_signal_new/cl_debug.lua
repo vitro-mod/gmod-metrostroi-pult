@@ -1,15 +1,15 @@
 local function enableDebug()
     local debug = GetConVar("metrostroi_drawsignaldebug")
     local ars = {
-        {"275 Hz", "0 KM/H"},
-        {"N/A Hz", "No frequency"},
-        {"275-N/A", "Absolute stop"},
+        { "275 Hz",  "0 KM/H" },
+        { "N/A Hz",  "No frequency" },
+        { "275-N/A", "Absolute stop" },
         nil,
-        {"225 Hz", "40 KM/H"},
+        { "225 Hz", "40 KM/H" },
         nil,
-        {"175 Hz", "60 KM/H"},
-        {"125 Hz", "70 KM/H"},
-        {"75  Hz", "80 KM/H"},
+        { "175 Hz", "60 KM/H" },
+        { "125 Hz", "70 KM/H" },
+        { "75  Hz", "80 KM/H" },
     }
     local cols = {
         R = Color(255, 0, 0),
@@ -26,7 +26,10 @@ local function enableDebug()
     local signalBg = Color(125, 125, 0, 128)
     local arsBg = Color(255, 125, 0, 128)
     local font = "TargetID"
-    if not debug:GetBool() then hook.Remove("PreDrawEffects", "MetrostroiSignalDebug") return end
+    if not debug:GetBool() then
+        hook.Remove("PreDrawEffects", "MetrostroiSignalDebug")
+        return
+    end
     hook.Add("PreDrawEffects", "MetrostroiSignalDebug", function()
         for _, sig in pairs(ents.FindByClass("gmod_track_signal")) do
             local shouldDraw = IsValid(sig) and LocalPlayer():GetPos():DistToSqr(sig:GetPos()) < 512 * 512
@@ -56,19 +59,29 @@ local function enableDebug()
             draw.DrawText(Format("TrackID: %s", sig:GetNW2Int("NextPosID", 0)), font, 25, 20, textColor)
             draw.DrawText(Format("PosX: %.02f", sig:GetNW2Float("NextPos", 0)), font, 135, 20, textColor)
             draw.DrawText(Format("Dist: %.02f", sig:GetNW2Float("DistanceToNext", 0)), font, 15, 40, textColor)
-            draw.DrawText(Format("PrevSignalName: %s", sig:GetNW2String("PrevSignalName", "N/A")), font, 15, 60, textColor)
+            draw.DrawText(Format("PrevSignalName: %s", sig:GetNW2String("PrevSignalName", "N/A")), font, 15, 60,
+                textColor)
             draw.DrawText(Format("TrackID: %s", sig:GetNW2Int("PrevPosID", 0)), font, 25, 80, textColor)
             draw.DrawText(Format("PosX: %.02f", sig:GetNW2Float("PrevPos", 0)), font, 135, 80, textColor)
             draw.DrawText(Format("DistPrev: %.02f", sig:GetNW2Float("DistanceToPrev", 0)), font, 15, 100, textColor)
             draw.DrawText(Format("Current route: %d", sig:GetNW2Int("CurrentRoute", -1)), font, 15, 120, textColor)
             draw.DrawText("AB info", font, 5, 160, textColor)
-            draw.DrawText(Format("Occupied: %s  VKSMet: %s", sig:GetNW2Bool("Occupied", false) and "Y" or "N", sig:GetNW2Bool("VKSMet", false) and "Y" or "N"), font, 5, 180, textColor)
-            draw.DrawText(Format("Linked to controller: %s", sig:GetNW2Bool("LinkedToController", false) and "Y" or "N"), font, 5, 200, textColor)
+            draw.DrawText(
+            Format("Occupied: %s  VKSMet: %s", sig:GetNW2Bool("Occupied", false) and "Y" or "N",
+                sig:GetNW2Bool("VKSMet", false) and "Y" or "N"), font, 5, 180, textColor)
+            draw.DrawText(Format("Linked to controller: %s", sig:GetNW2Bool("LinkedToController", false) and "Y" or "N"),
+                font, 5, 200, textColor)
             draw.DrawText(Format("Num: %d", sig:GetNW2Int("ControllersNumber", 0)), font, 10, 220, textColor)
-            draw.DrawText(Format("Controller logic: %s", sig:GetNW2Bool("BlockedByController", false) and "Y" or "N"), font, 5, 240, textColor)
-            draw.DrawText(Format("Autostop: %s  Red: %d", not sig.ARSOnly and sig.AutostopPresent and (sig:GetNW2Bool("Autostop") and "Up" or "Down") or "Absent", sig:GetNW2Bool("Red") and 1 or 0), font, 5, 260, textColor)
+            draw.DrawText(Format("Controller logic: %s", sig:GetNW2Bool("BlockedByController", false) and "Y" or "N"),
+                font, 5, 240, textColor)
+            draw.DrawText(
+            Format("Autostop: %s  Red: %d",
+                not sig.ARSOnly and sig.AutostopPresent and (sig:GetNW2Bool("Autostop") and "Up" or "Down") or "Absent",
+                sig:GetNW2Bool("Red") and 1 or 0), font, 5, 260, textColor)
             draw.DrawText(Format("2/6: %s", sig:GetNW2Bool("2/6", false) and "Y" or "N"), font, 5, 280, textColor)
-            draw.DrawText(Format("FreeBS: %d / %d  L: %d  N: %d", sig:GetNW2Int("FreeBS"), sig:GetNW2Int("FreeBSToPrev"), sig:GetNW2Int("ArsThis"), sig:GetNW2Int("ArsNext")), font, 5, 300, textColor)
+            draw.DrawText(
+            Format("FreeBS: %d / %d  L: %d  N: %d", sig:GetNW2Int("FreeBS"), sig:GetNW2Int("FreeBSToPrev"),
+                sig:GetNW2Int("ArsThis"), sig:GetNW2Int("ArsNext")), font, 5, 300, textColor)
             draw.DrawText("ARS info", font, 5, 335, colorRed)
             local num = 0
             for i, tbl in pairs(ars) do
@@ -86,10 +99,14 @@ local function enableDebug()
 
             if sig:GetNW2Bool("CurrentARS325", false) or sig:GetNW2Bool("CurrentARS325_2", false) then
                 draw.DrawText("(325 Hz)", font, 5, 355 + num * 20, colorGreen)
-                draw.DrawText(Format("LN:%s Apr0:%s", sig:GetNW2Bool("CurrentARS325", false) and "Y" or "N", sig:GetNW2Bool("CurrentARS325_2", false) and "Y" or "N"), font, 105, 355 + num * 20, colorGreen)
+                draw.DrawText(
+                Format("LN:%s Apr0:%s", sig:GetNW2Bool("CurrentARS325", false) and "Y" or "N",
+                    sig:GetNW2Bool("CurrentARS325_2", false) and "Y" or "N"), font, 105, 355 + num * 20, colorGreen)
             else
                 draw.DrawText("(325 Hz)", font, 5, 355 + num * 20, textColor)
-                draw.DrawText(Format("LN:%s Apr0:%s", sig:GetNW2Bool("CurrentARS325", false) and "Y" or "N", sig:GetNW2Bool("CurrentARS325_2", false) and "Y" or "N"), font, 105, 355 + num * 20, textColor)
+                draw.DrawText(
+                Format("LN:%s Apr0:%s", sig:GetNW2Bool("CurrentARS325", false) and "Y" or "N",
+                    sig:GetNW2Bool("CurrentARS325_2", false) and "Y" or "N"), font, 105, 355 + num * 20, textColor)
             end
 
             if not sig.ARSOnly then
