@@ -385,7 +385,7 @@ for i = 0, (#ENT.TrafficLightModels) do
 		Vector(8),    -- Sep (on short kron) Indicator model offset
 		Vector(-12, 0, 0), -- Sep (on short kron) Indicator model offset if left
 		Vector(3, 0, 3), -- Arrow offset
-		Vector(20, 0, -12), -- Arrow offset if left
+		Vector(0, 0, -12), -- Arrow offset if left
 	}
 	ENT.TrafficLightModels[i].LampBase = { model = "models/metrostroi/signals/mus/lamp_base.mdl" }
 	ENT.TrafficLightModels[i].SignLetterSmall = {
