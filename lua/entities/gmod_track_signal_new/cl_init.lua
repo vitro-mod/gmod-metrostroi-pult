@@ -130,9 +130,9 @@ function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
             if tbl.middle and isLast then continue end
             if tbl.last and not isLast then continue end
             self.Models[1][ID_modeli] = ClientsideModel(tbl[1], RENDERGROUP_OPAQUE)
-            self.Models[1][ID_modeli]:SetPos(self:LocalToWorld(pos + tbl[2] * (isLeft and vector_mirror or 1)))
-            self.Models[1][ID_modeli]:SetAngles(self:LocalToWorldAngles(ang))
-            self.Models[1][ID_modeli]:SetParent(self)
+            self.Models[1][ID_modeli]:SetParent(self.Models[1][ID])
+            self.Models[1][ID_modeli]:SetLocalPos(tbl[2] * (isLeft and vector_mirror or 1))
+            self.Models[1][ID_modeli]:SetLocalAngles(ang)
             self.Models[1][ID_modeli]:SetModelScale(tbl[3] or 1)
         end
     end
