@@ -106,12 +106,14 @@ function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
         if LampIndicator.models[rnadd] then
             self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd], RENDERGROUP_OPAQUE)
             self.Models[1][rouid]:SetPos(self:LocalToWorld(pos - self.RouteNumberOffset +
-            (isLeft and LampIndicator[1] or LampIndicator[2])))
+                (isLeft and LampIndicator[1] or LampIndicator[2])))
             self.Models[1][rouid]:SetAngles(self:GetAngles())
             self.Models[1][rouid]:SetParent(self)
         end
-        if self.RouteNumbers[id] then self.RouteNumbers[id].pos = pos - self.RouteNumberOffset +
-            (isLeft and LampIndicator[1] or LampIndicator[2]) end
+        if self.RouteNumbers[id] then
+            self.RouteNumbers[id].pos = pos - self.RouteNumberOffset +
+                (isLeft and LampIndicator[1] or LampIndicator[2])
+        end
         self.RN = self.RN + 1
     end
     for k, v in pairs(TLM[head][3]) do
@@ -153,8 +155,7 @@ function ENT:SetLight(ID, ID2, pos, ang, skin, State, Change)
             self.Models[3][IDID2]:Remove()
         end
     elseif IsStateAboveZero then
-        self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model,
-            RENDERGROUP_OPAQUE)
+        self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model, RENDERGROUP_OPAQUE)
         self.Models[3][IDID2]:SetPos(self:LocalToWorld(pos))
         self.Models[3][IDID2]:SetAngles(self:LocalToWorldAngles(ang))
         self.Models[3][IDID2]:SetSkin(skin)
@@ -355,11 +356,7 @@ function ENT:CreateTrafficLightModels()
     local offset = self.RenderOffset[self.LightType] or vector_origin
     self.LongOffset = self.LongOffset or vector_origin
     if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType], angle_zero, LenseNum) end
-    if self.Left or self.Double then
-        self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror,
-            Angle(0, 180, 0), LenseNum, self.Double and "d" or nil)
-    end
-
+    if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror, Angle(0, 180, 0), LenseNum, self.Double and "d" or nil) end
 
     if not self.RouteNumbers.sep and #self.RouteNumbers > 1 then
         self.RouteNumbers.sep = 2
@@ -492,7 +489,6 @@ function ENT:CreateTrafficLightModels()
     if self.LightType == 1 then
         offset = offset - self.NamesOffset
     end
-    --local double = self.LightType ~= 1 and string.find(self.Name,"^[A-Z][A-Z]")
     local double = self.LightType ~= 1 and string.find(self.Name, "^[%a%p][%a%p]")
     if double then
         if not self.Left or self.Double then
@@ -517,15 +513,13 @@ function ENT:CreateTrafficLightModels()
             min = min + 1; continue
         end
         --if not IsValid(self.Models[2][i]) then
-        self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(0, 0, id * TLM.SignLetter.z),
-            (Metrostroi.LiterWarper[self.Name[i + 1]] or self.Name[i + 1]))
+        self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(0, 0, id * TLM.SignLetter.z), (Metrostroi.LiterWarper[self.Name[i + 1]] or self.Name[i + 1]))
         --end
     end
     if self.Name and self.Name:match("(/+)$") then
         local i = #self.Name
         local id = (double and i - 1 or i) - min
-        self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(0, 0, id * TLM.SignLetter.z),
-            Format("s%d", math.min(3, #self.Name:match("(/+)$"))))
+        self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(0, 0, id * TLM.SignLetter.z), Format("s%d", math.min(3, #self.Name:match("(/+)$"))))
     end
 end
 
@@ -553,8 +547,7 @@ function ENT:CreateARSOnlyModels()
 
         for i = 0, #name - 1 do
             local id = i
-            self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(id * 5.85, 0, 0),
-                (Metrostroi.LiterWarper[name[i + 1]] or name[i + 1]), not self.Left and true or false, angle)
+            self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(id * 5.85, 0, 0), (Metrostroi.LiterWarper[name[i + 1]] or name[i + 1]), not self.Left and true or false, angle)
         end
     end
 
@@ -574,8 +567,7 @@ function ENT:UpdateModels(CurrentTime)
     --TODO
     if self.AutostopPresent then
         if IsValid(self.Models[1]["autostop"]) then
-            self.Models[1]["autostop"]:SetPoseParameter("position",
-                self:Animate("Autostop", self:GetNW2Bool("Autostop") and 1 or 0, 0, 1, 0.4, false))
+            self.Models[1]["autostop"]:SetPoseParameter("position", self:Animate("Autostop", self:GetNW2Bool("Autostop") and 1 or 0, 0, 1, 0.4, false))
         end
     end
 
@@ -663,16 +655,10 @@ function ENT:UpdateModels(CurrentTime)
                 if not IsValid(self.Models[3][ID .. ID2]) and State > 0 then self.Signals[lID2].State = nil end
                 local offsetAndLongOffset = offset + self.LongOffset
                 if not self.DoubleL then
-                    self:SetLight(ID, ID2,
-                        (self.BasePos[self.LightType] + offsetAndLongOffset) * (self.Left and vector_mirror or 1) +
-                        lenOff * (self.Left and vector_mirror or 1), angle_zero, self.SignalConverter[v[i]] - 1, State,
-                        self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
+                    self:SetLight(ID, ID2, (self.BasePos[self.LightType] + offsetAndLongOffset) * (self.Left and vector_mirror or 1) + lenOff * (self.Left and vector_mirror or 1), angle_zero, self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
                 else
-                    self:SetLight(ID, ID2, self.BasePos[self.LightType] + offsetAndLongOffset + lenOff, angle_zero,
-                        self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
-                    self:SetLight(ID, ID2 .. "x",
-                        (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + lenOff * vector_mirror,
-                        angle_zero, self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
+                    self:SetLight(ID, ID2, self.BasePos[self.LightType] + offsetAndLongOffset + lenOff, angle_zero, self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
+                    self:SetLight(ID, ID2 .. "x", (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + lenOff * vector_mirror, angle_zero, self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
                 end
                 self.Signals[ID2].State = State
             end
@@ -842,8 +828,7 @@ function ENT:Sprite(pos, ang, col, bri, mul, handlerKey)
     view:Normalize()
     local viewdot = math.Clamp(view:Dot(fw), 0, 1)
 
-    local s = Visible * (viewdot + math.exp(-20 * (1 - viewdot))) * bri * math.Clamp(dist / 32, 64, 256) * mul *
-    (lense_scale or 1)
+    local s = Visible * (viewdot + math.exp(-20 * (1 - viewdot))) * bri * math.Clamp(dist / 32, 64, 256) * mul * (lense_scale or 1)
 
     render.SetMaterial(self.SpriteMat)
     render.DrawSprite(pos, s, s, col)
@@ -902,14 +887,18 @@ function ENT:UpdateRoutePointer(ID, rnState)
 
     if not self.UseRoutePointerFont[self.LightType] then
         if (not self.Double or self.DoubleL or not self.Left) and Metrostroi.RoutePointer[rnState] and IsValid(self.Models[1][ID]) then
-            self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[rnState]) end
+            self.Models[1][ID]:SetSkin(Metrostroi.RoutePointer[rnState])
+        end
         if (self.Double and self.DoubleL or self.Left) and Metrostroi.RoutePointer[rnState] and IsValid(self.Models[1][ID .. "d"]) then
-            self.Models[1][ID .. "d"]:SetSkin(Metrostroi.RoutePointer[rnState]) end
+            self.Models[1][ID .. "d"]:SetSkin(Metrostroi.RoutePointer[rnState])
+        end
     elseif self.Font[rnState] and (not self.NumLit[ID] or self.NumLit[ID] ~= rnState) then
-        if (not self.Double or self.DoubleL or not self.Left) then self:UpdatePointerLamps(ID, rnState, TLM.M[9],
-                TLM.M[10]) end
-        if (self.Double and self.DoubleL or self.Left) then self:UpdatePointerLamps(ID .. "d", rnState, TLM.M[9],
-                TLM.M[10]) end
+        if (not self.Double or self.DoubleL or not self.Left) then
+            self:UpdatePointerLamps(ID, rnState, TLM.M[9], TLM.M[10])
+        end
+        if (self.Double and self.DoubleL or self.Left) then
+            self:UpdatePointerLamps(ID .. "d", rnState, TLM.M[9], TLM.M[10])
+        end
         self.NumLit[ID] = rnState
     end
     self.rnIdx = self.rnIdx + 1
