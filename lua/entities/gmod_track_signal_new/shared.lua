@@ -372,11 +372,11 @@ for i = 0, (#ENT.TrafficLightModels) do
 	ENT.BasePos[i] = ENT.BasePos[i] or ENT.BasePosition
 	ENT.TrafficLightModels[i].LampIndicator = {
 		models = {
-			"models/metrostroi/signals/mus/light_lampindicator.mdl",
-			"models/metrostroi/signals/mus/light_lampindicator2.mdl",
-			"models/metrostroi/signals/mus/light_lampindicator3.mdl",
-			"models/metrostroi/signals/mus/light_lampindicator4.mdl",
-			"models/metrostroi/signals/mus/light_lampindicator5.mdl",
+			"models/metrostroi/signals/mus/light_lampindicator.mdl", -- kron full
+			"models/metrostroi/signals/mus/light_lampindicator2.mdl", -- kron half
+			"models/metrostroi/signals/mus/light_lampindicator3.mdl", -- sep half
+			"models/metrostroi/signals/mus/light_lampindicator4.mdl", -- sep full
+			"models/metrostroi/signals/mus/light_lampindicator5.mdl", -- empty kron
 			numb = "models/metrostroi/signals/mus/light_lampindicator_numb_l.mdl",
 			lamp = "models/metrostroi/signals/mus/light_lampindicator_lamp.mdl",
 		},
