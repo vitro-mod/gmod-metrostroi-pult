@@ -59,7 +59,7 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
     return min + (max - min) * self.Anims[id].val
 end
 
-function ENT:SpawnMainModels(pos, ang, LenseNum, add)
+function ENT:SpawnMainModels(pos, ang, HeadsNum, add)
     local TLM = self.MainModels[self.LightType]
     for k, v in pairs(TLM) do
         if k:find("long") then continue end
@@ -67,7 +67,7 @@ function ENT:SpawnMainModels(pos, ang, LenseNum, add)
         if IsValid(self.Models[1][idx]) then break end
 
         local k_long = k .. "_long"
-        if TLM[k_long] and LenseNum > (self.LongThreshold[self.LightType] or 2) then
+        if TLM[k_long] and HeadsNum > (self.LongThreshold[self.LightType] or 2) then
             self.Models[1][idx] = ClientsideModel(TLM[k_long].model, RENDERGROUP_OPAQUE)
             self.LongOffset = TLM[k .. "_long_pos"]
         else
@@ -280,52 +280,10 @@ function ENT:CreateTrafficLightModels()
     local TLM = self.TrafficLightModels[self.LightType]
     local ID = 0
     local ID2 = 0
-    --SPAWN A OLD ROUTE Numbers
-    --оператор # съедает больше производительности, чем исопльзование своей переменной с хранением количества элементов в таблице
-    --поэтому добавляю каунтеры
-    --TODO вообще сравнить бы это здесь xD
-    local rn1 = {}
-    local rn1N = 0
-    local rn2 = {}
-    self.RouteNumbers = {}
-    self.SpecRouteNumbers = {}
-    for i = 1, #self.RouteNumberSetup do
-        local CurRN = self.RouteNumberSetup[i]
-        --[[
-                self.OldRouteNumberSetup[1] = "1234D",
-                self.OldRouteNumberSetup[2] = "WKFX",
-                self.OldRouteNumberSetup[3] = "LR"
-                rn1 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[1]
-                rn2 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[2]
-                SpecRouteNumbers заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[3]
-                rn1 - цифробуквенные
-                rn2 - W-20КМ, K-КГУ, F-стрела вверх, X-пустой (для длинного кронштейна)
-                и SpecRouteNumbers - особые маршрутники, редко используются (стрелы влево вправо)
-            ]]
-        if self.OldRouteNumberSetup[1]:find(CurRN) then
-            rn1N = table.insert(rn1, CurRN)
-        elseif self.OldRouteNumberSetup[2]:find(CurRN) then
-            table.insert(rn2, CurRN)
-        elseif self.OldRouteNumberSetup[3]:find(CurRN) then
-            table.insert(self.SpecRouteNumbers, { CurRN, CurRN == "F" })
-        end
-    end
-    for i = 1, rn1N, 2 do
-        table.insert(self.RouteNumbers, { rn1[i], rn1[i + 1], true })
-    end
-    for k, v in pairs(rn2) do
-        table.insert(self.RouteNumbers, { v })
-    end
-    self.Arrow = nil
 
-    for k, v in pairs(self.SpecRouteNumbers) do
-        if not v[2] then
-            self.Arrow = k
-            self.SpecRouteNumbers = v
-            break
-        end
-    end
-    local LenseNum = self.Arrow and 1 or 0
+    self:InitRouteNumbers()
+
+    local HeadsNum = self.Arrow and 1 or 0
     local OneLense = self.Arrow == nil
     for k, v in ipairs(self.LensesTBL) do
         if k > 1 and v:find("[RGBWYM]+") then
@@ -333,33 +291,28 @@ function ENT:CreateTrafficLightModels()
         end
         for i = 1, #v do
             if v[i]:find("[RGBWYM]") then
-                LenseNum = LenseNum + 1
+                HeadsNum = HeadsNum + 1
             end
         end
     end
-    if LenseNum == 0 then OneLense = false end
-    LenseNum = 0
+    if HeadsNum == 0 then OneLense = false end
+    HeadsNum = 0
     local oneItemHeadCount = 0
     for k, v in pairs(self.LensesTBL) do
         if #v > 1 then
-            LenseNum = LenseNum + 1
+            HeadsNum = HeadsNum + 1
         else
             oneItemHeadCount = oneItemHeadCount + 1
         end
     end
     -- if oneItemHeadCount > 1 then
-    --     LenseNum = LenseNum + oneItemHeadCount
+    --     HeadsNum = HeadsNum + oneItemHeadCount
     -- end
     local offset = self.RenderOffset[self.LightType] or vector_origin
     self.LongOffset = self.LongOffset or vector_origin
-    if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType], angle_zero, LenseNum) end
-    if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror, Angle(0, 180, 0), LenseNum, self.Double and "d" or nil) end
+    if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType], angle_zero, HeadsNum) end
+    if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror, Angle(0, 180, 0), HeadsNum, self.Double and "d" or nil) end
 
-    if not self.RouteNumbers.sep and #self.RouteNumbers > 1 then
-        self.RouteNumbers.sep = 2
-    elseif not self.RouteNumbers.sep and #self.RouteNumbers > 0 then
-        self.RouteNumbers.sep = 1
-    end
     if self.RouteNumbers.sep and self.RouteNumbers[self.RouteNumbers.sep][1] ~= "X" then
         local id = self.RouteNumbers.sep
         local rnadd = self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 3 or 4
@@ -372,18 +325,12 @@ function ENT:CreateTrafficLightModels()
         self.Models[1]["rous"]:SetAngles(self:GetAngles())
         self.Models[1]["rous"]:SetParent(self)
     end
-    if #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep) then
-        self.RN = 1
-        self.RouteNumberOffset = TLM.RouteNumberOffset
-        offset = offset + self.RouteNumberOffset
-    else
-        self.RouteNumberOffset = nil
-        self.RN = nil
-    end
+
+    offset = offset + self.RouteNumberOffset
+
     if self.AutostopPresent and not IsValid(self.Models[1]["autostop"]) then
         self.Models[1]["autostop"] = ClientsideModel(self.AutostopModel[self.LightType][1], RENDERGROUP_OPAQUE)
-        self.Models[1]["autostop"]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] +
-            self.AutostopModel[self.LightType][2]))
+        self.Models[1]["autostop"]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] + self.AutostopModel[self.LightType][2]))
         self.Models[1]["autostop"]:SetAngles(self:GetAngles())
         self.Models[1]["autostop"]:SetParent(self)
     end
@@ -464,31 +411,25 @@ function ENT:CreateTrafficLightModels()
     if self.Arrow then
         local id = self.Arrow
         self.Models[1]["roua"] = ClientsideModel(TLM.LampIndicator.models[4], RENDERGROUP_OPAQUE)
-        self.SpecRouteNumbers.pos = (self.BasePos[self.LightType] + offset + self.LongOffset - TLM.LampIndicator[5]) +
-            (self.Left and TLM.LampIndicator[6] or vector_origin) - (self.RouteNumberOffset or vector_origin)
+        self.SpecRouteNumbers.pos = (self.BasePos[self.LightType] + offset + self.LongOffset - TLM.LampIndicator[5]) + (self.Left and TLM.LampIndicator[6] or vector_origin) - (self.RouteNumberOffset or vector_origin)
         if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos * vector_mirror end
         self.Models[1]["roua"]:SetPos(self:LocalToWorld(self.SpecRouteNumbers.pos))
         self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-90, 0, 0) or Angle(90, 0, 0)))
         self.Models[1]["roua"]:SetParent(self)
     end
-    offset = self.RenderOffset[self.LightType] + (OneLense and TLM.name_one or TLM.name) +
-        (OneLense and self.RouteNumberOffset or vector_origin)
+    offset = self.RenderOffset[self.LightType] + (OneLense and TLM.name_one or TLM.name) + (OneLense and self.RouteNumberOffset or vector_origin)
     if self.LightType == 1 then
         offset = offset - self.NamesOffset
     end
     local double = self.LightType ~= 1 and string.find(self.Name, "^[%a%p][%a%p]")
     if double then
         if not self.Left or self.Double then
-            self:SpawnLetter(0, TLM.SignLetterSmall.model, offset - TLM.SignLetterSmall[2],
-                (Metrostroi.LiterWarper[self.Name[0 + 1]] or self.Name[0 + 1]), true)
-            self:SpawnLetter(1, TLM.SignLetterSmall.model, offset - TLM.SignLetterSmall[1],
-                (Metrostroi.LiterWarper[self.Name[1 + 1]] or self.Name[1 + 1]), true)
+            self:SpawnLetter(0, TLM.SignLetterSmall.model, offset - TLM.SignLetterSmall[2], (Metrostroi.LiterWarper[self.Name[0 + 1]] or self.Name[0 + 1]), true)
+            self:SpawnLetter(1, TLM.SignLetterSmall.model, offset - TLM.SignLetterSmall[1], (Metrostroi.LiterWarper[self.Name[1 + 1]] or self.Name[1 + 1]), true)
         end
         if self.Left or self.Double then
-            self:SpawnLetter(0, TLM.SignLetterSmall.model, offset - TLM.SignLetterSmall[1],
-                (Metrostroi.LiterWarper[self.Name[0 + 1]] or self.Name[0 + 1]), false)
-            self:SpawnLetter(1, TLM.SignLetterSmall.model, offset - TLM.SignLetterSmall[2],
-                (Metrostroi.LiterWarper[self.Name[1 + 1]] or self.Name[1 + 1]), false)
+            self:SpawnLetter(0, TLM.SignLetterSmall.model, offset - TLM.SignLetterSmall[1], (Metrostroi.LiterWarper[self.Name[0 + 1]] or self.Name[0 + 1]), false)
+            self:SpawnLetter(1, TLM.SignLetterSmall.model, offset - TLM.SignLetterSmall[2], (Metrostroi.LiterWarper[self.Name[1 + 1]] or self.Name[1 + 1]), false)
         end
     end
     local min = 0
@@ -507,6 +448,70 @@ function ENT:CreateTrafficLightModels()
         local i = #self.Name
         local id = (double and i - 1 or i) - min
         self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(0, 0, id * TLM.SignLetter.z), Format("s%d", math.min(3, #self.Name:match("(/+)$"))))
+    end
+end
+
+function ENT:InitRouteNumbers()
+    local TLM = self.TrafficLightModels[self.LightType]
+    --SPAWN A OLD ROUTE Numbers
+    --оператор # съедает больше производительности, чем исопльзование своей переменной с хранением количества элементов в таблице
+    --поэтому добавляю каунтеры
+    --TODO вообще сравнить бы это здесь xD
+    local rn1 = {}
+    local rn1N = 0
+    local rn2 = {}
+    self.RouteNumbers = {}
+    self.SpecRouteNumbers = {}
+    for i = 1, #self.RouteNumberSetup do
+        local CurRN = self.RouteNumberSetup[i]
+        --[[
+                self.OldRouteNumberSetup[1] = "1234D",
+                self.OldRouteNumberSetup[2] = "WKFX",
+                self.OldRouteNumberSetup[3] = "LR"
+                rn1 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[1]
+                rn2 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[2]
+                SpecRouteNumbers заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[3]
+                rn1 - цифробуквенные
+                rn2 - W-20КМ, K-КГУ, F-стрела вверх, X-пустой (для длинного кронштейна)
+                и SpecRouteNumbers - особые маршрутники, редко используются (стрелы влево вправо)
+            ]]
+        if self.OldRouteNumberSetup[1]:find(CurRN) then
+            rn1N = table.insert(rn1, CurRN)
+        elseif self.OldRouteNumberSetup[2]:find(CurRN) then
+            table.insert(rn2, CurRN)
+        elseif self.OldRouteNumberSetup[3]:find(CurRN) then
+            table.insert(self.SpecRouteNumbers, { CurRN, CurRN == "F" })
+        end
+    end
+    for i = 1, rn1N, 2 do
+        table.insert(self.RouteNumbers, { rn1[i], rn1[i + 1], true })
+    end
+    for k, v in pairs(rn2) do
+        table.insert(self.RouteNumbers, { v })
+    end
+
+    self.Arrow = nil
+
+    for k, v in pairs(self.SpecRouteNumbers) do
+        if not v[2] then
+            self.Arrow = k
+            self.SpecRouteNumbers = v
+            break
+        end
+    end
+
+    if not self.RouteNumbers.sep and #self.RouteNumbers > 1 then
+        self.RouteNumbers.sep = 2
+    elseif not self.RouteNumbers.sep and #self.RouteNumbers > 0 then
+        self.RouteNumbers.sep = 1
+    end
+
+    if #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep) then
+        self.RN = 1
+        self.RouteNumberOffset = TLM.RouteNumberOffset
+    else
+        self.RouteNumberOffset = vector_origin
+        self.RN = nil
     end
 end
 
@@ -679,8 +684,7 @@ function ENT:UpdateRouteNumbers()
             self.Models[3][rou1k]:SetPos(self:LocalToWorld(v.pos + self.OldRouteNumberSetup[4]))
             self.Models[3][rou1k]:SetAngles(self:GetAngles())
             self.Models[3][rou1k]:SetParent(self)
-            self.Models[3][rou1k]:SetSkin(v[3] and self.OldRouteNumberSetup[5][v[1]] or self.OldRouteNumberSetup[6]
-                [v[1]] or tonumber(v[1]) - 1)
+            self.Models[3][rou1k]:SetSkin(v[3] and self.OldRouteNumberSetup[5][v[1]] or self.OldRouteNumberSetup[6][v[1]] or tonumber(v[1]) - 1)
             self.Models[3][rou1k]:SetRenderMode(RENDERMODE_TRANSCOLOR)
             self.Models[3][rou1k]:SetColor(Color(255, 255, 255, 0))
         end
