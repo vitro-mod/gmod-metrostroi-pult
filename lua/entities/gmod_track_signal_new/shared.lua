@@ -236,6 +236,7 @@ Metrostroi.SigTypeNames[3] = 'Small'
 Metrostroi.SigTypeSpriteMul[3] = 0.75
 ENT.RenderOffset[3] = Vector(15, 0, -3.85)
 if game.GetMap() == "gm_metro_minsk_1984" then ENT.RenderOffset[3] = Vector(0, 0, 3.85) end
+ENT.MainModels[3] = {}
 ENT.TrafficLightModels[3] = {
 	name = Vector(10.07 - 10, 0.5 + 6, 42.5),
 	name_one = Vector(10.07 - 10, 0.5 + 6, 42.5),
