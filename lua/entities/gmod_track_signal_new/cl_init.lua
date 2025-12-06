@@ -366,8 +366,7 @@ function ENT:CreateTrafficLightModels()
         self.Models[1]["rous"] = ClientsideModel(TLM.LampIndicator.models[rnadd], RENDERGROUP_OPAQUE)
         self.RouteNumbers[id].pos = (self.BasePos[self.LightType] + offset + self.LongOffset - TLM.LampIndicator[3])
         if self.Left then
-            self.RouteNumbers[id].pos = self.RouteNumbers[id].pos * vector_mirror +
-                TLM.LampIndicator[4]
+            self.RouteNumbers[id].pos = self.RouteNumbers[id].pos * vector_mirror + TLM.LampIndicator[4]
         end
         self.Models[1]["rous"]:SetPos(self:LocalToWorld(self.RouteNumbers[id].pos))
         self.Models[1]["rous"]:SetAngles(self:GetAngles())
