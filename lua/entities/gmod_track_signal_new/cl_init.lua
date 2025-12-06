@@ -388,9 +388,7 @@ function ENT:CreateTrafficLightModels()
         self.Models[1]["autostop"]:SetParent(self)
     end
     self.NamesOffset = vector_origin
-    -- Create traffic light models
-    --if self.LightType > 2 then self.LightType = 2 end
-    --if self.LightType < 0 then self.LightType = 0 end
+
     local first = true
     local assembled = false
     self.RouteHeads = self.RouteHeads or {}
