@@ -86,7 +86,6 @@ function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
     local replaceTo = TLM.left_replace and TLM.left_replace.to or "_mirror.mdl"
 
     local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(replaceFrom, replaceTo) or TLM[head][2]
-    local glass = TLM[head][3] and TLM[head][3].glass
     local longKron = #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep)
 
     if not IsValid(self.Models[1][ID]) then
@@ -105,14 +104,12 @@ function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
         local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
         if LampIndicator.models[rnadd] then
             self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd], RENDERGROUP_OPAQUE)
-            self.Models[1][rouid]:SetPos(self:LocalToWorld(pos - self.RouteNumberOffset +
-                (isLeft and LampIndicator[1] or LampIndicator[2])))
+            self.Models[1][rouid]:SetPos(self:LocalToWorld(pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])))
             self.Models[1][rouid]:SetAngles(self:GetAngles())
             self.Models[1][rouid]:SetParent(self)
         end
         if self.RouteNumbers[id] then
-            self.RouteNumbers[id].pos = pos - self.RouteNumberOffset +
-                (isLeft and LampIndicator[1] or LampIndicator[2])
+            self.RouteNumbers[id].pos = pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])
         end
         self.RN = self.RN + 1
     end
