@@ -59,9 +59,6 @@ function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
     return min + (max - min) * self.Anims[id].val
 end
 
---------------------------
--- MAIN SPAWN FUNCTIONS --
---------------------------
 function ENT:SpawnMainModels(pos, ang, LenseNum, add)
     local TLM = self.MainModels[self.LightType]
     for k, v in pairs(TLM) do
