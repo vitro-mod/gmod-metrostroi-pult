@@ -305,9 +305,7 @@ function ENT:CreateTrafficLightModels()
             oneItemHeadCount = oneItemHeadCount + 1
         end
     end
-    -- if oneItemHeadCount > 1 then
-    --     HeadsNum = HeadsNum + oneItemHeadCount
-    -- end
+
     local offset = self.RenderOffset[self.LightType] or vector_origin
     self.LongOffset = self.LongOffset or vector_origin
     if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType], angle_zero, HeadsNum) end
@@ -360,7 +358,11 @@ function ENT:CreateTrafficLightModels()
             head = 'M'
         end
         if not data then continue end
+
+        --- @type Vector
         local vec = data[1]
+
+        local curoffset = vector_origin
         if assembled then curoffset = TLM['kronOff'] + TLM['step'] * #v end
         if first then
             first = false
@@ -600,7 +602,11 @@ function ENT:UpdateModels(CurrentTime)
         end
         if not data then continue end
         if assembled and v[#v] == 'M' then data = TLM['M'] end
+
+        --- @type Vector
         local vec = data[1]
+
+        local curoffset = vector_origin
 
         if assembled then curoffset = TLM['kronOff'] + TLM['step'] * #v end
         if first then
