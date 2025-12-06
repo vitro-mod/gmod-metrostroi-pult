@@ -138,7 +138,7 @@ function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
     end
 end
 
-function ENT:SetLight(ID, ID2, pos, ang, skin, State, Change)
+function ENT:SetLight(ID, ID2, pos, parent, skin, State, Change)
     local TLM = self.TrafficLightModels[self.LightType]
     local IsStateAboveZero = State > 0
     local IDID2 = ID .. ID2
@@ -153,17 +153,18 @@ function ENT:SetLight(ID, ID2, pos, ang, skin, State, Change)
         end
     elseif IsStateAboveZero then
         self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model, RENDERGROUP_OPAQUE)
-        self.Models[3][IDID2]:SetPos(self:LocalToWorld(pos))
-        self.Models[3][IDID2]:SetAngles(self:LocalToWorldAngles(ang))
+        self.Models[3][IDID2]:SetParent(parent)
+        self.Models[3][IDID2]:SetLocalPos(pos)
+        self.Models[3][IDID2]:SetLocalAngles(angle_zero)
         self.Models[3][IDID2]:SetSkin(skin)
-        self.Models[3][IDID2]:SetParent(self)
         self.Models[3][IDID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
         self.Models[3][IDID2]:SetColor(Color(255, 255, 255, State * 255))
         self.Models[3][IDID2]:SetModelScale(TLM.lense_scale or 1)
     end
 
     self.Sprites[IDID2] = {
-        pos = self:LocalToWorld(pos + Metrostroi.SigSpriteOffset + (TLM.sprite_offset or vector_origin)),
+        pos = parent:LocalToWorld(pos + Metrostroi.SigSpriteOffset + (TLM.sprite_offset or vector_origin)),
+        ang = parent:LocalToWorldAngles(angle_zero),
         bri = State,
         col = Metrostroi.Lenses[self.SpriteConverter[skin + 1]],
         mul = Metrostroi.SigTypeSpriteMul[self.LightType] * self.SpriteMultiplier[skin + 1]
@@ -182,7 +183,7 @@ function ENT:SetLight(ID, ID2, pos, ang, skin, State, Change)
             self.PTs[IDID2]:SetFOV(45)
             self.PTs[IDID2]:SetPos(self.Sprites[IDID2].pos)
             self.PTs[IDID2]:SetBrightness(self.Sprites[IDID2].bri)
-            local ptAng = self:LocalToWorldAngles(ang)
+            local ptAng = self.Sprites[IDID2].ang
             ptAng:Add(Angle(0, 90, 0))
             self.PTs[IDID2]:SetAngles(ptAng)
             self.PTs[IDID2]:Update()
@@ -377,10 +378,10 @@ function ENT:CreateTrafficLightModels()
         local offsetAndLongOffset = offset + self.LongOffset
         --SpawnHead(ID,model,pos,ang,isLeft,isLast)
         if not self.Left or self.Double then
-            self:SpawnHead(ID .. (#v + ID2), head, self.BasePos[self.LightType] + offsetAndLongOffset, angle_zero, false, #v == 1)
+            self:SpawnHead(ID, head, self.BasePos[self.LightType] + offsetAndLongOffset, angle_zero, false, #v == 1)
         end
         if self.Left or self.Double then
-            self:SpawnHead((self.Double and ID .. (#v + ID2) .. "d" or ID), head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror, angle_zero, true, #v == 1)
+            self:SpawnHead((self.Double and ID .. "d" or ID), head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror, angle_zero, true, #v == 1)
         end
 
         if v ~= "M" and v ~= "X" then
@@ -578,10 +579,7 @@ function ENT:UpdateModels(CurrentTime)
     end
 
     if self.ARSOnly then return true end
-    local offset = (self.RenderOffset[self.LightType] or vector_origin)
-    if self.RouteNumberOffset then
-        offset = offset + self.RouteNumberOffset
-    end
+
     local ID = 0
     local ID2 = 0
     local lID2 = 0
@@ -603,20 +601,9 @@ function ENT:UpdateModels(CurrentTime)
         if not data then continue end
         if assembled and v[#v] == 'M' then data = TLM['M'] end
 
-        --- @type Vector
-        local vec = data[1]
-
-        local curoffset = vector_origin
-
         if assembled then curoffset = TLM['kronOff'] + TLM['step'] * #v end
         if first then
             first = false
-        else
-            if not assembled then
-                offset = offset - vec
-            else
-                offset = offset - curoffset
-            end
         end
 
         if v ~= "M" and v ~= "X" then
@@ -651,12 +638,11 @@ function ENT:UpdateModels(CurrentTime)
                 -- local State = self:Animate(ID .. "/" .. i, enableLense and 1 or 0, 0, 1, blink and 256 or 128)
                 local State = enableLense and 1 or 0
                 if not IsValid(self.Models[3][ID .. ID2]) and State > 0 then self.Signals[lID2].State = nil end
-                local offsetAndLongOffset = offset + self.LongOffset
                 if not self.DoubleL then
-                    self:SetLight(ID, ID2, (self.BasePos[self.LightType] + offsetAndLongOffset) * (self.Left and vector_mirror or 1) + lenOff * (self.Left and vector_mirror or 1), angle_zero, self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
+                    self:SetLight(ID, ID2, lenOff * (self.Left and vector_mirror or 1), self.Models[1][ID], self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
                 else
-                    self:SetLight(ID, ID2, self.BasePos[self.LightType] + offsetAndLongOffset + lenOff, angle_zero, self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
-                    self:SetLight(ID, ID2 .. "x", (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + lenOff * vector_mirror, angle_zero, self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
+                    self:SetLight(ID, ID2, lenOff, self.Models[1][ID], self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
+                    self:SetLight(ID, ID2 .. "x", lenOff * vector_mirror, self.Models[1][ID .. 'd'], self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
                 end
                 self.Signals[ID2].State = State
             end
@@ -806,12 +792,11 @@ end
 function ENT:LightSprites()
     if not self.Sprites then return end
     for k, v in pairs(self.Sprites) do
-        self:Sprite(v.pos, self:GetAngles(), v.col, v.bri, v.mul, k)
+        self:Sprite(v.pos, v.ang, v.col, v.bri, v.mul, k)
     end
 end
 
 function ENT:Sprite(pos, ang, col, bri, mul, handlerKey)
-    local TLM = self.TrafficLightModels[self.LightType]
     if bri <= 0 then return end
 
     local Visible = util.PixelVisible(pos, 1, self.PixVisibleHandlers[handlerKey])
@@ -819,7 +804,7 @@ function ENT:Sprite(pos, ang, col, bri, mul, handlerKey)
     if Visible <= 0.1 then return end
 
     local lense_scale = self.TrafficLightModels[self.LightType].lense_scale
-    local fw = -ang:Right()
+    local fw = ang:Forward()
     local view = EyePos() - pos
     local dist = view:Length()
     view:Normalize()
@@ -871,6 +856,7 @@ function ENT:UpdatePointerLamps(ID, rnState, SpriteColor, SpriteMultiplier)
         if state or self.Sprites[mIDi] then
             self.Sprites[mIDi] = {
                 pos = self.Models[4][IDi]:GetPos() + pos,
+                ang = self:GetAngles(),
                 bri = state and 1 or 0,
                 col = Metrostroi.Lenses[SpriteColor],
                 mul = SpriteMultiplier
