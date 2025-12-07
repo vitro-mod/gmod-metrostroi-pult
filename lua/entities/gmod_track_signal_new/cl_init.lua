@@ -193,9 +193,7 @@ function ENT:SetLight(ID, ID2, pos, parent, skin, State, Change, handler)
             self.PTs[IDID2]:SetFOV(45)
             self.PTs[IDID2]:SetPos(self.Sprites[IDID2].pos)
             self.PTs[IDID2]:SetBrightness(self.Sprites[IDID2].bri)
-            local ptAng = self.Sprites[IDID2].ang
-            ptAng:Add(Angle(0, 90, 0))
-            self.PTs[IDID2]:SetAngles(ptAng)
+            self.PTs[IDID2]:SetAngles(self.Sprites[IDID2].ang + angle_right)
             self.PTs[IDID2]:Update()
         end
     else
@@ -782,7 +780,7 @@ function ENT:Sprite(pos, ang, col, bri, mul, handler)
     if Visible <= 0.1 then return end
 
     local lense_scale = self.TrafficLightModels[self.LightType].lense_scale
-    local fw = ang:Forward()
+    local fw = -ang:Right()
     local view = EyePos() - pos
     local dist = view:Length()
     view:Normalize()

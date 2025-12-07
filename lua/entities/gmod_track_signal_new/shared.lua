@@ -49,6 +49,7 @@ Metrostroi.LiterWarper = {
 }
 
 vector_mirror = Vector(-1, 1, 1)
+angle_right = Angle(0, 90, 0)
 
 -- Lamp indexes
 -- 0 Red
