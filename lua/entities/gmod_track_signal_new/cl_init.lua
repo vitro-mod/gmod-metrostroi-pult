@@ -79,7 +79,7 @@ function ENT:SpawnMainModels(pos, ang, HeadsNum, add)
     end
 end
 
-function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
+function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
     local TLM = self.TrafficLightModels[self.LightType]
 
     local replaceFrom = TLM.left_replace and TLM.left_replace.from or ".mdl"
@@ -93,6 +93,7 @@ function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
         self.Models[1][ID]:SetPos(self:LocalToWorld(pos))
         self.Models[1][ID]:SetAngles(self:LocalToWorldAngles(ang))
         self.Models[1][ID]:SetParent(self)
+        self.Models[1][ID].LampsData = {}
     end
     if self.RN and self.RN == self.RouteNumbers.sep then
         self.RN = self.RN + 1
@@ -112,6 +113,15 @@ function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
             self.RouteNumbers[id].pos = pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])
         end
         self.RN = self.RN + 1
+    end
+    for i = 1, #lenses do
+        self.Models[1][ID].LampsData[i] = {
+            color = lenses[i],
+            pos = TLM[head][3][i - 1] * (isLeft and vector_mirror or 1),
+            handler = util.GetPixelVisibleHandle(),
+            headLampNum = i,
+            num = ID2 + i
+        }
     end
     for k, v in pairs(TLM[head][3]) do
         local ID_model = tostring(ID) .. "_" .. k
@@ -138,7 +148,7 @@ function ENT:SpawnHead(ID, head, pos, ang, isLeft, isLast)
     end
 end
 
-function ENT:SetLight(ID, ID2, pos, parent, skin, State, Change)
+function ENT:SetLight(ID, ID2, pos, parent, skin, State, Change, handler)
     local TLM = self.TrafficLightModels[self.LightType]
     local IsStateAboveZero = State > 0
     local IDID2 = ID .. ID2
@@ -162,13 +172,13 @@ function ENT:SetLight(ID, ID2, pos, parent, skin, State, Change)
         self.Models[3][IDID2]:SetModelScale(TLM.lense_scale or 1)
     end
 
-    self.Sprites[IDID2] = {
-        pos = parent:LocalToWorld(pos + Metrostroi.SigSpriteOffset + (TLM.sprite_offset or vector_origin)),
-        ang = parent:LocalToWorldAngles(angle_zero),
-        bri = State,
-        col = Metrostroi.Lenses[self.SpriteConverter[skin + 1]],
-        mul = Metrostroi.SigTypeSpriteMul[self.LightType] * self.SpriteMultiplier[skin + 1]
-    }
+    self.Sprites[IDID2] = self.Sprites[IDID2] or {}
+    self.Sprites[IDID2].pos = parent:LocalToWorld(pos + Metrostroi.SigSpriteOffset + (TLM.sprite_offset or vector_origin))
+    self.Sprites[IDID2].ang = parent:LocalToWorldAngles(angle_zero)
+    self.Sprites[IDID2].bri = State
+    self.Sprites[IDID2].col = Metrostroi.Lenses[self.SpriteConverter[skin + 1]]
+    self.Sprites[IDID2].mul = Metrostroi.SigTypeSpriteMul[self.LightType] * self.SpriteMultiplier[skin + 1]
+    self.Sprites[IDID2].handler = handler
 
     local distSqr = (EyePos() - self.Sprites[IDID2].pos):LengthSqr()
     local distZ = math.abs(EyePos().z - self.Sprites[IDID2].pos.z)
@@ -378,35 +388,26 @@ function ENT:CreateTrafficLightModels()
         local offsetAndLongOffset = offset + self.LongOffset
         --SpawnHead(ID,model,pos,ang,isLeft,isLast)
         if not self.Left or self.Double then
-            self:SpawnHead(ID, head, self.BasePos[self.LightType] + offsetAndLongOffset, angle_zero, false, #v == 1)
+            self:SpawnHead(ID, ID2, head, self.BasePos[self.LightType] + offsetAndLongOffset, angle_zero, false, #v == 1, true, assembled and v[#v] or v)
         end
         if self.Left or self.Double then
-            self:SpawnHead((self.Double and ID .. "d" or ID), head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror, angle_zero, true, #v == 1)
+            self:SpawnHead((self.Double and ID .. "d" or ID), ID2, head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror, angle_zero, true, #v == 1, true, assembled and v[#v] or v)
         end
 
         if v ~= "M" and v ~= "X" then
             for i = 1, #v do
-                local lnum = assembled and 1 or i
-                local lenOff = data[3][i - 1]
                 local head = 'single'
                 if v[i] == 'M' then head = 'M_single' end
-                if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i - #v) end
-                --if assembled then lenOff = Vector(0,0,100) end
                 ID2 = ID2 + 1
                 if assembled and i < #v then
                     if not self.Left or self.Double then
-                        self:SpawnHead(ID .. ID2, head, self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero, false, i == #v - 1)
+                        self:SpawnHead(ID .. ID2, ID2, head, self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero,false,i == 1,i == #v,v[i])
                     end
                     if self.Left or self.Double then
-                        self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + TLM['step'] * (#v - i), angle_zero, true, i == #v - 1)
+                        self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), ID2, head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + TLM['step'] * (#v - i), angle_zero, true, i == 1, i == #v, v[i])
                     end
                 end
                 if not self.Signals[ID2] then self.Signals[ID2] = {} end
-
-                self.PixVisibleHandlers[ID .. ID2] = util.GetPixelVisibleHandle()
-                if self.DoubleL then
-                    self.PixVisibleHandlers[ID .. ID2 .. "x"] = util.GetPixelVisibleHandle()
-                end
             end
         end
         ID = ID + 1
@@ -582,69 +583,20 @@ function ENT:UpdateModels(CurrentTime)
 
     local ID = 0
     local ID2 = 0
-    local lID2 = 0
-    local first = true
     local assembled = false
     self.rnIdx = 1
     for _, v in ipairs(self.LensesTBL) do
-        local data
-        if not TLM[v] then
-            if not TLM['single'] then
-                data = TLM[#v - 1]
-            else
-                data = TLM[0]
-                assembled = true
-            end
-        else
-            data = TLM[v]
-        end
-        if not data then continue end
-        if assembled and v[#v] == 'M' then data = TLM['M'] end
-
-        if assembled then curoffset = TLM['kronOff'] + TLM['step'] * #v end
-        if first then
-            first = false
-        end
+        if not TLM[v] and TLM['single'] then assembled = true end
 
         if v ~= "M" and v ~= "X" then
             for i = 1, #v do
                 ID2 = ID2 + 1
-                if v[i] ~= "M" then
-                    lID2 = lID2 + 1
-                end
-                local lenOff = data[3][i - 1]
-                if assembled then lenOff = TLM['single'][3][0] - TLM['step'] * (i - #v) end
 
                 if v[i] == "M" then
                     if i == #v then continue end
                     self:UpdateRoutePointer(ID .. ID2, self.Num[self.rnIdx])
                     continue
                 end
-                if v[i] == "X" then continue end
-                local n = tonumber(self.Sig[lID2])
-                -- условия для короткого погасания сигнала
-                local fadeCondition = n == 1 or n == 2
-                if n ~= nil and self.Signals[lID2].RealState ~= fadeCondition then
-                    self.Signals[lID2].RealState = fadeCondition
-                    self.Signals[lID2].Stop = CurrentTime + 0.1
-                end
-                if self.Signals[lID2].Stop and CurrentTime - self.Signals[lID2].Stop > 0 then
-                    self.Signals[lID2].Stop = nil
-                end
-                --Animate(clientProp, value, min, max, speed, damping, stickyness)
-                --local State = self:Animate(ID.."/"..i,  ((n == 1 or (n == 2 and blink)) and not self.Signals[ID2].Stop) and 1 or 0,  0,1, blink and 256 or 128)
-                -- local State = ((n == 1 or (n == 2 and blink)) and not self.Signals[lID2].Stop) and 1 or 0
-                local enableLense = ((n == 1 or n == 3) or (n == 2 and blink)) and not self.Signals[ID2].Stop
-                -- local State = self:Animate(ID .. "/" .. i, enableLense and 1 or 0, 0, 1, blink and 256 or 128)
-                local State = enableLense and 1 or 0
-                if not IsValid(self.Models[3][ID .. ID2]) and State > 0 then self.Signals[lID2].State = nil end
-                if not self.DoubleL then
-                    self:SetLight(ID, ID2, lenOff * (self.Left and vector_mirror or 1), self.Models[1][ID], self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State, self.Signals[lID2].Stop)
-                else
-                    self:SetLight(ID, ID2, lenOff, self.Models[1][ID], self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
-                    self:SetLight(ID, ID2 .. "x", lenOff * vector_mirror, self.Models[1][ID .. 'd'], self.SignalConverter[v[i]] - 1, State, self.Signals[lID2].State ~= State)
-                end
-                self.Signals[ID2].State = State
             end
         else
             self:UpdateRoutePointer(ID, self.Num[self.rnIdx])
@@ -655,10 +607,36 @@ function ENT:UpdateModels(CurrentTime)
         ID = ID + 1
     end
 
-    self:UpdateRouteNumbers()
+    self:UpdateSignalLights(CurrentTime, blink)
+    self:UpdateOldIndicators()
 end
 
-function ENT:UpdateRouteNumbers()
+function ENT:UpdateSignalLights(CurrentTime, blink)
+    for k, headModel in pairs(self.Models[1]) do
+        if not headModel.LampsData then continue end
+        -- PrintTable(headModel.LampsData)
+        for lampNum, lampData in pairs(headModel.LampsData) do
+            local parent = headModel
+            local pos = lampData.pos
+            local skin = self.SignalConverter[lampData.color]
+            if not skin then continue end
+            local n = tonumber(self.Sig[lampData.num])
+            local fadeCondition = n == 1 or n == 2
+            if n ~= nil and lampData.RealState ~= fadeCondition then
+                lampData.RealState = fadeCondition
+                lampData.Stop = CurrentTime + 0.1
+            end
+            if lampData.Stop and CurrentTime - lampData.Stop > 0 then
+                lampData.Stop = nil
+            end
+            local enableLense = ((n == 1 or n == 3) or (n == 2 and blink)) and not lampData.Stop
+            local state = enableLense and 1 or 0
+            self:SetLight(k, lampNum, pos, parent, skin - 1, state, true, lampData.handler)
+        end
+    end
+end
+
+function ENT:UpdateOldIndicators()
     local TLM = self.TrafficLightModels[self.LightType]
     local LampIndicatorModels_numb_mdl = TLM.LampIndicator.models['numb']
     local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.models['lamp']
@@ -705,11 +683,11 @@ function ENT:UpdateRouteNumbers()
         end
     end
     if self.Arrow then
-        self:UpdateArrowPointer(offset)
+        self:UpdateOldArrowPointer(offset)
     end
 end
 
-function ENT:UpdateArrowPointer(offset)
+function ENT:UpdateOldArrowPointer(offset)
     local TLM = self.TrafficLightModels[self.LightType]
     local LampIndicatorModels_lamp_mdl = TLM.LampIndicator.models['lamp']
     local State = self:Animate("roua", self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0, 0, 1, 256)
@@ -792,14 +770,14 @@ end
 function ENT:LightSprites()
     if not self.Sprites then return end
     for k, v in pairs(self.Sprites) do
-        self:Sprite(v.pos, v.ang, v.col, v.bri, v.mul, k)
+        self:Sprite(v.pos, v.ang, v.col, v.bri, v.mul, v.handler)
     end
 end
 
-function ENT:Sprite(pos, ang, col, bri, mul, handlerKey)
+function ENT:Sprite(pos, ang, col, bri, mul, handler)
     if bri <= 0 then return end
 
-    local Visible = util.PixelVisible(pos, 1, self.PixVisibleHandlers[handlerKey])
+    local Visible = util.PixelVisible(pos, 1, handler)
 
     if Visible <= 0.1 then return end
 
