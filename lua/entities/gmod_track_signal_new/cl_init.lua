@@ -281,7 +281,11 @@ function ENT:CreateModels()
     self.Models.have = true
     self.ModelsCreated = true
     local signal = self
-    hook.Add("PostDrawTranslucentRenderables", "Sprites_" .. self:EntIndex(), function() signal:LightSprites() end)
+    hook.Add("PostDrawTranslucentRenderables", "Sprites_" .. self:EntIndex(), function()
+        render.SetMaterial(self.SpriteMat)
+        -- render.DepthRange(0, 0.01)
+        signal:LightSprites()
+    end)
 
     return true
 end
@@ -788,8 +792,6 @@ function ENT:Sprite(pos, ang, col, bri, mul, handler)
     local viewdot = math.Clamp(view:Dot(fw), 0, 1)
 
     local s = Visible * (viewdot + math.exp(-20 * (1 - viewdot))) * bri * math.Clamp(dist / 32, 64, 256) * mul * (lense_scale or 1)
-
-    render.SetMaterial(self.SpriteMat)
     render.DrawSprite(pos, s, s, col)
 end
 

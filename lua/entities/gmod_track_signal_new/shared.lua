@@ -96,6 +96,8 @@ ENT.OldRouteNumberSetup = {
 	{ ["F"] = 0, ["L"] = 2, ["R"] = 0, W = 3, K = 4, d = 1 },
 }
 ENT.SpriteMat = Material("sprites/light_ignorez")
+-- ENT.SpriteMat = Material("sprites/light_glow02_add_noz")
+-- ENT.SpriteMat = Material("sprites/glow04_noz")
 
 Metrostroi.SigTypeNames = {}
 Metrostroi.SigTypeSpriteMul = {}
