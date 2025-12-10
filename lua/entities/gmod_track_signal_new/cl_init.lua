@@ -115,6 +115,7 @@ function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
         self.RN = self.RN + 1
     end
     for i = 1, #lenses do
+        if not TLM[head][3][i - 1] then continue end
         self.Models[1][ID].LampsData[i] = {
             color = lenses[i],
             pos = TLM[head][3][i - 1] * (isLeft and vector_mirror or 1),
