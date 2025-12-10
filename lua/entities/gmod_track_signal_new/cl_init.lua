@@ -416,7 +416,6 @@ function ENT:CreateTrafficLightModels()
         ID = ID + 1
     end
     if self.Arrow then
-        local id = self.Arrow
         self.Models[1]["roua"] = ClientsideModel(TLM.LampIndicator.models[4], RENDERGROUP_OPAQUE)
         self.SpecRouteNumbers.pos = (self.BasePos[self.LightType] + offset + self.LongOffset - TLM.LampIndicator[5]) + (self.Left and TLM.LampIndicator[6] or vector_origin) - (self.RouteNumberOffset or vector_origin)
         if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos * vector_mirror end
