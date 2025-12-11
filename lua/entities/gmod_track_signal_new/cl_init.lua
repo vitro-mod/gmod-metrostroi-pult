@@ -174,12 +174,14 @@ function ENT:CreateTrafficLightModels()
         end
         self.NamesOffset = self.NamesOffset + vec
         local offsetAndLongOffset = offset + self.LongOffset
-        --SpawnHead(ID,model,pos,ang,isLeft,isLast)
+        local startLenseNum = assembled and ID2 + #v - 1 or ID2
+        local headPos = self.BasePos[self.LightType] + offsetAndLongOffset
+        local headLenses = assembled and v[#v] or v
         if not self.Left or self.Double then
-            self:SpawnHead(ID, ID2, head, self.BasePos[self.LightType] + offsetAndLongOffset, angle_zero, false, #v == 1, true, assembled and v[#v] or v)
+            self:SpawnHead(ID, startLenseNum, head, headPos, angle_zero, false, #v == 1, true, headLenses)
         end
         if self.Left or self.Double then
-            self:SpawnHead((self.Double and ID .. "d" or ID), ID2, head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror, angle_zero, true, #v == 1, true, assembled and v[#v] or v)
+            self:SpawnHead((self.Double and ID .. "d" or ID), startLenseNum, head, headPos * vector_mirror, angle_zero, true, #v == 1, true, headLenses)
         end
 
         if v ~= "M" and v ~= "X" then
@@ -189,10 +191,10 @@ function ENT:CreateTrafficLightModels()
                 ID2 = ID2 + 1
                 if assembled and i < #v then
                     if not self.Left or self.Double then
-                        self:SpawnHead(ID .. ID2, ID2, head, self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero, false, i == 1, i == #v, v[i])
+                        self:SpawnHead(ID .. ID2, ID2 - 1, head, self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero, false, i == 1, i == #v, v[i])
                     end
                     if self.Left or self.Double then
-                        self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), ID2, head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + TLM['step'] * (#v - i), angle_zero, true, i == 1, i == #v, v[i])
+                        self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), ID2 - 1, head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + TLM['step'] * (#v - i), angle_zero, true, i == 1, i == #v, v[i])
                     end
                 end
                 if not self.Signals[ID2] then self.Signals[ID2] = {} end
