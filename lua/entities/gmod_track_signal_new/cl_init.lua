@@ -100,7 +100,7 @@ function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
     end
     local id = self.RN
     local rouid = id and "rou" .. id
-    if rouid and not IsValid(self.Models[1][rouid]) then
+    if rouid and not IsValid(self.Models[1][rouid]) and (isFirst or self.LightType ~= 5) then
         local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 2 or 1) or 5)
         local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
         if LampIndicator.models[rnadd] then
