@@ -175,13 +175,13 @@ function ENT:CreateTrafficLightModels()
         self.NamesOffset = self.NamesOffset + vec
         local offsetAndLongOffset = offset + self.LongOffset
         local startLenseNum = assembled and ID2 + #v - 1 or ID2
-        local headPos = self.BasePos[self.LightType] + offsetAndLongOffset
+        local headPos = offsetAndLongOffset
         local headLenses = assembled and v[#v] or v
         if not self.Left or self.Double then
-            self:SpawnHead(ID, startLenseNum, head, headPos, angle_zero, false, #v == 1, true, headLenses)
+            self:SpawnHead(ID, startLenseNum, nil, head, headPos, angle_zero, false, #v == 1, true, headLenses)
         end
         if self.Left or self.Double then
-            self:SpawnHead((self.Double and ID .. "d" or ID), startLenseNum, head, headPos * vector_mirror, angle_zero, true, #v == 1, true, headLenses)
+            self:SpawnHead((self.Double and ID .. "d" or ID), startLenseNum, self.Double and "d" or nil, head, headPos, angle_mirror, true, #v == 1, true, headLenses)
         end
 
         if v ~= "M" and v ~= "X" then
@@ -191,10 +191,10 @@ function ENT:CreateTrafficLightModels()
                 ID2 = ID2 + 1
                 if assembled and i < #v then
                     if not self.Left or self.Double then
-                        self:SpawnHead(ID .. ID2, ID2 - 1, head, self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero, false, i == 1, i == #v, v[i])
+                        self:SpawnHead(ID .. ID2, ID2 - 1, nil, head, offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero, false, i == 1, i == #v, v[i])
                     end
                     if self.Left or self.Double then
-                        self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), ID2 - 1, head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + TLM['step'] * (#v - i), angle_zero, true, i == 1, i == #v, v[i])
+                        self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), ID2 - 1, self.Double and "d" or nil, head, offsetAndLongOffset + TLM['step'] * (#v - i), angle_mirror, true, i == 1, i == #v, v[i])
                     end
                 end
                 if not self.Signals[ID2] then self.Signals[ID2] = {} end
@@ -273,7 +273,7 @@ function ENT:CreateARSOnlyModels()
     end
 
     if not IsValid(self.Models[1][k]) then
-        local v = self.MainModels[self.LightType]["m1"]
+        local v = self.MainModels[self.LightType][k]
         self.Models[1][k] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
         self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] * (self.Left and vector_mirror or 1)))
         self.Models[1][k]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-1, 1, 1) or Angle(1, 1, 1)))
@@ -301,7 +301,7 @@ function ENT:SpawnMainModels(pos, ang, HeadsNum, add)
     end
 end
 
-function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
+function ENT:SpawnHead(ID, ID2, suffix, head, pos, ang, isLeft, isLast, isFirst, lenses)
     local TLM = self.TrafficLightModels[self.LightType]
 
     local replaceFrom = TLM.left_replace and TLM.left_replace.from or ".mdl"
@@ -310,11 +310,14 @@ function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
     local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(replaceFrom, replaceTo) or TLM[head][2]
     local longKron = #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep)
 
+    local machtKey = "m1"
+    local macht = self.Models[1][suffix and (machtKey .. suffix) or machtKey]
+
     if not IsValid(self.Models[1][ID]) then
         self.Models[1][ID] = ClientsideModel(model, RENDERGROUP_OPAQUE)
-        self.Models[1][ID]:SetPos(self:LocalToWorld(pos))
-        self.Models[1][ID]:SetAngles(self:LocalToWorldAngles(ang))
-        self.Models[1][ID]:SetParent(self)
+        self.Models[1][ID]:SetParent(macht or self)
+        self.Models[1][ID]:SetLocalPos(pos)
+        self.Models[1][ID]:SetLocalAngles(ang)
         self.Models[1][ID].LampsData = {}
     end
     if self.RN and self.RN == self.RouteNumbers.sep then
@@ -325,14 +328,18 @@ function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
     if rouid and not IsValid(self.Models[1][rouid]) and (isFirst or self.LightType ~= 5) then
         local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 2 or 1) or 5)
         local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
+        local roupos = pos - self.RouteNumberOffset + LampIndicator[2]
+        if isLeft then
+            roupos = pos + self.RouteNumberOffset - LampIndicator[1]
+        end
         if LampIndicator.models[rnadd] then
             self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd], RENDERGROUP_OPAQUE)
-            self.Models[1][rouid]:SetPos(self:LocalToWorld(pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])))
-            self.Models[1][rouid]:SetAngles(self:GetAngles())
-            self.Models[1][rouid]:SetParent(self)
+            self.Models[1][rouid]:SetParent(macht)
+            self.Models[1][rouid]:SetLocalPos(roupos)
+            self.Models[1][rouid]:SetLocalAngles(ang)
         end
         if self.RouteNumbers[id] then
-            self.RouteNumbers[id].pos = pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])
+            self.RouteNumbers[id].pos = roupos
         end
         self.RN = self.RN + 1
     end
