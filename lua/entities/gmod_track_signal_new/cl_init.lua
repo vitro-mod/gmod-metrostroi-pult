@@ -15,262 +15,47 @@ function ENT:Initialize()
     self.NumLit = {}
 end
 
-function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
-    local id = clientProp
-    if not self.Anims[id] then
-        self.Anims[id] = {}
-        self.Anims[id].val = value
-        self.Anims[id].V = 0.0
+function ENT:Think()
+    local CurrentTime = CurTime()
+    --self:SetNextClientThink(CurTime + 0.027)
+    self.PrevTime = self.PrevTime or RealTime()
+    self.DeltaTime = (RealTime() - self.PrevTime)
+    self.PrevTime = RealTime()
+
+    if self:IsDormant() or Metrostroi and Metrostroi.ReloadClientside then
+        if not self.ReloadModels and self.ModelsCreated then
+            self:OnRemove()
+        end
+        return true
     end
 
-    if damping == false then
-        local dX = speed * self.DeltaTime
-        if value > self.Anims[id].val then
-            self.Anims[id].val = self.Anims[id].val + dX
+    if self.ReloadModels then
+        self.ReloadModels = false
+        self:RemoveModels()
+    end
+
+    if not self.Name then
+        if self.sended and (CurrentTime - self.sended) > 0 then
+            self.sended = nil
         end
-        if value < self.Anims[id].val then
-            self.Anims[id].val = self.Anims[id].val - dX
+        if not self.sended then
+            net.Start("metrostroi-signal")
+            net.WriteEntity(self)
+            net.SendToServer()
+            self.sended = CurrentTime + 1.5
         end
-        if math.abs(value - self.Anims[id].val) < dX then
-            self.Anims[id].val = value
-        end
+        return true
+    end
+
+    if not self.ModelsCreated then
+        local created = self:CreateModels()
+        self.Models.have = created
+        self.ModelsCreated = created
     else
-        -- Prepare speed limiting
-        local delta = math.abs(value - self.Anims[id].val)
-        local max_speed = 1.5 * delta / self.DeltaTime
-        local max_accel = 0.5 / self.DeltaTime
-
-        -- Simulate
-        local dX2dT = (speed or 128) * (value - self.Anims[id].val) - self.Anims[id].V * (damping or 8.0)
-        if dX2dT > max_accel then dX2dT = max_accel end
-        if dX2dT < -max_accel then dX2dT = -max_accel end
-
-        self.Anims[id].V = self.Anims[id].V + dX2dT * self.DeltaTime
-        if self.Anims[id].V > max_speed then self.Anims[id].V = max_speed end
-        if self.Anims[id].V < -max_speed then self.Anims[id].V = -max_speed end
-
-        self.Anims[id].val = math.max(0, math.min(1, self.Anims[id].val + self.Anims[id].V * self.DeltaTime))
-
-        -- Check if value got stuck
-        if (math.abs(dX2dT) < 0.001) and stickyness and (self.DeltaTime > 0) then
-            self.Anims[id].stuck = true
-        end
+        self:UpdateModels(CurrentTime)
     end
-    return min + (max - min) * self.Anims[id].val
+    return true
 end
-
-function ENT:SpawnMainModels(pos, ang, HeadsNum, add)
-    local TLM = self.MainModels[self.LightType]
-    for k, v in pairs(TLM) do
-        if k:find("long") then continue end
-        local idx = add and k .. add or k
-        if IsValid(self.Models[1][idx]) then break end
-
-        local k_long = k .. "_long"
-        if TLM[k_long] and HeadsNum > (self.LongThreshold[self.LightType] or 2) then
-            self.Models[1][idx] = ClientsideModel(TLM[k_long].model, RENDERGROUP_OPAQUE)
-            self.LongOffset = TLM[k .. "_long_pos"]
-        else
-            self.Models[1][idx] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
-        end
-        self.Models[1][idx]:SetPos(self:LocalToWorld(pos))
-        self.Models[1][idx]:SetAngles(self:LocalToWorldAngles(ang))
-        self.Models[1][idx]:SetParent(self)
-    end
-end
-
-function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
-    local TLM = self.TrafficLightModels[self.LightType]
-
-    local replaceFrom = TLM.left_replace and TLM.left_replace.from or ".mdl"
-    local replaceTo = TLM.left_replace and TLM.left_replace.to or "_mirror.mdl"
-
-    local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(replaceFrom, replaceTo) or TLM[head][2]
-    local longKron = #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep)
-
-    if not IsValid(self.Models[1][ID]) then
-        self.Models[1][ID] = ClientsideModel(model, RENDERGROUP_OPAQUE)
-        self.Models[1][ID]:SetPos(self:LocalToWorld(pos))
-        self.Models[1][ID]:SetAngles(self:LocalToWorldAngles(ang))
-        self.Models[1][ID]:SetParent(self)
-        self.Models[1][ID].LampsData = {}
-    end
-    if self.RN and self.RN == self.RouteNumbers.sep then
-        self.RN = self.RN + 1
-    end
-    local id = self.RN
-    local rouid = id and "rou" .. id
-    if rouid and not IsValid(self.Models[1][rouid]) and (isFirst or self.LightType ~= 5) then
-        local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 2 or 1) or 5)
-        local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
-        if LampIndicator.models[rnadd] then
-            self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd], RENDERGROUP_OPAQUE)
-            self.Models[1][rouid]:SetPos(self:LocalToWorld(pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])))
-            self.Models[1][rouid]:SetAngles(self:GetAngles())
-            self.Models[1][rouid]:SetParent(self)
-        end
-        if self.RouteNumbers[id] then
-            self.RouteNumbers[id].pos = pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])
-        end
-        self.RN = self.RN + 1
-    end
-    for i = 1, #lenses do
-        if not TLM[head][3][i - 1] then continue end
-        self.Models[1][ID].LampsData[i] = {
-            color = lenses[i],
-            pos = TLM[head][3][i - 1] * (isLeft and vector_mirror or 1),
-            handler = util.GetPixelVisibleHandle(),
-            headLampNum = i,
-            num = ID2 + i
-        }
-    end
-    for k, v in pairs(TLM[head][3]) do
-        local ID_model = tostring(ID) .. "_" .. k
-        if type(k) ~= "string" then continue end
-        for i, tbl in pairs(TLM[head][3][k]) do
-            local ID_modeli = ID_model .. i
-            if IsValid(self.Models[1][ID_modeli]) then continue end
-            if tbl.left and not isLeft then continue end
-            if tbl.right and isLeft then continue end
-            if tbl.long and not longKron then continue end
-            if tbl.short and longKron then continue end
-            if tbl.middle and isLast then continue end
-            if tbl.last and not isLast then continue end
-            self.Models[1][ID_modeli] = ClientsideModel(tbl[1], RENDERGROUP_OPAQUE)
-            self.Models[1][ID_modeli]:SetParent(self.Models[1][ID])
-            self.Models[1][ID_modeli]:SetLocalPos(tbl[2] * (isLeft and vector_mirror or 1))
-            self.Models[1][ID_modeli]:SetLocalAngles(ang)
-            self.Models[1][ID_modeli]:SetModelScale(tbl[3] or 1)
-        end
-    end
-
-    if self.UseRoutePointerFont[self.LightType] and (head == 'M' or head == 'M_single') then
-        self:SpawnPointerLamps(ID, pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8])
-    end
-end
-
-function ENT:SetLight(ID, ID2, pos, parent, skin, State, Change, handler)
-    local TLM = self.TrafficLightModels[self.LightType]
-    local IsStateAboveZero = State > 0
-    local IDID2 = ID .. ID2
-    local IsModelValid = IsValid(self.Models[3][IDID2])
-    if IsModelValid then
-        if IsStateAboveZero then
-            if Change then
-                self.Models[3][IDID2]:SetColor(Color(255, 255, 255, State * 255))
-            end
-        else
-            self.Models[3][IDID2]:Remove()
-        end
-    elseif IsStateAboveZero then
-        self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model, RENDERGROUP_OPAQUE)
-        self.Models[3][IDID2]:SetParent(parent)
-        self.Models[3][IDID2]:SetLocalPos(pos)
-        self.Models[3][IDID2]:SetLocalAngles(angle_zero)
-        self.Models[3][IDID2]:SetSkin(skin)
-        self.Models[3][IDID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
-        self.Models[3][IDID2]:SetColor(Color(255, 255, 255, State * 255))
-        self.Models[3][IDID2]:SetModelScale(TLM.lense_scale or 1)
-    end
-
-    self.Sprites[IDID2] = self.Sprites[IDID2] or {}
-    self.Sprites[IDID2].pos = parent:LocalToWorld(pos + Metrostroi.SigSpriteOffset + (TLM.sprite_offset or vector_origin))
-    self.Sprites[IDID2].ang = parent:LocalToWorldAngles(angle_zero)
-    self.Sprites[IDID2].bri = State
-    self.Sprites[IDID2].col = Metrostroi.Lenses[self.SpriteConverter[skin + 1]]
-    self.Sprites[IDID2].mul = Metrostroi.SigTypeSpriteMul[self.LightType] * self.SpriteMultiplier[skin + 1]
-    self.Sprites[IDID2].handler = handler
-
-    local distSqr = (EyePos() - self.Sprites[IDID2].pos):LengthSqr()
-    local distZ = math.abs(EyePos().z - self.Sprites[IDID2].pos.z)
-
-    if true and IsStateAboveZero and distZ < 256 and (distSqr < 4096 * 4096) then
-        if not IsValid(self.PTs[IDID2]) then self.PTs[IDID2] = ProjectedTexture() end
-        if IsValid(self.PTs[IDID2]) then
-            self.PTs[IDID2]:SetEnableShadows((distSqr < 1024 * 1024) and true or false)
-            self.PTs[IDID2]:SetTexture("effects/flashlight001")
-            self.PTs[IDID2]:SetColor(self.Sprites[IDID2].col)
-            self.PTs[IDID2]:SetFarZ(300)
-            self.PTs[IDID2]:SetFOV(45)
-            self.PTs[IDID2]:SetPos(self.Sprites[IDID2].pos)
-            self.PTs[IDID2]:SetBrightness(self.Sprites[IDID2].bri)
-            self.PTs[IDID2]:SetAngles(self.Sprites[IDID2].ang + angle_right)
-            self.PTs[IDID2]:Update()
-        end
-    else
-        if IsValid(self.PTs[IDID2]) then self.PTs[IDID2]:Remove() end
-    end
-end
-
-function ENT:SpawnLetter(i, model, pos, letter, double)
-    local LetMaterials = self.TrafficLightModels[self.LightType].LetMaterials.str
-    local LetMaterialsStart = LetMaterials .. "let_start"
-    local LetMaterialsletter = LetMaterials .. letter
-    if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
-        self.Models[2][i] = ClientsideModel(model, RENDERGROUP_OPAQUE)
-        self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle(0, 180, 0)))
-        self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] + pos))
-        self.Models[2][i]:SetParent(self)
-        for k, v in pairs(self.Models[2][i]:GetMaterials()) do
-            if v:find(LetMaterialsStart) then
-                self.Models[2][i]:SetSubMaterial(k - 1, LetMaterialsletter)
-            end
-        end
-    end
-    local id = i .. "d"
-    if not double and not IsValid(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
-        self.Models[2][id] = ClientsideModel(model, RENDERGROUP_OPAQUE)
-        self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle(0, 180, 0)))
-        self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePos[self.LightType] + pos) * vector_mirror))
-        self.Models[2][id]:SetParent(self)
-        for k, v in pairs(self.Models[2][id]:GetMaterials()) do
-            if v:find(LetMaterialsStart) then
-                self.Models[2][id]:SetSubMaterial(k - 1, LetMaterialsletter)
-            end
-        end
-    end
-end
-
-function ENT:OnRemove()
-    self:RemoveModels()
-    hook.Remove("PostDrawTranslucentRenderables", "Sprites_" .. self:EntIndex())
-    self:RemovePTs()
-end
-
-function ENT:RemoveModels(final)
-    if self.Models and self.Models.have then
-        for _, v in pairs(self.Models) do if type(v) == "table" then for _, v1 in pairs(v) do v1:Remove() end end end
-    end
-    self.NumLit = {}
-    self.Models = { {}, {}, {}, {} }
-    self.ModelsCreated = false
-end
-
-function ENT:RemovePTs()
-    if not self.PTs then return end
-    for k, v in pairs(self.PTs) do
-        if IsValid(v) then v:Remove() end
-    end
-end
-
-net.Receive("metrostroi-signal", function()
-    local ent = net.ReadEntity()
-    if not IsValid(ent) then return end
-    ent.LightType = net.ReadInt(4)
-    ent.Name = net.ReadString()
-    --ent.Name = " BUDAPEiT"..string.gsub(ent.Name,"[A-Za-z]*","")
-    ent.Lenses = net.ReadString()
-    ent.ARSOnly = ent.Lenses == "ARSOnly"
-    ent.RouteNumberSetup = net.ReadString()
-    ent.Left = net.ReadBool()
-    ent.Double = net.ReadBool()
-    ent.DoubleL = net.ReadBool()
-    ent.AutostopPresent = net.ReadBool()
-    if not ent.ARSOnly then
-        ent.LensesTBL = string.Explode("-", ent.Lenses)
-    end
-    if ent.RemoveModels then ent:RemoveModels() end
-end)
 
 function ENT:CreateModels()
     if not self.ARSOnly then
@@ -404,7 +189,7 @@ function ENT:CreateTrafficLightModels()
                 ID2 = ID2 + 1
                 if assembled and i < #v then
                     if not self.Left or self.Double then
-                        self:SpawnHead(ID .. ID2, ID2, head, self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero,false,i == 1,i == #v,v[i])
+                        self:SpawnHead(ID .. ID2, ID2, head, self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero, false, i == 1, i == #v, v[i])
                     end
                     if self.Left or self.Double then
                         self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), ID2, head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + TLM['step'] * (#v - i), angle_zero, true, i == 1, i == #v, v[i])
@@ -457,6 +242,162 @@ function ENT:CreateTrafficLightModels()
     end
 end
 
+function ENT:CreateARSOnlyModels()
+    local TLM = self.TrafficLightModels[self.LightType]
+    local k = "m1"
+
+    if TLM.arsletter and (self.Name:StartWith('TC') or self.Name:StartWith('  ')) then
+        local name = self.Name
+        local offset = TLM.name
+        local angle = TLM.name_s_ang
+
+        name = string.Replace(name, " ", "")
+        name = string.Replace(name, "/", "")
+        name = string.Replace(name, "TC", "")
+        name = string.Replace(name, "REP", "")
+        name = string.Replace(name, "CH", "")
+        name = string.Replace(name, "J", "")
+        if (self.Left) then name = string.reverse(name) end
+
+        offset = TLM.name_out
+
+        if self.Left then offset = offset - Vector(10, 0, 0) end
+        offset = offset - Vector((5.85 / 2) * (3 - (#name)), 0, 0)
+
+        for i = 0, #name - 1 do
+            local id = i
+            self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(id * 5.85, 0, 0), (Metrostroi.LiterWarper[name[i + 1]] or name[i + 1]), not self.Left and true or false, angle)
+        end
+    end
+
+    if not IsValid(self.Models[1][k]) then
+        local v = self.MainModels[self.LightType]["m1"]
+        self.Models[1][k] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
+        self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] * (self.Left and vector_mirror or 1)))
+        self.Models[1][k]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-1, 1, 1) or Angle(1, 1, 1)))
+        self.Models[1][k]:SetParent(self)
+    end
+end
+
+function ENT:SpawnMainModels(pos, ang, HeadsNum, add)
+    local TLM = self.MainModels[self.LightType]
+    for k, v in pairs(TLM) do
+        if k:find("long") then continue end
+        local idx = add and k .. add or k
+        if IsValid(self.Models[1][idx]) then break end
+
+        local k_long = k .. "_long"
+        if TLM[k_long] and HeadsNum > (self.LongThreshold[self.LightType] or 2) then
+            self.Models[1][idx] = ClientsideModel(TLM[k_long].model, RENDERGROUP_OPAQUE)
+            self.LongOffset = TLM[k .. "_long_pos"]
+        else
+            self.Models[1][idx] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
+        end
+        self.Models[1][idx]:SetPos(self:LocalToWorld(pos))
+        self.Models[1][idx]:SetAngles(self:LocalToWorldAngles(ang))
+        self.Models[1][idx]:SetParent(self)
+    end
+end
+
+function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
+    local TLM = self.TrafficLightModels[self.LightType]
+
+    local replaceFrom = TLM.left_replace and TLM.left_replace.from or ".mdl"
+    local replaceTo = TLM.left_replace and TLM.left_replace.to or "_mirror.mdl"
+
+    local model = (not TLM.noleft and isLeft) and TLM[head][2]:Replace(replaceFrom, replaceTo) or TLM[head][2]
+    local longKron = #self.RouteNumbers > 0 and (#self.RouteNumbers ~= 1 or not self.RouteNumbers.sep)
+
+    if not IsValid(self.Models[1][ID]) then
+        self.Models[1][ID] = ClientsideModel(model, RENDERGROUP_OPAQUE)
+        self.Models[1][ID]:SetPos(self:LocalToWorld(pos))
+        self.Models[1][ID]:SetAngles(self:LocalToWorldAngles(ang))
+        self.Models[1][ID]:SetParent(self)
+        self.Models[1][ID].LampsData = {}
+    end
+    if self.RN and self.RN == self.RouteNumbers.sep then
+        self.RN = self.RN + 1
+    end
+    local id = self.RN
+    local rouid = id and "rou" .. id
+    if rouid and not IsValid(self.Models[1][rouid]) and (isFirst or self.LightType ~= 5) then
+        local rnadd = ((self.RouteNumbers[id] and self.RouteNumbers[id][1] ~= "X") and (self.RouteNumbers[id][3] and not self.RouteNumbers[id][2] and 2 or 1) or 5)
+        local LampIndicator = self.TrafficLightModels[self.LightType].LampIndicator
+        if LampIndicator.models[rnadd] then
+            self.Models[1][rouid] = ClientsideModel(LampIndicator.models[rnadd], RENDERGROUP_OPAQUE)
+            self.Models[1][rouid]:SetPos(self:LocalToWorld(pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])))
+            self.Models[1][rouid]:SetAngles(self:GetAngles())
+            self.Models[1][rouid]:SetParent(self)
+        end
+        if self.RouteNumbers[id] then
+            self.RouteNumbers[id].pos = pos - self.RouteNumberOffset + (isLeft and LampIndicator[1] or LampIndicator[2])
+        end
+        self.RN = self.RN + 1
+    end
+    for i = 1, #lenses do
+        if not TLM[head][3][i - 1] then continue end
+        self.Models[1][ID].LampsData[i] = {
+            color = lenses[i],
+            pos = TLM[head][3][i - 1] * (isLeft and vector_mirror or 1),
+            handler = util.GetPixelVisibleHandle(),
+            headLampNum = i,
+            num = ID2 + i
+        }
+    end
+    for k, v in pairs(TLM[head][3]) do
+        local ID_model = tostring(ID) .. "_" .. k
+        if type(k) ~= "string" then continue end
+        for i, tbl in pairs(TLM[head][3][k]) do
+            local ID_modeli = ID_model .. i
+            if IsValid(self.Models[1][ID_modeli]) then continue end
+            if tbl.left and not isLeft then continue end
+            if tbl.right and isLeft then continue end
+            if tbl.long and not longKron then continue end
+            if tbl.short and longKron then continue end
+            if tbl.middle and isLast then continue end
+            if tbl.last and not isLast then continue end
+            self.Models[1][ID_modeli] = ClientsideModel(tbl[1], RENDERGROUP_OPAQUE)
+            self.Models[1][ID_modeli]:SetParent(self.Models[1][ID])
+            self.Models[1][ID_modeli]:SetLocalPos(tbl[2] * (isLeft and vector_mirror or 1))
+            self.Models[1][ID_modeli]:SetLocalAngles(ang)
+            self.Models[1][ID_modeli]:SetModelScale(tbl[3] or 1)
+        end
+    end
+
+    if self.UseRoutePointerFont[self.LightType] and (head == 'M' or head == 'M_single') then
+        self:SpawnPointerLamps(ID, pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8])
+    end
+end
+
+function ENT:SpawnLetter(i, model, pos, letter, double)
+    local LetMaterials = self.TrafficLightModels[self.LightType].LetMaterials.str
+    local LetMaterialsStart = LetMaterials .. "let_start"
+    local LetMaterialsletter = LetMaterials .. letter
+    if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
+        self.Models[2][i] = ClientsideModel(model, RENDERGROUP_OPAQUE)
+        self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle(0, 180, 0)))
+        self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] + pos))
+        self.Models[2][i]:SetParent(self)
+        for k, v in pairs(self.Models[2][i]:GetMaterials()) do
+            if v:find(LetMaterialsStart) then
+                self.Models[2][i]:SetSubMaterial(k - 1, LetMaterialsletter)
+            end
+        end
+    end
+    local id = i .. "d"
+    if not double and not IsValid(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
+        self.Models[2][id] = ClientsideModel(model, RENDERGROUP_OPAQUE)
+        self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle(0, 180, 0)))
+        self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePos[self.LightType] + pos) * vector_mirror))
+        self.Models[2][id]:SetParent(self)
+        for k, v in pairs(self.Models[2][id]:GetMaterials()) do
+            if v:find(LetMaterialsStart) then
+                self.Models[2][id]:SetSubMaterial(k - 1, LetMaterialsletter)
+            end
+        end
+    end
+end
+
 function ENT:InitRouteNumbers()
     local TLM = self.TrafficLightModels[self.LightType]
     --SPAWN A OLD ROUTE Numbers
@@ -471,16 +412,16 @@ function ENT:InitRouteNumbers()
     for i = 1, #self.RouteNumberSetup do
         local CurRN = self.RouteNumberSetup[i]
         --[[
-                self.OldRouteNumberSetup[1] = "1234D",
-                self.OldRouteNumberSetup[2] = "WKFX",
-                self.OldRouteNumberSetup[3] = "LR"
-                rn1 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[1]
-                rn2 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[2]
-                SpecRouteNumbers заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[3]
-                rn1 - цифробуквенные
-                rn2 - W-20КМ, K-КГУ, F-стрела вверх, X-пустой (для длинного кронштейна)
-                и SpecRouteNumbers - особые маршрутники, редко используются (стрелы влево вправо)
-            ]]
+            self.OldRouteNumberSetup[1] = "1234D",
+            self.OldRouteNumberSetup[2] = "WKFX",
+            self.OldRouteNumberSetup[3] = "LR"
+            rn1 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[1]
+            rn2 заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[2]
+            SpecRouteNumbers заполняется если CurRN содержит что либо из self.OldRouteNumberSetup[3]
+            rn1 - цифробуквенные
+            rn2 - W-20КМ, K-КГУ, F-стрела вверх, X-пустой (для длинного кронштейна)
+            и SpecRouteNumbers - особые маршрутники, редко используются (стрелы влево вправо)
+        ]]
         if self.OldRouteNumberSetup[1]:find(CurRN) then
             rn1N = table.insert(rn1, CurRN)
         elseif self.OldRouteNumberSetup[2]:find(CurRN) then
@@ -521,42 +462,72 @@ function ENT:InitRouteNumbers()
     end
 end
 
-function ENT:CreateARSOnlyModels()
+function ENT:SpawnPointerLamps(ID, InitPos, StepX, StepY, Scale, mdl)
     local TLM = self.TrafficLightModels[self.LightType]
-    local k = "m1"
 
-    if TLM.arsletter and (self.Name:StartWith('TC') or self.Name:StartWith('  ')) then
-        local name = self.Name
-        local offset = TLM.name
-        local angle = TLM.name_s_ang
+    local xf = 0;
+    local yf = 0;
+    local width = self.RoutePointerFontWidth[self.LightType] or 5
+    self.Font = TLM.RoutePointerFont or Metrostroi.RoutePointerFont
 
-        name = string.Replace(name, " ", "")
-        name = string.Replace(name, "/", "")
-        name = string.Replace(name, "TC", "")
-        name = string.Replace(name, "REP", "")
-        name = string.Replace(name, "CH", "")
-        name = string.Replace(name, "J", "")
-        if (self.Left) then name = string.reverse(name) end
+    for i = 1, #self.Font[""] do
+        local IDi = ID .. "i" .. i
+        self.Models[4][IDi] = ClientsideModel(mdl, RENDERGROUP_OPAQUE)
+        self.Models[4][IDi]:SetPos(self:LocalToWorld((InitPos - Vector(xf * StepX, 0, yf * StepY))))
+        self.Models[4][IDi]:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
+        self.Models[4][IDi]:SetModelScale(Scale)
+        self.Models[4][IDi]:SetParent(self)
+        self.Models[4][IDi]:SetNoDraw(true)
+        self.PixVisibleHandlers[ID .. 's' .. i] = util.GetPixelVisibleHandle()
 
-        offset = TLM.name_out
-
-        if self.Left then offset = offset - Vector(10, 0, 0) end
-        offset = offset - Vector((5.85 / 2) * (3 - (#name)), 0, 0)
-
-        for i = 0, #name - 1 do
-            local id = i
-            self:SpawnLetter(i, TLM.SignLetter.model, offset - Vector(id * 5.85, 0, 0), (Metrostroi.LiterWarper[name[i + 1]] or name[i + 1]), not self.Left and true or false, angle)
+        xf = xf + 1
+        if xf == width then
+            xf = 0
+            yf = yf + 1
         end
     end
+end
 
-    if not IsValid(self.Models[1][k]) then
-        local v = self.MainModels[self.LightType]["m1"]
-        self.Models[1][k] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
-        self.Models[1][k]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] * (self.Left and vector_mirror or 1)))
-        self.Models[1][k]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-1, 1, 1) or Angle(1, 1, 1)))
-        self.Models[1][k]:SetParent(self)
+function ENT:OnRemove()
+    self:RemoveModels()
+    hook.Remove("PostDrawTranslucentRenderables", "Sprites_" .. self:EntIndex())
+    self:RemovePTs()
+end
+
+function ENT:RemoveModels(final)
+    if self.Models and self.Models.have then
+        for _, v in pairs(self.Models) do if type(v) == "table" then for _, v1 in pairs(v) do v1:Remove() end end end
+    end
+    self.NumLit = {}
+    self.Models = { {}, {}, {}, {} }
+    self.ModelsCreated = false
+end
+
+function ENT:RemovePTs()
+    if not self.PTs then return end
+    for k, v in pairs(self.PTs) do
+        if IsValid(v) then v:Remove() end
     end
 end
+
+net.Receive("metrostroi-signal", function()
+    local ent = net.ReadEntity()
+    if not IsValid(ent) then return end
+    ent.LightType = net.ReadInt(4)
+    ent.Name = net.ReadString()
+    --ent.Name = " BUDAPEiT"..string.gsub(ent.Name,"[A-Za-z]*","")
+    ent.Lenses = net.ReadString()
+    ent.ARSOnly = ent.Lenses == "ARSOnly"
+    ent.RouteNumberSetup = net.ReadString()
+    ent.Left = net.ReadBool()
+    ent.Double = net.ReadBool()
+    ent.DoubleL = net.ReadBool()
+    ent.AutostopPresent = net.ReadBool()
+    if not ent.ARSOnly then
+        ent.LensesTBL = string.Explode("-", ent.Lenses)
+    end
+    if ent.RemoveModels then ent:RemoveModels() end
+end)
 
 function ENT:UpdateModels(CurrentTime)
     local TLM = self.TrafficLightModels[self.LightType]
@@ -616,7 +587,6 @@ end
 function ENT:UpdateSignalLights(CurrentTime, blink)
     for k, headModel in pairs(self.Models[1]) do
         if not headModel.LampsData then continue end
-        -- PrintTable(headModel.LampsData)
         for lampNum, lampData in pairs(headModel.LampsData) do
             local parent = headModel
             local pos = lampData.pos
@@ -636,6 +606,84 @@ function ENT:UpdateSignalLights(CurrentTime, blink)
             self:SetLight(k, lampNum, pos, parent, skin - 1, state, true, lampData.handler)
         end
     end
+end
+
+function ENT:SetLight(ID, ID2, pos, parent, skin, State, Change, handler)
+    local TLM = self.TrafficLightModels[self.LightType]
+    local IsStateAboveZero = State > 0
+    local IDID2 = ID .. ID2
+    local IsModelValid = IsValid(self.Models[3][IDID2])
+    if IsModelValid then
+        if IsStateAboveZero then
+            if Change then
+                self.Models[3][IDID2]:SetColor(Color(255, 255, 255, State * 255))
+            end
+        else
+            self.Models[3][IDID2]:Remove()
+        end
+    elseif IsStateAboveZero then
+        self.Models[3][IDID2] = ClientsideModel(self.TrafficLightModels[self.LightType].LampBase.model, RENDERGROUP_OPAQUE)
+        self.Models[3][IDID2]:SetParent(parent)
+        self.Models[3][IDID2]:SetLocalPos(pos)
+        self.Models[3][IDID2]:SetLocalAngles(angle_zero)
+        self.Models[3][IDID2]:SetSkin(skin)
+        self.Models[3][IDID2]:SetRenderMode(RENDERMODE_TRANSCOLOR)
+        self.Models[3][IDID2]:SetColor(Color(255, 255, 255, State * 255))
+        self.Models[3][IDID2]:SetModelScale(TLM.lense_scale or 1)
+    end
+
+    self.Sprites[IDID2] = self.Sprites[IDID2] or {}
+    self.Sprites[IDID2].pos = parent:LocalToWorld(pos + Metrostroi.SigSpriteOffset + (TLM.sprite_offset or vector_origin))
+    self.Sprites[IDID2].ang = parent:LocalToWorldAngles(angle_zero)
+    self.Sprites[IDID2].bri = State
+    self.Sprites[IDID2].col = Metrostroi.Lenses[self.SpriteConverter[skin + 1]]
+    self.Sprites[IDID2].mul = Metrostroi.SigTypeSpriteMul[self.LightType] * self.SpriteMultiplier[skin + 1]
+    self.Sprites[IDID2].handler = handler
+
+    local distSqr = (EyePos() - self.Sprites[IDID2].pos):LengthSqr()
+    local distZ = math.abs(EyePos().z - self.Sprites[IDID2].pos.z)
+
+    if true and IsStateAboveZero and distZ < 256 and (distSqr < 4096 * 4096) then
+        if not IsValid(self.PTs[IDID2]) then self.PTs[IDID2] = ProjectedTexture() end
+        if IsValid(self.PTs[IDID2]) then
+            self.PTs[IDID2]:SetEnableShadows((distSqr < 1024 * 1024) and true or false)
+            self.PTs[IDID2]:SetTexture("effects/flashlight001")
+            self.PTs[IDID2]:SetColor(self.Sprites[IDID2].col)
+            self.PTs[IDID2]:SetFarZ(300)
+            self.PTs[IDID2]:SetFOV(45)
+            self.PTs[IDID2]:SetPos(self.Sprites[IDID2].pos)
+            self.PTs[IDID2]:SetBrightness(self.Sprites[IDID2].bri)
+            self.PTs[IDID2]:SetAngles(self.Sprites[IDID2].ang + angle_right)
+            self.PTs[IDID2]:Update()
+        end
+    else
+        if IsValid(self.PTs[IDID2]) then self.PTs[IDID2]:Remove() end
+    end
+end
+
+function ENT:LightSprites()
+    if not self.Sprites then return end
+    for k, v in pairs(self.Sprites) do
+        self:Sprite(v.pos, v.ang, v.col, v.bri, v.mul, v.handler)
+    end
+end
+
+function ENT:Sprite(pos, ang, col, bri, mul, handler)
+    if bri <= 0 then return end
+
+    local Visible = util.PixelVisible(pos, 1, handler)
+
+    if Visible <= 0.1 then return end
+
+    local lense_scale = self.TrafficLightModels[self.LightType].lense_scale
+    local fw = -ang:Right()
+    local view = EyePos() - pos
+    local dist = view:Length()
+    view:Normalize()
+    local viewdot = math.Clamp(view:Dot(fw), 0, 1)
+
+    local s = Visible * (viewdot + math.exp(-20 * (1 - viewdot))) * bri * math.Clamp(dist / 32, 64, 256) * mul * (lense_scale or 1)
+    render.DrawSprite(pos, s, s, col)
 end
 
 function ENT:UpdateOldIndicators()
@@ -695,8 +743,7 @@ function ENT:UpdateOldArrowPointer(offset)
     local State = self:Animate("roua", self.Num:find(self.SpecRouteNumbers[1]) and 1 or 0, 0, 1, 256)
     if not IsValid(self.Models[3]["roua"]) and State > 0 then
         self.Models[3]["roua"] = ClientsideModel(LampIndicatorModels_lamp_mdl, RENDERGROUP_OPAQUE)
-        self.SpecRouteNumbers.pos = (self.BasePos[self.LightType] + offset - TLM.SpecRouteNumberOffset) -
-            (self.RouteNumberOffset or vector_origin) + TLM.RouteNumberOffset3
+        self.SpecRouteNumbers.pos = (self.BasePos[self.LightType] + offset - TLM.SpecRouteNumberOffset) - (self.RouteNumberOffset or vector_origin) + TLM.RouteNumberOffset3
         if self.Left then self.SpecRouteNumbers.pos = self.SpecRouteNumbers.pos * TLM.SpecRouteNumberOffset2 end
         self.Models[3]["roua"]:SetPos(self.Models[1]["roua"]:LocalToWorld(TLM.RouaOffset))
         self.Models[3]["roua"]:SetAngles(self.Models[1]["roua"]:LocalToWorldAngles(Angle(180, 0, 0)))
@@ -722,102 +769,9 @@ function ENT:UpdateOldArrowPointer(offset)
     end
 end
 
-function ENT:Think()
-    local CurrentTime = CurTime()
-    --self:SetNextClientThink(CurTime + 0.027)
-    self.PrevTime = self.PrevTime or RealTime()
-    self.DeltaTime = (RealTime() - self.PrevTime)
-    self.PrevTime = RealTime()
-
-    if self:IsDormant() or Metrostroi and Metrostroi.ReloadClientside then
-        if not self.ReloadModels and self.ModelsCreated then
-            self:OnRemove()
-        end
-        return true
-    end
-
-    if self.ReloadModels then
-        self.ReloadModels = false
-        self:RemoveModels()
-    end
-
-    if not self.Name then
-        if self.sended and (CurrentTime - self.sended) > 0 then
-            self.sended = nil
-        end
-        if not self.sended then
-            net.Start("metrostroi-signal")
-            net.WriteEntity(self)
-            net.SendToServer()
-            self.sended = CurrentTime + 1.5
-        end
-        return true
-    end
-
-    if not self.ModelsCreated then
-        local created = self:CreateModels()
-        self.Models.have = created
-        self.ModelsCreated = created
-    else
-        self:UpdateModels(CurrentTime)
-    end
-    return true
-end
-
 function ENT:Draw()
     -- Draw model
     self:DrawModel()
-end
-
-function ENT:LightSprites()
-    if not self.Sprites then return end
-    for k, v in pairs(self.Sprites) do
-        self:Sprite(v.pos, v.ang, v.col, v.bri, v.mul, v.handler)
-    end
-end
-
-function ENT:Sprite(pos, ang, col, bri, mul, handler)
-    if bri <= 0 then return end
-
-    local Visible = util.PixelVisible(pos, 1, handler)
-
-    if Visible <= 0.1 then return end
-
-    local lense_scale = self.TrafficLightModels[self.LightType].lense_scale
-    local fw = -ang:Right()
-    local view = EyePos() - pos
-    local dist = view:Length()
-    view:Normalize()
-    local viewdot = math.Clamp(view:Dot(fw), 0, 1)
-
-    local s = Visible * (viewdot + math.exp(-20 * (1 - viewdot))) * bri * math.Clamp(dist / 32, 64, 256) * mul * (lense_scale or 1)
-    render.DrawSprite(pos, s, s, col)
-end
-
-function ENT:SpawnPointerLamps(ID, InitPos, StepX, StepY, Scale, mdl)
-    local TLM = self.TrafficLightModels[self.LightType]
-
-    local xf = 0;
-    local yf = 0;
-    local width = self.RoutePointerFontWidth[self.LightType] or 5
-    self.Font = TLM.RoutePointerFont or Metrostroi.RoutePointerFont
-
-    for i = 1, #self.Font[""] do
-        local IDi = ID .. "i" .. i
-        self.Models[4][IDi] = ClientsideModel(mdl, RENDERGROUP_OPAQUE)
-        self.Models[4][IDi]:SetPos(self:LocalToWorld((InitPos - Vector(xf * StepX, 0, yf * StepY))))
-        self.Models[4][IDi]:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
-        self.Models[4][IDi]:SetModelScale(Scale)
-        self.Models[4][IDi]:SetParent(self)
-        self.Models[4][IDi]:SetNoDraw(true)
-        self.PixVisibleHandlers[ID .. 's' .. i] = util.GetPixelVisibleHandle()
-
-        xf = xf + 1
-        if xf == width then
-            xf = 0
-            yf = yf + 1
-        end
-    end
 end
 
 function ENT:UpdatePointerLamps(ID, rnState, SpriteColor, SpriteMultiplier)
@@ -863,6 +817,50 @@ function ENT:UpdateRoutePointer(ID, rnState)
         self.NumLit[ID] = rnState
     end
     self.rnIdx = self.rnIdx + 1
+end
+
+function ENT:Animate(clientProp, value, min, max, speed, damping, stickyness)
+    local id = clientProp
+    if not self.Anims[id] then
+        self.Anims[id] = {}
+        self.Anims[id].val = value
+        self.Anims[id].V = 0.0
+    end
+
+    if damping == false then
+        local dX = speed * self.DeltaTime
+        if value > self.Anims[id].val then
+            self.Anims[id].val = self.Anims[id].val + dX
+        end
+        if value < self.Anims[id].val then
+            self.Anims[id].val = self.Anims[id].val - dX
+        end
+        if math.abs(value - self.Anims[id].val) < dX then
+            self.Anims[id].val = value
+        end
+    else
+        -- Prepare speed limiting
+        local delta = math.abs(value - self.Anims[id].val)
+        local max_speed = 1.5 * delta / self.DeltaTime
+        local max_accel = 0.5 / self.DeltaTime
+
+        -- Simulate
+        local dX2dT = (speed or 128) * (value - self.Anims[id].val) - self.Anims[id].V * (damping or 8.0)
+        if dX2dT > max_accel then dX2dT = max_accel end
+        if dX2dT < -max_accel then dX2dT = -max_accel end
+
+        self.Anims[id].V = self.Anims[id].V + dX2dT * self.DeltaTime
+        if self.Anims[id].V > max_speed then self.Anims[id].V = max_speed end
+        if self.Anims[id].V < -max_speed then self.Anims[id].V = -max_speed end
+
+        self.Anims[id].val = math.max(0, math.min(1, self.Anims[id].val + self.Anims[id].V * self.DeltaTime))
+
+        -- Check if value got stuck
+        if (math.abs(dX2dT) < 0.001) and stickyness and (self.DeltaTime > 0) then
+            self.Anims[id].stuck = true
+        end
+    end
+    return min + (max - min) * self.Anims[id].val
 end
 
 --Metrostroi.OptimisationPatch()
