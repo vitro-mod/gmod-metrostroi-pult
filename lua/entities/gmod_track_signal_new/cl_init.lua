@@ -107,8 +107,8 @@ function ENT:CreateTrafficLightModels()
 
     local offset = self.RenderOffset[self.LightType] or vector_origin
     self.LongOffset = self.LongOffset or vector_origin
-    if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType], angle_zero, HeadsNum) end
-    if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror, Angle(0, 180, 0), HeadsNum, self.Double and "d" or nil) end
+    if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType], angle_zero, HeadsNum, nil, false) end
+    if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror, Angle(0, 180, 0), HeadsNum, self.Double and "d" or nil, true) end
 
     if self.RouteNumbers.sep and self.RouteNumbers[self.RouteNumbers.sep][1] ~= "X" then
         local id = self.RouteNumbers.sep
@@ -281,7 +281,7 @@ function ENT:CreateARSOnlyModels()
     end
 end
 
-function ENT:SpawnMainModels(pos, ang, HeadsNum, add)
+function ENT:SpawnMainModels(pos, ang, HeadsNum, add, isLeft)
     local TLM = self.MainModels[self.LightType]
     for k, v in pairs(TLM) do
         if k:find("long") then continue end
@@ -295,7 +295,10 @@ function ENT:SpawnMainModels(pos, ang, HeadsNum, add)
         else
             self.Models[1][idx] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
         end
-        self.Models[1][idx]:SetPos(self:LocalToWorld(pos))
+
+        local position = pos + (v.offset or vector_origin) * (isLeft and vector_mirror or 1)
+
+        self.Models[1][idx]:SetPos(self:LocalToWorld(position))
         self.Models[1][idx]:SetAngles(self:LocalToWorldAngles(ang))
         self.Models[1][idx]:SetParent(self)
     end
