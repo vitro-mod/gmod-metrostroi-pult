@@ -191,10 +191,10 @@ function ENT:CreateTrafficLightModels()
                 ID2 = ID2 + 1
                 if assembled and i < #v then
                     if not self.Left or self.Double then
-                        self:SpawnHead(ID .. ID2, ID2 - 1, head, self.BasePos[self.LightType] + offsetAndLongOffset + TLM['step'] * (#v - i), angle_zero, false, i == 1, i == #v, v[i])
+                        self:SpawnHead(ID .. ID2, ID2 - 1, head, headPos + TLM['step'] * (#v - i), angle_zero, false, i == 1, i == #v, v[i])
                     end
                     if self.Left or self.Double then
-                        self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), ID2 - 1, head, (self.BasePos[self.LightType] + offsetAndLongOffset) * vector_mirror + TLM['step'] * (#v - i), angle_zero, true, i == 1, i == #v, v[i])
+                        self:SpawnHead((self.Double and ID .. ID2 .. "d" or ID .. ID2), ID2 - 1, head, headPos * vector_mirror + TLM['step'] * (#v - i), angle_zero, true, i == 1, i == #v, v[i])
                     end
                 end
                 if not self.Signals[ID2] then self.Signals[ID2] = {} end
@@ -289,15 +289,16 @@ function ENT:SpawnMainModels(pos, ang, HeadsNum, add, isLeft)
         if IsValid(self.Models[1][idx]) then break end
 
         local k_long = k .. "_long"
+        local tlm = v
+
         if TLM[k_long] and HeadsNum > (self.LongThreshold[self.LightType] or 2) then
-            self.Models[1][idx] = ClientsideModel(TLM[k_long].model, RENDERGROUP_OPAQUE)
+            tlm = TLM[k_long]
             self.LongOffset = TLM[k .. "_long_pos"]
-        else
-            self.Models[1][idx] = ClientsideModel(v.model, RENDERGROUP_OPAQUE)
         end
+        
+        local position = pos + (tlm.offset or vector_origin) * (isLeft and vector_mirror or 1)
 
-        local position = pos + (v.offset or vector_origin) * (isLeft and vector_mirror or 1)
-
+        self.Models[1][idx] = ClientsideModel(tlm.model, RENDERGROUP_OPAQUE)
         self.Models[1][idx]:SetPos(self:LocalToWorld(position))
         self.Models[1][idx]:SetAngles(self:LocalToWorldAngles(ang))
         self.Models[1][idx]:SetParent(self)
