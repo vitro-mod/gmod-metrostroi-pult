@@ -108,7 +108,7 @@ function ENT:CreateTrafficLightModels()
     local offset = self.RenderOffset[self.LightType] or vector_origin
     self.LongOffset = self.LongOffset or vector_origin
     if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType], angle_zero, HeadsNum, nil, false) end
-    if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror, Angle(0, 180, 0), HeadsNum, self.Double and "d" or nil, true) end
+    if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror, angle_mirror, HeadsNum, self.Double and "d" or nil, true) end
 
     if self.RouteNumbers.sep and self.RouteNumbers[self.RouteNumbers.sep][1] ~= "X" then
         local id = self.RouteNumbers.sep
@@ -381,7 +381,7 @@ function ENT:SpawnLetter(i, model, pos, letter, double)
     local LetMaterialsletter = LetMaterials .. letter
     if double ~= false and not IsValid(self.Models[2][i]) and (self.Double or not self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and self.Left) then
         self.Models[2][i] = ClientsideModel(model, RENDERGROUP_OPAQUE)
-        self.Models[2][i]:SetAngles(self:LocalToWorldAngles(Angle(0, 180, 0)))
+        self.Models[2][i]:SetAngles(self:LocalToWorldAngles(angle_mirror))
         self.Models[2][i]:SetPos(self:LocalToWorld(self.BasePos[self.LightType] + pos))
         self.Models[2][i]:SetParent(self)
         for k, v in pairs(self.Models[2][i]:GetMaterials()) do
@@ -393,7 +393,7 @@ function ENT:SpawnLetter(i, model, pos, letter, double)
     local id = i .. "d"
     if not double and not IsValid(self.Models[2][id]) and (self.Double or self.Left) and (not letter:match("s[1-3]") or letter == "s3" or self.Double and not self.Left) then
         self.Models[2][id] = ClientsideModel(model, RENDERGROUP_OPAQUE)
-        self.Models[2][id]:SetAngles(self:LocalToWorldAngles(Angle(0, 180, 0)))
+        self.Models[2][id]:SetAngles(self:LocalToWorldAngles(angle_mirror))
         self.Models[2][id]:SetPos(self:LocalToWorld((self.BasePos[self.LightType] + pos) * vector_mirror))
         self.Models[2][id]:SetParent(self)
         for k, v in pairs(self.Models[2][id]:GetMaterials()) do
