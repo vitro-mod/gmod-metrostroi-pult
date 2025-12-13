@@ -107,8 +107,8 @@ function ENT:CreateTrafficLightModels()
 
     local offset = self.RenderOffset[self.LightType] or vector_origin
     self.LongOffset = self.LongOffset or vector_origin
-    if not self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType], angle_zero, HeadsNum, nil, false) end
-    if self.Left or self.Double then self:SpawnMainModels(self.BasePos[self.LightType] * vector_mirror, angle_mirror, HeadsNum, self.Double and "d" or nil, true) end
+    if not self.Left or self.Double then self:SpawnMainModels(HeadsNum, nil, false) end
+    if self.Left or self.Double then self:SpawnMainModels(HeadsNum, self.Double and "d" or nil, true) end
 
     if self.RouteNumbers.sep and self.RouteNumbers[self.RouteNumbers.sep][1] ~= "X" then
         local id = self.RouteNumbers.sep
@@ -281,7 +281,9 @@ function ENT:CreateARSOnlyModels()
     end
 end
 
-function ENT:SpawnMainModels(pos, ang, HeadsNum, add, isLeft)
+function ENT:SpawnMainModels(HeadsNum, add, isLeft)
+    local pos = self.BasePos[self.LightType] * (isLeft and vector_mirror or 1)
+    local ang = isLeft and angle_mirror or angle_zero
     local TLM = self.MainModels[self.LightType]
     for k, v in pairs(TLM) do
         if k:find("long") then continue end
@@ -344,7 +346,7 @@ function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
         if not TLM[head][3][i - 1] then continue end
         self.Models[1][ID].LampsData[i] = {
             color = lenses[i],
-            pos = TLM[head][3][i - 1] * (isLeft and vector_mirror or 1),
+            pos = TLM[head][3][i - 1],
             handler = util.GetPixelVisibleHandle(),
             headLampNum = i,
             num = ID2 + i
