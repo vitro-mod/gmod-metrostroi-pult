@@ -83,10 +83,10 @@ function ENT:CreateTrafficLightModels()
     self:InitRouteNumbers()
 
     local HeadsNum = self.Arrow and 1 or 0
-    local OneLense = self.Arrow == nil
+    local OneHead = self.Arrow == nil
     for k, v in ipairs(self.LensesTBL) do
         if k > 1 and v:find("[RGBWYM]+") then
-            OneLense = false
+            OneHead = false
         end
         for i = 1, #v do
             if v[i]:find("[RGBWYM]") then
@@ -94,7 +94,7 @@ function ENT:CreateTrafficLightModels()
             end
         end
     end
-    if HeadsNum == 0 then OneLense = false end
+    if HeadsNum == 0 then OneHead = false end
     HeadsNum = 0
     local oneItemHeadCount = 0
     for k, v in pairs(self.LensesTBL) do
@@ -210,7 +210,7 @@ function ENT:CreateTrafficLightModels()
         self.Models[1]["roua"]:SetAngles(self:LocalToWorldAngles(self.Left and Angle(-90, 0, 0) or Angle(90, 0, 0)))
         self.Models[1]["roua"]:SetParent(self)
     end
-    offset = self.RenderOffset[self.LightType] + (OneLense and TLM.name_one or TLM.name) + (OneLense and self.RouteNumberOffset or vector_origin)
+    offset = self.RenderOffset[self.LightType] + (OneHead and TLM.name_one or TLM.name) + (OneHead and self.RouteNumberOffset or vector_origin)
     if self.LightType == 1 then
         offset = offset - self.NamesOffset
     end
@@ -282,9 +282,8 @@ function ENT:CreateARSOnlyModels()
 end
 
 function ENT:SpawnMainModels(HeadsNum, add, isLeft)
-    local pos = self.BasePos[self.LightType] * (isLeft and vector_mirror or 1)
-    local ang = isLeft and angle_mirror or angle_zero
     local TLM = self.MainModels[self.LightType]
+    local pos = self.BasePos[self.LightType] * (isLeft and vector_mirror or 1)
     for k, v in pairs(TLM) do
         if k:find("long") then continue end
         local idx = add and k .. add or k
@@ -297,8 +296,9 @@ function ENT:SpawnMainModels(HeadsNum, add, isLeft)
             tlm = TLM[k_long]
             self.LongOffset = TLM[k .. "_long_pos"]
         end
-        
+
         local position = pos + (tlm.offset or vector_origin) * (isLeft and vector_mirror or 1)
+        local ang = (isLeft and not tlm.doNotRotate) and angle_mirror or angle_zero
 
         self.Models[1][idx] = ClientsideModel(tlm.model, RENDERGROUP_OPAQUE)
         self.Models[1][idx]:SetPos(self:LocalToWorld(position))
@@ -344,9 +344,20 @@ function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
     end
     for i = 1, #lenses do
         if not TLM[head][3][i - 1] then continue end
+        local posConfig = TLM[head][3][i - 1]
+
+        local pos
+        if type(posConfig) == "Vector" then
+            pos = posConfig * (isLeft and vector_mirror or 1)
+        elseif type(posConfig) == "table" then
+            pos = isLeft and posConfig.left or posConfig.right
+        else
+            continue
+        end
+
         self.Models[1][ID].LampsData[i] = {
             color = lenses[i],
-            pos = TLM[head][3][i - 1],
+            pos = pos,
             handler = util.GetPixelVisibleHandle(),
             headLampNum = i,
             num = ID2 + i
