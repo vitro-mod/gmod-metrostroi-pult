@@ -151,6 +151,8 @@ Metrostroi.SigTypeNames[1] = 'Outside'
 Metrostroi.SigTypeSpriteMul[1] = 0.75
 ENT.RenderOffset[1] = Vector(0, 0, 200)
 ENT.LongThreshold[1] = 1
+ENT.UseRoutePointerFont[1] = true
+ENT.RoutePointerFontWidth[1] = 5
 ENT.MainModels[1] = {
 	m1 = { model = "models/metrostroi/signals/mus/pole_1.mdl" },
 }
@@ -181,7 +183,7 @@ ENT.TrafficLightModels[1] = {
 			{ "models/metrostroi/signals/mus/lamp_lens.mdl", Vector(0, 13.3, 7.97) },
 		}
 	} },
-	M = { Vector(0, 0, 40), "models/metrostroi/signals/mus/light_pathindicator3.mdl", {}, Vector(7, 11, 25), 3.6, 3.4, 5 },
+	M = { Vector(0, 0, 40), "models/metrostroi/signals/mus/light_pathindicator3.mdl", {}, Vector(6.5, 11.6, 23.9), 3.2, 3.3, 1.1, "models/mus/direction_lamp_w.mdl", "Y", 0.25 },
 	noleft = true,
 }
 
