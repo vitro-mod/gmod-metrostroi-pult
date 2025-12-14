@@ -1,5 +1,6 @@
-include("shared.lua")
 include("cl_font.lua")
+include("cl_umsfont.lua")
+include("shared.lua")
 include("cl_debug.lua")
 --------------------------------------------------------------------------------
 function ENT:Initialize()
@@ -591,7 +592,7 @@ function ENT:UpdateModels(CurrentTime)
         else
             self:UpdateRoutePointer(ID, self.Num[self.rnIdx])
         end
-        if v[#v] == "M" and assembled then
+        if #v > 1 and v[#v] == "M" then
             self:UpdateRoutePointer(ID, self.Num[self.rnIdx])
         end
         ID = ID + 1
@@ -809,7 +810,7 @@ function ENT:UpdatePointerLamps(ID, rnState, SpriteColor, SpriteMultiplier)
                 bri = state and 1 or 0,
                 col = Metrostroi.Lenses[SpriteColor],
                 mul = SpriteMultiplier,
-                handler = util.GetPixelVisibleHandle()
+                handler = util.GetPixelVisibleHandle(),
             }
         end
     end

@@ -1,3 +1,5 @@
+AddCSLuaFile("cl_font.lua")
+AddCSLuaFile("cl_umsfont.lua")
 ENT.Type                  = "anim"
 ENT.PrintName             = "Signalling Element"
 ENT.Category              = "Metrostroi (utility)"
@@ -295,6 +297,8 @@ ENT.TrafficLightModels[4] = {
 Metrostroi.SigTypeNames[5] = 'Virus New'
 Metrostroi.SigTypeSpriteMul[5] = 1
 ENT.RenderOffset[5] = Vector(1, 0, 113.35)
+ENT.UseRoutePointerFont[5] = true
+ENT.RoutePointerFontWidth[5] = 8
 ENT.MainModels[5] = {
 	m1 = { model = "models/jar/ars_drossel.mdl" },
 	m2 = { model = "models/virus/new_signals/pole_2.mdl" },
@@ -337,8 +341,9 @@ ENT.TrafficLightModels[5] = {
 		}
 	} },
 
-	M = { Vector(0, 0, 24.5), "models/virus/new_signals/path_ind.mdl", {}, Vector(13.1, 2, 19.5), 1.75, 2.05, 4 },
-	M_single = { Vector(0, 0, 24.5), "models/virus/new_signals/path_ind_single.mdl", {} },
+	M = { Vector(0, 0, 24.5), "models/virus/new_signals/path_ind.mdl", {}, Vector(-5.5, 2.2, 17), 0.525, 0.525, 0.125, "models/mus/direction_lamp_w.mdl", "W", 0.04 },
+	M_single = { Vector(0, 0, 24.5), "models/virus/new_signals/path_ind_single.mdl", {}, Vector(0, 0, 0), 0.525, 0.525, 0.125, "models/mus/direction_lamp_w.mdl", "W", 0.04 },
+	RoutePointerFont = Metrostroi.UMSFont,
 }
 
 ENT.SignalConverter = {
