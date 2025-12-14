@@ -108,6 +108,8 @@ Metrostroi.SigTypeSpriteMul = {}
 Metrostroi.SigTypeNames[0] = 'Inside'
 Metrostroi.SigTypeSpriteMul[0] = 1
 ENT.RenderOffset[0] = Vector(0, 0.5, 113.35)
+ENT.UseRoutePointerFont[0] = true
+ENT.RoutePointerFontWidth[0] = 5
 ENT.MainModels[0] = {
 	m1          = { model = "models/metrostroi/signals/mus/box.mdl" },
 	m2          = { model = "models/metrostroi/signals/mus/pole_2.mdl" },
@@ -139,7 +141,7 @@ ENT.TrafficLightModels[0] = {
 		}
 	} },
 
-	M          = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(13.1, 2, 19.5), 1.75, 2.05, 4 },
+	M          = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(-7.32, 0.7, 22.78), 1.77, 1.84, 0.6, "models/mus/direction_lamp_w.mdl", "W", 0.125 },
 	arsletter  = true,
 }
 
@@ -194,6 +196,8 @@ Metrostroi.SigTypeNames[2] = 'Outside box'
 Metrostroi.SigTypeSpriteMul[2] = 0.75
 ENT.RenderOffset[2] = Vector(0, 0., 112)
 ENT.LongThreshold[2] = 1
+ENT.UseRoutePointerFont[2] = true
+ENT.RoutePointerFontWidth[2] = 5
 ENT.MainModels[2] = {
 	m1 = { model = "models/metrostroi/signals/mus/box_outside.mdl" },
 	m2 = { model = "models/metrostroi/signals/mus/pole_3.mdl" },
@@ -219,7 +223,7 @@ ENT.TrafficLightModels[2] = {
 			{ "models/metrostroi/signals/mus/lamp_lens.mdl", Vector(10.39, 2.32, 16) },
 		}
 	} },
-	[3] = { Vector(0, 0, 47), "models/metrostroi/signals/mus/light_outside2_4.mdl", {
+	[3] = { Vector(0, 0, 58), "models/metrostroi/signals/mus/light_outside2_4.mdl", {
 		[0] = Vector(10.07, -29.7, 50.45),
 		[1] = Vector(10.07, -29.7, 39.37),
 		[2] = Vector(10.07, -29.7, 27.55),
@@ -232,7 +236,7 @@ ENT.TrafficLightModels[2] = {
 		}
 	} },
 
-	M = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(13.8, 2, 22.8), 1.8, 2.1, 4 },
+	M = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(-7.32, 0.7, 22.78), 1.77, 1.84, 0.6, "models/mus/direction_lamp_w.mdl", "W", 0.125 },
 }
 
 --------------------------------------------------------------------------------
