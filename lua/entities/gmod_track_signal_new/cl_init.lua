@@ -8,7 +8,6 @@ function ENT:Initialize()
     self.Models = { {}, {}, {}, {} }
     self.Signals = {}
     self.Anims = {}
-    self.PixVisibleHandlers = {}
     self.Sprites = {}
     self.Lights = {}
     self.PTs = {}
@@ -497,7 +496,6 @@ function ENT:SpawnPointerLamps(ID, InitPos, StepX, StepY, Scale, mdl)
         self.Models[4][IDi]:SetModelScale(Scale)
         self.Models[4][IDi]:SetParent(self)
         self.Models[4][IDi]:SetNoDraw(true)
-        self.PixVisibleHandlers[ID .. 's' .. i] = util.GetPixelVisibleHandle()
 
         xf = xf + 1
         if xf == width then
@@ -800,7 +798,7 @@ function ENT:UpdatePointerLamps(ID, rnState, SpriteColor, SpriteMultiplier)
     for i = 1, #self.Font[""] do
         local IDi = ID .. "i" .. i
         if not IsValid(self.Models[4][IDi]) then return end
-        local state = self.Font[rnState][i]
+        local state = self.Font[rnState][i] == 1
         local mIDi = ID .. 's' .. i
         self.Models[4][IDi]:SetSkin(state and 1 or 0)
         self.Models[4][IDi]:SetNoDraw(not state)
@@ -810,7 +808,8 @@ function ENT:UpdatePointerLamps(ID, rnState, SpriteColor, SpriteMultiplier)
                 ang = self:GetAngles(),
                 bri = state and 1 or 0,
                 col = Metrostroi.Lenses[SpriteColor],
-                mul = SpriteMultiplier
+                mul = SpriteMultiplier,
+                handler = util.GetPixelVisibleHandle()
             }
         end
     end
