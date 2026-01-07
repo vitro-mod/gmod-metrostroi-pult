@@ -22,10 +22,10 @@ VitroMod.Pult.Switches = {
             VitroMod.Pult.Switches.States[entity:GetName()] = invertAll and VitroMod.Pult.Switches.InvertControl(state) or state
             VitroMod.Pult.Switches.Locked[entity:GetName()] = false
 
-            addEntityOutputHook(entity, 'OnFullyOpen', 'swSend')
-            addEntityOutputHook(entity, 'OnFullyClosed', 'swSend')
-            addEntityOutputHook(entity, 'OnOpen', 'swSend')
-            addEntityOutputHook(entity, 'OnClose', 'swSend')
+            AddEntityOutputHook(entity, 'OnFullyOpen', 'swSend')
+            AddEntityOutputHook(entity, 'OnFullyClosed', 'swSend')
+            AddEntityOutputHook(entity, 'OnOpen', 'swSend')
+            AddEntityOutputHook(entity, 'OnClose', 'swSend')
         end
     end,
     UpdateState = function(entity)

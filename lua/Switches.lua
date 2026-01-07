@@ -23,10 +23,10 @@ function initSwitches()
 	for k, v in pairs(VitroMod.Pult.Switches) do
 		--for k2,v2 in pairs(VitroMod.Pult.Switches[k]) do
 		local v2 = VitroMod.Pult.Switches[k][1]
-		addEntityOutputHook(v2, 'OnFullyOpen', 'swSend')
-		addEntityOutputHook(v2, 'OnFullyClosed', 'swSend')
-		addEntityOutputHook(v2, 'OnOpen', 'swSend')
-		addEntityOutputHook(v2, 'OnClose', 'swSend')
+		AddEntityOutputHook(v2, 'OnFullyOpen', 'swSend')
+		AddEntityOutputHook(v2, 'OnFullyClosed', 'swSend')
+		AddEntityOutputHook(v2, 'OnOpen', 'swSend')
+		AddEntityOutputHook(v2, 'OnClose', 'swSend')
 		--end
 	end
 end

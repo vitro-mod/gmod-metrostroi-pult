@@ -9,7 +9,7 @@ end
 --SetupMapLua()
 hook.Add( "InitPostEntity", "SetupMapLua_InitPostEntity", SetupMapLua )
 hook.Add( "PostCleanupMap", "SetupMapLua_PostCleanupMap", SetupMapLua )
-function addEntityOutputHook(entity, outputName, hookName)
+function AddEntityOutputHook(entity, outputName, hookName)
 	entity.outputHooks = entity.outputHooks or {}
 	entity.outputHooks[outputName] = entity.outputHooks[outputName] or {}
 	if entity.outputHooks[outputName][hookName] ~= nil then return end

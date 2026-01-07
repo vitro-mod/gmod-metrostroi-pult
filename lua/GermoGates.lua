@@ -17,10 +17,10 @@ VitroMod.Pult.GermoGates = {
             VitroMod.Pult.GermoGates.States[entity:GetName()] = invertAll and VitroMod.Pult.GermoGates.InvertControl(state) or state
             VitroMod.Pult.GermoGates.Locked[entity:GetName()] = false
 
-            addEntityOutputHook(entity, 'OnFullyOpen', 'mkSend')
-            addEntityOutputHook(entity, 'OnFullyClosed', 'mkSend')
-            addEntityOutputHook(entity, 'OnOpen', 'mkSend')
-            addEntityOutputHook(entity, 'OnClose', 'mkSend')
+            AddEntityOutputHook(entity, 'OnFullyOpen', 'mkSend')
+            AddEntityOutputHook(entity, 'OnFullyClosed', 'mkSend')
+            AddEntityOutputHook(entity, 'OnOpen', 'mkSend')
+            AddEntityOutputHook(entity, 'OnClose', 'mkSend')
         end
     end,
     UpdateState = function(entity)
