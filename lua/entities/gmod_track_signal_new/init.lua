@@ -755,6 +755,63 @@ function ENT:SendUpdate(ply)
 	if ply then net.Send(ply) else net.Broadcast() end
 end
 
+function ENT:GetMetrostroiSaveTable()
+	return {
+		Class = "gmod_track_signal",
+		Pos = self:GetPos(),
+		Angles = self:GetAngles(),
+		SignalType = self.SignalType,
+		Name = self.Name,
+		RouteNumberSetup = self.RouteNumberSetup,
+		LensesStr = self.LensesStr,
+		RouteNumber = self.RouteNumber,
+		IsolateSwitches = self.IsolateSwitches,
+		ARSOnly = self.ARSOnly,
+		Routes = self.Routes,
+		Approve0 = self.Approve0,
+		TwoToSix = self.TwoToSix,
+		NonAutoStop = self.NonAutoStop,
+		Left = self.Left,
+		Double = self.Double,
+		DoubleL = self.DoubleL,
+		AutoStop = self.AutoStop,
+		PassOcc = self.PassOcc,
+	}
+end
+
+function ENT:MetrostroiLoad(data, version, TwoToSix)
+	self:SetPos(data.Pos)
+	self:SetAngles(data.Angles)
+	self.SignalType = data.SignalType
+	self.Name = data.Name
+	self.RouteNumberSetup = data.RouteNumberSetup
+	self.LensesStr = data.LensesStr
+	self.Lenses = string.Explode("-", data.LensesStr)
+	self.RouteNumber = data.RouteNumber
+	self.IsolateSwitches = data.IsolateSwitches
+	self.Routes = data.Routes
+	self.ARSOnly = data.ARSOnly
+	self.Left = data.Left
+	self.Double = data.Double
+	self.DoubleL = data.DoubleL
+	self.Approve0 = data.Approve0
+	self.TwoToSix = data.TwoToSix
+	self.NonAutoStop = data.NonAutoStop
+	self.PassOcc = data.PassOcc
+	self.Lenses = string.Explode("-", self.LensesStr)
+	self.InS = nil
+	for i = 1, #self.Lenses do
+		if self.Lenses[i]:find("W") then
+			self.InS = i
+		end
+	end
+	if version == 1 and self.Left then
+		print(Format("Metrostroi: !!Converting from version %.1f!! signal %s rotated.", version, self.Name))
+		self:SetAngles(self:LocalToWorldAngles(self:WorldToLocalAngles(self:GetAngles()) + Angle(0, 180, 0)))
+	end
+	if version ~= 1.2 then self.TwoToSix = TwoToSix end
+end
+
 --On receive update request, we send update
 net.Receive("metrostroi-signal", function(_, ply)
 	local ent = net.ReadEntity()
