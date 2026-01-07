@@ -16,7 +16,3 @@ function AddEntityOutputHook(entity, outputName, hookName)
 	entity:Fire("AddOutput", outputName.." outputhook:RunPassedCode:hook.Run('"..hookName.."'):0:-1")
 	entity.outputHooks[outputName][hookName] = true
 end
-function writeclean()
-	print('CLEANUP')
-end
-hook.Add( "PostCleanupMap", "SetupMapLua_write", writeclean )
