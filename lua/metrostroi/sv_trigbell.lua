@@ -454,171 +454,169 @@ hook.Add("Initialize", "Metrostroi_VitroModInitialize", function()
     end)
 end)
 
-timer.Simple(2, function()
-    function Metrostroi.Save(name)
-        if not file.Exists("metrostroi_data", "DATA") then
-            file.CreateDir("metrostroi_data")
-        end
-        name = name or game.GetMap()
+function Metrostroi.Save(name)
+    if not file.Exists("metrostroi_data", "DATA") then
+        file.CreateDir("metrostroi_data")
+    end
+    name = name or game.GetMap()
 
-        -- Format signs, signal, switch data
-        local signs = {}
-        local signals_ents = ents.FindByClass("gmod_track_signal")
-        if not signals_ents then print("Metrostroi: Signs file is corrupted!") end
-        for k, v in pairs(signals_ents) do
-            if not Metrostroi.ARSSubSections[v] then
-                local Routes = table.Copy(v.Routes)
-                for k, v in pairs(Routes) do
-                    v.LightsExploded = nil
-                    v.IsOpened = nil
-                end
-                table.insert(signs, v:GetMetrostroiSaveTable())
+    -- Format signs, signal, switch data
+    local signs = {}
+    local signals_ents = ents.FindByClass("gmod_track_signal")
+    if not signals_ents then print("Metrostroi: Signs file is corrupted!") end
+    for k, v in pairs(signals_ents) do
+        if not Metrostroi.ARSSubSections[v] then
+            local Routes = table.Copy(v.Routes)
+            for k, v in pairs(Routes) do
+                v.LightsExploded = nil
+                v.IsOpened = nil
             end
+            table.insert(signs, v:GetMetrostroiSaveTable())
         end
-        local switch_ents = ents.FindByClass("gmod_track_switch")
-        for k, v in pairs(switch_ents) do
-            table.insert(signs, {
-                Class = "gmod_track_switch",
+    end
+    local switch_ents = ents.FindByClass("gmod_track_switch")
+    for k, v in pairs(switch_ents) do
+        table.insert(signs, {
+            Class = "gmod_track_switch",
+            Pos = v:GetPos(),
+            Angles = v:GetAngles(),
+            Name = v.Name,
+            Channel = v:GetChannel(),
+            NotChangePos = v.NotChangePos,
+            LockedSignal = v.LockedSignal,
+            Invertred = v.Invertred,
+        })
+    end
+    local signs_ents = ents.FindByClass("gmod_track_signs")
+    for k, v in pairs(signs_ents) do
+        table.insert(signs, {
+            Class = "gmod_track_signs",
+            Pos = v:GetPos(),
+            Angles = v:GetAngles(),
+            SignType = v.SignType,
+            YOffset = v.YOffset,
+            ZOffset = v.ZOffset,
+            Left = v.Left,
+        })
+    end
+    signs.Version = Metrostroi.SignalVersion
+    -- Save data
+    print("Metrostroi: Saving signs and track definition...")
+    local data = util.TableToJSON(signs, true)
+    file.Write(string.format("metrostroi_data/signs_%s.txt", name), data)
+    print(Format("Saved to metrostroi_data/signs_%s.txt", name))
+
+    saveTriggers(name)
+    saveBells(name)
+    saveDevices(name)
+    saveRays(name)
+
+    local auto = {}
+    local auto_ents = ents.FindByClass("gmod_track_autodrive_plate")
+    for k, v in pairs(auto_ents) do
+        if not v.Linked then
+            table.insert(auto, {
                 Pos = v:GetPos(),
                 Angles = v:GetAngles(),
-                Name = v.Name,
-                Channel = v:GetChannel(),
-                NotChangePos = v.NotChangePos,
-                LockedSignal = v.LockedSignal,
-                Invertred = v.Invertred,
+                Type = v.PlateType,
+                Right = v.Right,
+                Mode = v.Mode,
+                Model = v.Model,
+                StationID = v.StationID,
+                StationPath = v.StationPath,
+
+                --UPPS
+                UPPS = v.UPPS,
+                DistanceToOPV = v.DistanceToOPV,
+
+                SBPPType = v.SBPPType,
+                IsDeadlock = v.IsDeadlock,
+                DriveMode = v.DriveMode,
+                RightDoors = v.RightDoors,
+                WTime = v.WTime,
+                RKPos = v.RKPos,
             })
         end
-        local signs_ents = ents.FindByClass("gmod_track_signs")
-        for k, v in pairs(signs_ents) do
-            table.insert(signs, {
-                Class = "gmod_track_signs",
-                Pos = v:GetPos(),
-                Angles = v:GetAngles(),
-                SignType = v.SignType,
-                YOffset = v.YOffset,
-                ZOffset = v.ZOffset,
-                Left = v.Left,
-            })
-        end
-        signs.Version = Metrostroi.SignalVersion
-        -- Save data
-        print("Metrostroi: Saving signs and track definition...")
-        local data = util.TableToJSON(signs, true)
-        file.Write(string.format("metrostroi_data/signs_%s.txt", name), data)
-        print(Format("Saved to metrostroi_data/signs_%s.txt", name))
+    end
+    print("Metrostroi: Saving auto definition...")
+    local adata = util.TableToJSON(auto, true)
+    file.Write(string.format("metrostroi_data/auto_%s.txt", name), adata)
+    print(Format("Saved to metrostroi_data/auto_%s.txt", name))
 
-        saveTriggers(name)
-        saveBells(name)
-        saveDevices(name)
-        saveRays(name)
-
-        local auto = {}
-        local auto_ents = ents.FindByClass("gmod_track_autodrive_plate")
-        for k, v in pairs(auto_ents) do
-            if not v.Linked then
-                table.insert(auto, {
+    local pa_ents = ents.FindByClass("gmod_track_pa_marker")
+    if Metrostroi.PAMConfTest then
+        print("Metrostroi: Saving PAData definition...")
+        local pa = table.Copy(Metrostroi.PAMConfTest)
+        pa.markers = {}
+        for k, v in pairs(pa_ents) do
+            if not v.UPPS and v.PAType == 1 then
+                table.insert(pa.markers, {
                     Pos = v:GetPos(),
                     Angles = v:GetAngles(),
-                    Type = v.PlateType,
-                    Right = v.Right,
-                    Mode = v.Mode,
-                    Model = v.Model,
-                    StationID = v.StationID,
-                    StationPath = v.StationPath,
-
-                    --UPPS
-                    UPPS = v.UPPS,
-                    DistanceToOPV = v.DistanceToOPV,
-
-                    SBPPType = v.SBPPType,
-                    IsDeadlock = v.IsDeadlock,
-                    DriveMode = v.DriveMode,
-                    RightDoors = v.RightDoors,
-                    WTime = v.WTime,
-                    RKPos = v.RKPos,
+                    PAType = v.PAType,
+                    PAStationPath = tonumber(v.PAStationPath),
+                    PAStationID = tonumber(v.PAStationID),
+                    PAStationName = v.PAStationName,
+                    PALastStation = v.PALastStation,
+                    PAWrongPath = v.PALastStation and v.PAWrongPath,
+                    PADeadlockStart = v.PALastStation and v.PADeadlockStart,
+                    PADeadlockEnd = v.PALastStation and v.PADeadlockEnd,
+                    PALineChange = v.PALastStation and v.PALineChange,
+                    PALineChangeStationPath = v.PALastStation and v.PALineChange and tonumber(v.PALineChangeStationPath),
+                    PALineChangeStationID = v.PALastStation and v.PALineChange and tonumber(v.PALineChangeStationID),
+                    PALastStationName = v.PALastStation and v.PALastStationName or nil,
+                    PAStationRightDoors = v.PAStationRightDoors,
+                    PAStationHorlift = v.PAStationHorlift,
+                    PAStationHasSwtiches = v.PAStationHasSwtiches,
+                    PAStationCorrection = tonumber(v.PAStationCorrection),
+                    TrackPath = v.TrackPath,
+                    TrackX = v.TrackX,
                 })
             end
         end
-        print("Metrostroi: Saving auto definition...")
-        local adata = util.TableToJSON(auto, true)
-        file.Write(string.format("metrostroi_data/auto_%s.txt", name), adata)
-        print(Format("Saved to metrostroi_data/auto_%s.txt", name))
-
-        local pa_ents = ents.FindByClass("gmod_track_pa_marker")
-        if Metrostroi.PAMConfTest then
-            print("Metrostroi: Saving PAData definition...")
-            local pa = table.Copy(Metrostroi.PAMConfTest)
-            pa.markers = {}
-            for k, v in pairs(pa_ents) do
-                if not v.UPPS and v.PAType == 1 then
-                    table.insert(pa.markers, {
-                        Pos = v:GetPos(),
-                        Angles = v:GetAngles(),
-                        PAType = v.PAType,
-                        PAStationPath = tonumber(v.PAStationPath),
-                        PAStationID = tonumber(v.PAStationID),
-                        PAStationName = v.PAStationName,
-                        PALastStation = v.PALastStation,
-                        PAWrongPath = v.PALastStation and v.PAWrongPath,
-                        PADeadlockStart = v.PALastStation and v.PADeadlockStart,
-                        PADeadlockEnd = v.PALastStation and v.PADeadlockEnd,
-                        PALineChange = v.PALastStation and v.PALineChange,
-                        PALineChangeStationPath = v.PALastStation and v.PALineChange and tonumber(v.PALineChangeStationPath),
-                        PALineChangeStationID = v.PALastStation and v.PALineChange and tonumber(v.PALineChangeStationID),
-                        PALastStationName = v.PALastStation and v.PALastStationName or nil,
-                        PAStationRightDoors = v.PAStationRightDoors,
-                        PAStationHorlift = v.PAStationHorlift,
-                        PAStationHasSwtiches = v.PAStationHasSwtiches,
-                        PAStationCorrection = tonumber(v.PAStationCorrection),
-                        TrackPath = v.TrackPath,
-                        TrackX = v.TrackX,
-                    })
-                end
-            end
-            local data = util.TableToJSON(pa, true)
-            file.Write(string.format("metrostroi_data/pa_%s.txt", name), data)
-            print(Format("Saved to metrostroi_data/pa_%s.txt", name))
-        end
+        local data = util.TableToJSON(pa, true)
+        file.Write(string.format("metrostroi_data/pa_%s.txt", name), data)
+        print(Format("Saved to metrostroi_data/pa_%s.txt", name))
     end
+end
 
-    function Metrostroi.Load(name, keep_signs)
-        name = name or game.GetMap()
+function Metrostroi.Load(name, keep_signs)
+    name = name or game.GetMap()
 
-        loadTracks(name)
+    loadTracks(name)
 
-        -- Initialize stations list
-        Metrostroi.UpdateStations()
-        -- Print info
-        Metrostroi.PrintStatistics()
+    -- Initialize stations list
+    Metrostroi.UpdateStations()
+    -- Print info
+    Metrostroi.PrintStatistics()
 
-        -- Ignore updates to prevent created/removed switches from constantly updating table of positions
-        Metrostroi.IgnoreEntityUpdates = true
-        loadSigns(name, keep_signs)
-        loadAutoSigns(name, keep_signs)
+    -- Ignore updates to prevent created/removed switches from constantly updating table of positions
+    Metrostroi.IgnoreEntityUpdates = true
+    loadSigns(name, keep_signs)
+    loadAutoSigns(name, keep_signs)
 
-        loadTrigs(name, keep_signs)
-        loadBells(name, keep_signs)
-        loadDevices(name, keep_signs)
-        loadRays(name, keep_signs)
+    loadTrigs(name, keep_signs)
+    loadBells(name, keep_signs)
+    loadDevices(name, keep_signs)
+    loadRays(name, keep_signs)
 
-        local pa_ents = ents.FindByClass("gmod_track_pa_marker")
-        for _, v in pairs(pa_ents) do SafeRemoveEntity(v) end
-        loadPAData(name)
-        timer.Simple(0.05, function()
-            -- No more ignoring updates
-            Metrostroi.IgnoreEntityUpdates = false
-            -- Load ARS entities
-            Metrostroi.UpdateSignalEntities()
-            -- Load switches
-            Metrostroi.UpdateSwitchEntities()
-            -- Add additional ARS sections
-            Metrostroi.UpdateARSSections()
-        end)
+    local pa_ents = ents.FindByClass("gmod_track_pa_marker")
+    for _, v in pairs(pa_ents) do SafeRemoveEntity(v) end
+    loadPAData(name)
+    timer.Simple(0.05, function()
+        -- No more ignoring updates
+        Metrostroi.IgnoreEntityUpdates = false
+        -- Load ARS entities
+        Metrostroi.UpdateSignalEntities()
+        -- Load switches
+        Metrostroi.UpdateSwitchEntities()
+        -- Add additional ARS sections
+        Metrostroi.UpdateARSSections()
+    end)
 
-        -- Initialize signs
-        print("Metrostroi: Initializing signs...")
-        Metrostroi.InitializeSigns()
+    -- Initialize signs
+    print("Metrostroi: Initializing signs...")
+    Metrostroi.InitializeSigns()
 
-        timer.Simple(1, function() hook.Run("Metrostroi.Signalling.AfterLoad") end)
-    end
-end)
+    timer.Simple(1, function() hook.Run("Metrostroi.Signalling.AfterLoad") end)
+end
