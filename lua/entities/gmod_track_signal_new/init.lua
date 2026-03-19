@@ -756,6 +756,11 @@ function ENT:SendUpdate(ply)
 end
 
 function ENT:GetMetrostroiSaveTable()
+	local Routes = table.Copy(self.Routes)
+	for k,v in pairs(Routes) do
+		v.LightsExploded = nil
+		v.IsOpened = nil
+    end
 	return {
 		Class = "gmod_track_signal",
 		Pos = self:GetPos(),
