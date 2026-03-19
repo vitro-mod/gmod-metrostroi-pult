@@ -772,7 +772,7 @@ function ENT:GetMetrostroiSaveTable()
 		RouteNumber = self.RouteNumber,
 		IsolateSwitches = self.IsolateSwitches,
 		ARSOnly = self.ARSOnly,
-		Routes = self.Routes,
+		Routes = Routes,
 		Approve0 = self.Approve0,
 		TwoToSix = self.TwoToSix,
 		NonAutoStop = self.NonAutoStop,
