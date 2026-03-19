@@ -756,6 +756,11 @@ function ENT:SendUpdate(ply)
 end
 
 function ENT:GetMetrostroiSaveTable()
+	local Routes = table.Copy(self.Routes)
+	for k,v in pairs(Routes) do
+		v.LightsExploded = nil
+		v.IsOpened = nil
+	end
 	return {
 		Class = "gmod_track_signal",
 		Pos = self:GetPos(),
@@ -767,7 +772,7 @@ function ENT:GetMetrostroiSaveTable()
 		RouteNumber = self.RouteNumber,
 		IsolateSwitches = self.IsolateSwitches,
 		ARSOnly = self.ARSOnly,
-		Routes = self.Routes,
+		Routes = Routes,
 		Approve0 = self.Approve0,
 		TwoToSix = self.TwoToSix,
 		NonAutoStop = self.NonAutoStop,
