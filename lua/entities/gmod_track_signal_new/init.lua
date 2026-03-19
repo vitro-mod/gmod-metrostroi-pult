@@ -760,7 +760,7 @@ function ENT:GetMetrostroiSaveTable()
 	for k,v in pairs(Routes) do
 		v.LightsExploded = nil
 		v.IsOpened = nil
-    end
+	end
 	return {
 		Class = "gmod_track_signal",
 		Pos = self:GetPos(),
