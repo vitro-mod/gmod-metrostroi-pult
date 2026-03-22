@@ -1,10 +1,10 @@
 function GetTrainState(wagon, signal)
-    if not IsValid(wagon) then return end
-    
     local train = wagon
     if MetrostroiExt and MetrostroiExt.DetectHeadWagon then
         train = MetrostroiExt.DetectHeadWagon( wagon, true )
     end
+
+    if not IsValid(train) then return end
     
     local RN = nil
     local CS = 0 --control state
@@ -22,11 +22,13 @@ function GetTrainState(wagon, signal)
         if train.Electric.CabActive == 1 then CS = 1 end
     end
 
+    local typeEMA = class == 'gmod_subway_81-502' or class == 'gmod_subway_ema_3935' or class == 'gmod_subway_ema_3934'
+
     if train.KRU then
         if train.KRU.Position > 0 then CS = 2 end
-    elseif train.VRU and class ~= 'gmod_subway_81-502' then
+    elseif train.VRU and not typeEMA then
         if train.VRU.Value == 0 then CS = 2 end
-    elseif train.VRU and class == 'gmod_subway_81-502' then
+    elseif train.VRU and typeEMA then
         if train.VRU.Value == 1 then CS = 2 end
     end
 
@@ -34,13 +36,13 @@ function GetTrainState(wagon, signal)
     local type760 = class:find("81-760", 1, true)
     local type722 = class:find("81-722", 1, true)
 
-    if class == 'gmod_subway_81-502' then
+    if typeEMA then
         if train.Electric.Type == 2 then
             if CS ~= 0 and train.RCAV5.Value == 1 and train.RCAV4.Value == 1 and train.RCAV3.Value == 1 then ARS = 1 end
         elseif train.MARS then
             if CS ~= 0 and train.RCARS.Value == 1 and train.RCBPS.Value == 1 then ARS = 1 end
         end
-    elseif class == 'gmod_subway_ezh3' then
+    elseif class == 'gmod_subway_ezh3' or class == 'gmod_subway_ezh3ru1' then
         if CS == 1 and train.RUM.Value == 1 then ARS = 1 end
     elseif class == 'gmod_subway_ezh' then
         if CS == 1 and train.RC1.Value == 1 then ARS = 1 end
