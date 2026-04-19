@@ -384,7 +384,7 @@ function ENT:SpawnHead(ID, ID2, head, pos, ang, isLeft, isLast, isFirst, lenses)
     end
 
     if self.UseRoutePointerFont[self.LightType] and (head == 'M' or head == 'M_single') then
-        self:SpawnPointerLamps(ID, pos + TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8])
+        self:SpawnPointerLamps(ID, self.Models[1][ID], TLM.M[4], TLM.M[5], TLM.M[6], TLM.M[7], TLM.M[8], isLeft)
     end
 end
 
@@ -481,7 +481,7 @@ function ENT:InitRouteNumbers()
     end
 end
 
-function ENT:SpawnPointerLamps(ID, InitPos, StepX, StepY, Scale, mdl)
+function ENT:SpawnPointerLamps(ID, parent, InitPos, StepX, StepY, Scale, mdl, isLeft)
     local TLM = self.TrafficLightModels[self.LightType]
 
     local xf = 0;
@@ -489,14 +489,22 @@ function ENT:SpawnPointerLamps(ID, InitPos, StepX, StepY, Scale, mdl)
     local width = self.RoutePointerFontWidth[self.LightType] or 5
     self.Font = TLM.RoutePointerFont or Metrostroi.RoutePointerFont
 
+    if isLeft then
+        InitPos = Vector(-InitPos.x + (width - 1) * StepX, InitPos.y, InitPos.z)
+    end
+
     for i = 1, #self.Font[""] do
         local IDi = ID .. "i" .. i
-        self.Models[4][IDi] = ClientsideModel(mdl, RENDERGROUP_OPAQUE)
-        self.Models[4][IDi]:SetPos(self:LocalToWorld((InitPos - Vector(xf * StepX, 0, yf * StepY))))
-        self.Models[4][IDi]:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
-        self.Models[4][IDi]:SetModelScale(Scale)
-        self.Models[4][IDi]:SetParent(self)
-        self.Models[4][IDi]:SetNoDraw(true)
+
+        if mdl then
+            self.Models[4][IDi] = ClientsideModel(mdl, RENDERGROUP_OPAQUE)
+            self.Models[4][IDi]:SetNoDraw(true)
+            self.Models[4][IDi]:SetParent(parent)
+            self.Models[4][IDi]:SetLocalPos((InitPos - Vector(xf * StepX, 0, yf * StepY)))
+            self.Models[4][IDi]:SetLocalAngles(angle_right)
+            self.Models[4][IDi]:SetModelScale(Scale)
+            self.Models[4][IDi].handler = util.GetPixelVisibleHandle()
+        end
 
         xf = xf + 1
         if xf == width then
@@ -798,20 +806,20 @@ function ENT:UpdatePointerLamps(ID, rnState, SpriteColor, SpriteMultiplier)
 
     for i = 1, #self.Font[""] do
         local IDi = ID .. "i" .. i
-        if not IsValid(self.Models[4][IDi]) then return end
         local state = self.Font[rnState][i] == 1
         local mIDi = ID .. 's' .. i
-        self.Models[4][IDi]:SetSkin(state and 1 or 0)
-        self.Models[4][IDi]:SetNoDraw(not state)
-        if state or self.Sprites[mIDi] then
-            self.Sprites[mIDi] = {
-                pos = self.Models[4][IDi]:GetPos() + pos,
-                ang = self:GetAngles(),
-                bri = state and 1 or 0,
-                col = Metrostroi.Lenses[SpriteColor],
-                mul = SpriteMultiplier,
-                handler = util.GetPixelVisibleHandle(),
-            }
+        if IsValid(self.Models[4][IDi]) then
+            self.Models[4][IDi]:SetSkin(state and 1 or 0)
+            self.Models[4][IDi]:SetNoDraw(not state)
+            if self.Models[4][IDi].handler then
+                self.Sprites[mIDi] = self.Sprites[mIDi] or {}
+                self.Sprites[mIDi].pos = self.Models[4][IDi]:GetPos()
+                self.Sprites[mIDi].ang = self.Models[4][IDi]:GetParent():GetAngles()
+                self.Sprites[mIDi].bri = state and 1 or 0
+                self.Sprites[mIDi].col = Metrostroi.Lenses[SpriteColor]
+                self.Sprites[mIDi].mul = SpriteMultiplier
+                self.Sprites[mIDi].handler = self.Models[4][IDi].handler
+            end
         end
     end
 end

@@ -143,7 +143,7 @@ ENT.TrafficLightModels[0] = {
 		}
 	} },
 
-	M          = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(-7.32, 0.7, 22.78), 1.77, 1.84, 0.6, "models/mus/direction_lamp_w.mdl", "W", 0.125 },
+	M          = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(14.4, 0.7, 22.78), 1.77, 1.84, 0.6, "models/mus/direction_lamp_w.mdl", "W", 0.125 },
 	arsletter  = true,
 }
 
@@ -238,7 +238,7 @@ ENT.TrafficLightModels[2] = {
 		}
 	} },
 
-	M = { Vector(0, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(-7.32, 0.7, 22.78), 1.77, 1.84, 0.6, "models/mus/direction_lamp_w.mdl", "W", 0.125 },
+	M = { Vector(2, 0, 24), "models/metrostroi/signals/mus/light_pathindicator.mdl", {}, Vector(14.4, 0.7, 22.78), 1.77, 1.84, 0.6, "models/mus/direction_lamp_w.mdl", "W", 0.125 },
 }
 
 --------------------------------------------------------------------------------
@@ -341,7 +341,7 @@ ENT.TrafficLightModels[5] = {
 		}
 	} },
 
-	M = { Vector(0, 0, 24.5), "models/virus/new_signals/path_ind.mdl", {}, Vector(-5.5, 2.2, 17), 0.525, 0.525, 0.125, "models/mus/direction_lamp_w.mdl", "W", 0.04 },
+	M = { Vector(0, 0, 24.5), "models/virus/new_signals/path_ind.mdl", {}, Vector(9, 2.2, 17), 0.525, 0.525, 0.125, "models/mus/direction_lamp_w.mdl", "W", 0.04 },
 	M_single = { Vector(0, 0, 24.5), "models/virus/new_signals/path_ind_single.mdl", {}, Vector(0, 0, 0), 0.525, 0.525, 0.125, "models/mus/direction_lamp_w.mdl", "W", 0.04 },
 	RoutePointerFont = Metrostroi.UMSFont,
 }
