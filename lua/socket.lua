@@ -6,7 +6,6 @@ VitroMod.Pult.WhiteList.Control = VitroMod.Pult.WhiteList.Control or {}
 VitroMod.Pult.SwitchesInvertAll = false
 require('gwsockets')
 pings = 0
-timer.Remove('ping')
 include('vitro_mod/pult/config.lua')
 local mapName = game.GetMap()
 if not file.Exists('vitro_mod/pult/maps/' .. mapName .. '.lua', 'LUA') or not VitroMod.Pult.Urls[mapName] then
@@ -88,9 +87,10 @@ function wsConnect(reconnect)
 			if SendRNs then SendRNs() end
 		end
 	else
-		--print('initConnect')
+		timer.Remove('ping')
 		sck:closeNow()
 		sck:open()
+		startPing(true)
 	end
 end
 
@@ -98,12 +98,6 @@ wsConnect()
 function startPing(instant)
 	if instant then wsConnect() end
 	timer.Create('ping', 2, 0, wsConnect)
-end
-
-startPing()
-function stopPing()
-	sck:closeNow()
-	timer.Remove('ping')
 end
 
 local OLD_MESSAGE = '' -- старое сообщение сокет-серверу
