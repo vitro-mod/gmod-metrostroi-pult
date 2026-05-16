@@ -1,17 +1,20 @@
 VitroMod.Pult.GermoGates = {
     Entities = {},
     Inverted = {},
+    InvertedInputs = {},
     States = {},
     Locked = {},
-    Init = function(entities, invert)
+    Init = function(entities, invert, invertInputsArg)
+        local invertInputs = invertInputsArg or invert or false
         local invertAll = invert or false
+        local invertInputsAll = invertInputs or false
         if not entities then return false end
         for k, entity in pairs(entities) do
             if not IsValid(entity) then return false end
 
             VitroMod.Pult.GermoGates.Entities[entity:GetName()] = entity
             VitroMod.Pult.GermoGates.Inverted[entity:GetName()] = invertAll
-
+            VitroMod.Pult.GermoGates.InvertedInputs[entity:GetName()] = invertInputsAll
             local state = entity:GetInternalVariable( "m_toggle_state" )
 
             VitroMod.Pult.GermoGates.States[entity:GetName()] = invertAll and VitroMod.Pult.GermoGates.InvertControl(state) or state
@@ -40,9 +43,9 @@ VitroMod.Pult.GermoGates = {
         return VitroMod.Pult.GermoGates.States
     end,
     Switch = function(name, to)
-        local inverted = VitroMod.Pult.GermoGates.Inverted[name] or false
+        name = name:Replace('.', '_')
+        local inverted = VitroMod.Pult.GermoGates.InvertedInputs[name] or false
         if inverted then to = not to end
-        name = name:Replace('.','_')
         local ent = VitroMod.Pult.GermoGates.Entities[name]
         if not IsValid(ent) then return end
         ent:Fire('Unlock')

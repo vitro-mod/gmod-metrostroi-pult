@@ -6,6 +6,7 @@ VitroMod.Pult.WhiteList.Control = VitroMod.Pult.WhiteList.Control or {}
 VitroMod.Pult.SwitchesInvertAll = false
 require('gwsockets')
 pings = 0
+timer.Remove('ping')
 include('vitro_mod/pult/config.lua')
 local mapName = game.GetMap()
 if not file.Exists('vitro_mod/pult/maps/' .. mapName .. '.lua', 'LUA') or not VitroMod.Pult.Urls[mapName] then
@@ -90,17 +91,20 @@ function wsConnect(reconnect)
 			if SendRNs then SendRNs() end
 		end
 	else
-		timer.Remove('ping')
+		--print('initConnect')
 		sck:closeNow()
 		sck:open()
-		startPing(true)
 	end
 end
 
-wsConnect()
 function startPing(instant)
 	if instant then wsConnect() end
 	timer.Create('ping', 2, 0, wsConnect)
+end
+
+function stopPing()
+	sck:closeNow()
+	timer.Remove('ping')
 end
 
 local OLD_MESSAGE = '' -- старое сообщение сокет-серверу
@@ -131,20 +135,26 @@ include('GetTState.lua')
 include('AllSeats.lua')
 rcASNP = {}
 rcASNPmsg = {}
-for k, v in pairs(ents.FindByClass('gmod_track_signal')) do
-	v.ControllerLogicCheckOccupied = true
-	--if v.Name and (string.sub(v.Name,1,2) == '  ' or string.sub(v.Name,1,3) == '   ') then 
-	rcNames[v.Name] = v.Occupied
-	rcNamesOcc[v.Name] = v.Occupied and true or nil
-	if rcASNP[v.Name] then rcASNP[v.Name] = v.Occupied and v.OccupiedBy or true end
-	--end    
-end
 
 include('ASNP.lua')
 
 VitroMod.Pult.Map.Init()
 VitroMod.Pult.IntervalClocks.Init()
 initSwitches()
+
+function InitSignalsIndex()
+	for k, v in pairs(ents.FindByClass('gmod_track_signal')) do
+		v.ControllerLogicCheckOccupied = true
+		rcNames[v.Name] = v.Occupied
+		rcNamesOcc[v.Name] = v.Occupied and true or nil
+		if rcASNP[v.Name] then rcASNP[v.Name] = v.Occupied and v.OccupiedBy or true end
+	end
+end
+
+InitSignalsIndex()
+
+wsConnect()
+startPing()
 
 function SendRCInfo(ACTIVATOR, CALLER, INFO)
 	local vname = CALLER:GetName()
@@ -166,6 +176,7 @@ function SendBU(name, occ, signal)
 	if sendRN and signal.OccupiedBy:GetClass() ~= 'me_train' and signal.OccupiedBy:GetClass() ~= 'me_train_static' then
 		rcASNP[name] = occ and signal.OccupiedBy or true
 		local tst = GetTrainState(signal.OccupiedBy, signal)
+		if not tst then return end
 		tst.cab = AllSeats(signal.OccupiedBy)
 		if MetExt ~= nil then tst.srv = GetHostName() end
 		local msg = 'BU' .. name .. '_1_' .. util.TableToJSON(tst)
@@ -175,8 +186,9 @@ end
 
 function SendRNs(force)
 	for k, v in pairs(rcASNP) do
-		if IsEntity(v) and IsValid(v) and Metrostroi.GetSignalByName(k).Occupied and v:GetClass() ~= 'me_train' and v:GetClass() ~= 'me_train_static' then
+		if isentity(v) and IsValid(v) and Metrostroi.GetSignalByName(k).Occupied and v:GetClass() ~= 'me_train' and v:GetClass() ~= 'me_train_static' then
 			local tst = GetTrainState(v, Metrostroi.GetSignalByName(k))
+			if not tst then continue end
 			tst.cab = AllSeats(v)
 			if MetExt ~= nil then tst.srv = GetHostName() end
 			local msg = 'BU' .. k .. '_1_' .. util.TableToJSON(tst)
@@ -211,6 +223,7 @@ concommand.Add('vitropult_reconnect', function(ply)
 	if ply:IsValid() and not ply:IsAdmin() then return end
 	print('VitroPult: reconnecting')
 	RunConsoleCommand('say', 'VitroPult: reconnecting')
-	wsConnect(true)
+	stopPing()
+	startPing(true)
 	pultUpd()
 end)
