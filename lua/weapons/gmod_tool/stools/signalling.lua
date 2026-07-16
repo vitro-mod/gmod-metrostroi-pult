@@ -45,16 +45,21 @@ function TOOL:SpawnSignal(ply,trace,param)
     local found = false
     local entlist = ents.FindInSphere(pos,64)
     for k,v in pairs(entlist) do
-        if v:GetClass() == "gmod_track_signal" then
-            if v.Name==self.Signal.Name then
-                ent = v
-                found=0
-                break
-            end
-            if not found or found > pos:Distance(v:GetPos()) then
-                ent = v
-                found = pos:Distance(v:GetPos())
-            end
+        if v:GetClass() ~= "gmod_track_signal" then continue end
+
+        -- ignore entites facing backwards
+        local dotProduct = -tr.right:Dot(v:GetAngles():Forward())
+        if dotProduct < 0 then continue end
+
+        if v.Name == self.Signal.Name then
+            ent = v
+            found = 0
+            break
+        end
+
+        if not found or found > pos:Distance(v:GetPos()) then
+            ent = v
+            found = pos:Distance(v:GetPos())
         end
     end
     if param == 2 then
