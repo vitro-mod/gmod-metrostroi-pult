@@ -583,7 +583,11 @@ end
 function Metrostroi.Load(name, keep_signs)
     name = name or game.GetMap()
 
-    loadTracks(name)
+    if Metrostroi.LoadTracks then
+        Metrostroi.LoadTracks(name)
+    else
+        loadTracks(name)
+    end
 
     -- Initialize stations list
     Metrostroi.UpdateStations()
