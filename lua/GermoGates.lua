@@ -5,8 +5,8 @@ VitroMod.Pult.GermoGates = {
     States = {},
     Locked = {},
     Init = function(entities, invert, invertInputsArg)
-        local invertInputs = invertInputsArg or invert or false
-        local invertAll = invert or false
+        local invertInputs = Either(invertInputsArg ~= nil, invertInputsArg, invert or false)
+        local invertAll = Either(invert ~= nil, invert, false)
         local invertInputsAll = invertInputs or false
         if not entities then return false end
         for k, entity in pairs(entities) do
