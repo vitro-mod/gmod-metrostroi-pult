@@ -57,7 +57,7 @@ VitroMod.Pult.Map = {
     end,
     OnSwitch = function(name, to) end,
     OnConnect = function()
-        VitroMod.Pult.GermoGates.Init(ents.FindByName('metalgate_*'), true)
+        VitroMod.Pult.GermoGates.Init(ents.FindByName('metalgate_*'), true, false)
         local cleanup = {
             byName = {
                 wildcards = {'wt_*', 'signal_depot_*'},
